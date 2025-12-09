@@ -669,7 +669,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       });
       setAiCommand('');
     } catch (error) {
-      setAiMessage({ text: 'Erro ao processar comando (Erro de rede ou IA indisponível).', type: 'error' });
+      const errorMessage = error instanceof Error && error.message === 'API key not configured'
+        ? '⚠️ Assistente IA não configurado. Para ativar, adicione a variável GEMINI_API_KEY no Vercel (Settings > Environment Variables). Obtenha sua chave em: https://aistudio.google.com/apikey'
+        : 'Erro ao processar comando. Verifique sua conexão ou tente novamente.';
+      setAiMessage({ text: errorMessage, type: 'error' });
     } finally {
       setIsProcessingAi(false);
     }
