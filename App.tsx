@@ -7,6 +7,7 @@ import AdminPanel, { AdminLogin } from './components/AdminPanel';
 import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
 import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
+import { fetchRooms, fetchPackages, fetchExtras, fetchDiscounts, fetchConfig, fetchReservations } from './services/apiService';
 
 // Interface for History Snapshot
 interface HistoryState {
@@ -46,6 +47,84 @@ const App: React.FC = () => {
 
   // Refs for scrolling
   const roomsSectionRef = useRef<HTMLDivElement>(null);
+
+  // Loading state
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  // Load data from database on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoadingData(true);
+        
+        // Load all data independently with individual error handling
+        const [roomsData, packagesData, extrasData, discountsData, configData, reservationsData] = await Promise.allSettled([
+          fetchRooms(),
+          fetchPackages(),
+          fetchExtras(),
+          fetchDiscounts(),
+          fetchConfig(),
+          fetchReservations()
+        ]);
+
+        // Set rooms data or fallback to initial
+        if (roomsData.status === 'fulfilled') {
+          setRooms(roomsData.value);
+        } else {
+          console.error('Failed to load rooms:', roomsData.reason);
+          setRooms(INITIAL_ROOMS);
+        }
+
+        // Set packages data or fallback to initial
+        if (packagesData.status === 'fulfilled') {
+          setPackages(packagesData.value);
+        } else {
+          console.error('Failed to load packages:', packagesData.reason);
+          setPackages(INITIAL_PACKAGES);
+        }
+
+        // Set extras data or fallback to initial
+        if (extrasData.status === 'fulfilled') {
+          setExtras(extrasData.value);
+        } else {
+          console.error('Failed to load extras:', extrasData.reason);
+          setExtras(INITIAL_EXTRAS);
+        }
+
+        // Set discounts data or fallback to initial
+        if (discountsData.status === 'fulfilled') {
+          setDiscounts(discountsData.value);
+        } else {
+          console.error('Failed to load discounts:', discountsData.reason);
+          setDiscounts(INITIAL_DISCOUNTS);
+        }
+
+        // Set config data or fallback to initial
+        if (configData.status === 'fulfilled') {
+          setConfig(configData.value);
+        } else {
+          console.error('Failed to load config:', configData.reason);
+          setConfig(INITIAL_CONFIG);
+        }
+
+        // Set reservations data or fallback to initial
+        if (reservationsData.status === 'fulfilled') {
+          setReservations(reservationsData.value);
+        } else {
+          console.error('Failed to load reservations:', reservationsData.reason);
+          setReservations(INITIAL_RESERVATIONS);
+        }
+
+        setIsLoadingData(false);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Keep initial data on error
+        setIsLoadingData(false);
+      }
+    };
+
+    loadData();
+  }, []);
 
   // --- HISTORY LOGIC ---
   const saveCheckpoint = () => {

@@ -1,4 +1,4 @@
-import { Reservation } from '../types';
+import { Reservation, Room, HolidayPackage, ExtraService, DiscountCode, HotelConfig } from '../types';
 
 const API_BASE_URL = '/api';
 
@@ -51,6 +51,150 @@ export interface PixPaymentResponse {
     expiresIn: number;
     pixKey: string;
   };
+}
+
+/**
+ * Fetch all rooms from the database
+ */
+export async function fetchRooms(): Promise<Room[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rooms`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch rooms');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all packages from the database
+ */
+export async function fetchPackages(): Promise<HolidayPackage[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/packages`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch packages');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching packages:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all extra services from the database
+ */
+export async function fetchExtras(): Promise<ExtraService[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/extras`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch extras');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching extras:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all discount codes from the database
+ */
+export async function fetchDiscounts(): Promise<DiscountCode[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/discounts`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch discounts');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching discounts:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch hotel configuration from the database
+ */
+export async function fetchConfig(): Promise<HotelConfig> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/config`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch config');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching config:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all reservations from the database
+ */
+export async function fetchReservations(): Promise<Reservation[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/reservations`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch reservations');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching reservations:', error);
+    throw error;
+  }
 }
 
 /**
