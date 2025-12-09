@@ -251,7 +251,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       setAdditionalGuests(newGuests);
   };
 
-  const handleFinalSubmit = () => {
+  const handleFinalSubmit = async () => {
     const newErrors: { [key: string]: string } = {};
     let firstErrorRef: React.RefObject<HTMLInputElement> | null = null;
 
