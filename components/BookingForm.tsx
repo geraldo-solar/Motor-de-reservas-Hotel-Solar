@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Users, ArrowRight, CheckCircle, Tag, Lock, ShoppingBag, CreditCard, MessageSquare, QrCode, Copy, User, Mail, Phone, FileText, ChevronLeft, ShieldCheck, AlertCircle, BedDouble, Trash2, Baby } from 'lucide-react';
 import { Room, DiscountCode, ExtraService, Reservation } from '../types';
+import { createReservation, sendReservationEmail, generatePixPayment } from '../services/apiService';
 
 interface BookingFormProps {
   selectedRooms: Room[];
@@ -101,6 +102,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   // Validation Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  
+  // Loading and PIX states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pixData, setPixData] = useState<{ payload: string; qrCode: string } | null>(null);
   
   // Refs for auto-scroll
   const nameRef = useRef<HTMLInputElement>(null);
@@ -276,14 +281,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
 
     // Success - Create Reservation Object
-    const reservation: Reservation = {
-        id: `RES-${Math.floor(Math.random() * 1000000)}`,
-        createdAt: new Date(),
-        checkIn: initialCheckIn ? initialCheckIn.toISOString() : '',
-        checkOut: initialCheckOut ? initialCheckOut.toISOString() : '',
+    const reservationPayload = {
+        checkIn: initialCheckIn ? initialCheckIn.toISOString().split('T')[0] : '',
+        checkOut: initialCheckOut ? initialCheckOut.toISOString().split('T')[0] : '',
         nights: nights,
         mainGuest: { name, email, phone, cpf },
-        additionalGuests: additionalGuests.filter(g => g.name), // Filter out empty if any logic slip
+        additionalGuests: additionalGuests.filter(g => g.name && g.cpf),
         observations,
         rooms: selectedRooms.map(r => ({ name: r.name, priceSnapshot: calculateRoomTotal(r) })),
         extras: Object.entries(selectedExtras).map(([id, qty]) => {
@@ -299,15 +302,43 @@ const BookingForm: React.FC<BookingFormProps> = ({
             expiry: cardExpiry,
             cvv: cardCvv
         } : undefined,
-        status: 'PENDING'
     };
     
-    onAddReservation(reservation);
-
-    alert('Reserva solicitada com sucesso! Enviamos um email com os detalhes.');
-    // In a real app, this would redirect or show a success component
-    // For now, we rely on the App.tsx handling or simple alert
-    window.location.reload(); 
+    // Submit reservation to API
+    setIsSubmitting(true);
+    
+    try {
+      // Create reservation in database
+      const { reservation } = await createReservation(reservationPayload);
+      
+      // Send email notification
+      await sendReservationEmail(reservation);
+      
+      // If PIX payment, generate PIX code
+      if (paymentMethod === 'PIX') {
+        const pixResponse = await generatePixPayment(total, reservation.id, name);
+        setPixData({
+          payload: pixResponse.pix.payload,
+          qrCode: pixResponse.pix.qrCode
+        });
+      }
+      
+      // Add to local state (for backward compatibility)
+      onAddReservation(reservation);
+      
+      alert('Reserva criada com sucesso! Um e-mail foi enviado para reserva@hotelsolar.tur.br com os detalhes.');
+      
+      // If credit card, show success and reload
+      if (paymentMethod === 'CREDIT_CARD') {
+        window.location.reload();
+      }
+      // If PIX, pixData will be shown in the UI
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+      alert('Erro ao criar reserva. Por favor, tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    } 
   };
 
   // --- RENDER ---
