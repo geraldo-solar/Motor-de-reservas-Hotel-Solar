@@ -738,7 +738,7 @@ const App: React.FC = () => {
          <div className="max-w-7xl mx-auto px-4 text-center">
             <div className="mb-8 flex justify-center">
                <img 
-                 src="/hotel-solar-logo.jpg" 
+                 src="/hotel-solar-logo.png" 
                  alt="Hotel Solar" 
                  className="h-24 w-auto object-contain"
                />

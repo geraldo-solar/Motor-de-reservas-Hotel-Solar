@@ -24,7 +24,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
           {/* Linha 1: Logomarca Centralizada */}
           <div className="flex items-center cursor-pointer mb-3 md:mb-4 group" onClick={() => onNavigate(ViewState.HOME)}>
             <img 
-              src="/hotel-solar-logo.jpg" 
+              src="/hotel-solar-logo.png" 
               alt="Hotel Solar" 
               className="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
             />
