@@ -317,3 +317,325 @@ export async function listReservations(
     throw error;
   }
 }
+
+
+/**
+ * Create a new room
+ */
+export async function createRoom(room: Room): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rooms`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(room),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create room');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating room:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing room
+ */
+export async function updateRoom(room: Room): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rooms`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(room),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update room');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating room:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a room
+ */
+export async function deleteRoom(id: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/rooms?id=${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete room');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting room:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new package
+ */
+export async function createPackage(pkg: HolidayPackage): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/packages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pkg),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create package');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating package:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing package
+ */
+export async function updatePackage(pkg: HolidayPackage): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/packages`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pkg),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update package');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating package:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a package
+ */
+export async function deletePackage(id: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/packages?id=${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete package');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting package:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new extra service
+ */
+export async function createExtra(extra: ExtraService): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/extras`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(extra),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create extra');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating extra:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing extra service
+ */
+export async function updateExtra(extra: ExtraService): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/extras`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(extra),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update extra');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating extra:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete an extra service
+ */
+export async function deleteExtra(id: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/extras?id=${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete extra');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting extra:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a new discount code
+ */
+export async function createDiscount(discount: DiscountCode): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/discounts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(discount),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create discount');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating discount:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing discount code
+ */
+export async function updateDiscount(discount: DiscountCode): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/discounts`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(discount),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update discount');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating discount:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a discount code
+ */
+export async function deleteDiscount(code: string): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/discounts?code=${code}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete discount');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error deleting discount:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update hotel configuration
+ */
+export async function updateConfig(config: HotelConfig): Promise<{ success: boolean }> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/config`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(config),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update config');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error updating config:', error);
+    throw error;
+  }
+}

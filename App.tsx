@@ -7,7 +7,7 @@ import AdminPanel, { AdminLogin } from './components/AdminPanel';
 import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
 import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
-import { fetchRooms, fetchPackages, fetchExtras, fetchDiscounts, fetchConfig, fetchReservations } from './services/apiService';
+import { fetchRooms, fetchPackages, fetchExtras, fetchDiscounts, fetchConfig, fetchReservations, createRoom, updateRoom, deleteRoom, createPackage, updatePackage, deletePackage, createExtra, updateExtra, deleteExtra, createDiscount, updateDiscount, deleteDiscount, updateConfig as updateConfigAPI } from './services/apiService';
 
 // Interface for History Snapshot
 interface HistoryState {
@@ -174,25 +174,132 @@ const App: React.FC = () => {
      setFuture(newFuture);
   };
 
-  // Wrappers for state updaters to include history saving
-  const updateRoomsWithHistory = (newRooms: Room[]) => {
+  // Wrappers for state updaters to include history saving and Postgres sync
+  const updateRoomsWithHistory = async (newRooms: Room[]) => {
      saveCheckpoint();
      setRooms(newRooms);
+     
+     // Sync with Postgres
+     try {
+       // Detect changes and sync with database
+       const oldRoomIds = new Set(rooms.map(r => r.id));
+       const newRoomIds = new Set(newRooms.map(r => r.id));
+       
+       // Find deleted rooms
+       const deletedIds = [...oldRoomIds].filter(id => !newRoomIds.has(id));
+       for (const id of deletedIds) {
+         await deleteRoom(id).catch(err => console.error('Failed to delete room:', err));
+       }
+       
+       // Find new or updated rooms
+       for (const room of newRooms) {
+         if (!oldRoomIds.has(room.id)) {
+           // New room
+           await createRoom(room).catch(err => console.error('Failed to create room:', err));
+         } else {
+           // Check if updated
+           const oldRoom = rooms.find(r => r.id === room.id);
+           if (JSON.stringify(oldRoom) !== JSON.stringify(room)) {
+             await updateRoom(room).catch(err => console.error('Failed to update room:', err));
+           }
+         }
+       }
+     } catch (error) {
+       console.error('Error syncing rooms with Postgres:', error);
+     }
   };
 
-  const updatePackagesWithHistory = (newPackages: HolidayPackage[]) => {
+  const updatePackagesWithHistory = async (newPackages: HolidayPackage[]) => {
      saveCheckpoint();
      setPackages(newPackages);
+     
+     // Sync with Postgres
+     try {
+       const oldPackageIds = new Set(packages.map(p => p.id));
+       const newPackageIds = new Set(newPackages.map(p => p.id));
+       
+       // Find deleted packages
+       const deletedIds = [...oldPackageIds].filter(id => !newPackageIds.has(id));
+       for (const id of deletedIds) {
+         await deletePackage(id).catch(err => console.error('Failed to delete package:', err));
+       }
+       
+       // Find new or updated packages
+       for (const pkg of newPackages) {
+         if (!oldPackageIds.has(pkg.id)) {
+           await createPackage(pkg).catch(err => console.error('Failed to create package:', err));
+         } else {
+           const oldPkg = packages.find(p => p.id === pkg.id);
+           if (JSON.stringify(oldPkg) !== JSON.stringify(pkg)) {
+             await updatePackage(pkg).catch(err => console.error('Failed to update package:', err));
+           }
+         }
+       }
+     } catch (error) {
+       console.error('Error syncing packages with Postgres:', error);
+     }
   };
 
-  const updateDiscountsWithHistory = (newDiscounts: DiscountCode[]) => {
+  const updateDiscountsWithHistory = async (newDiscounts: DiscountCode[]) => {
      saveCheckpoint();
      setDiscounts(newDiscounts);
+     
+     // Sync with Postgres
+     try {
+       const oldDiscountCodes = new Set(discounts.map(d => d.code));
+       const newDiscountCodes = new Set(newDiscounts.map(d => d.code));
+       
+       // Find deleted discounts
+       const deletedCodes = [...oldDiscountCodes].filter(code => !newDiscountCodes.has(code));
+       for (const code of deletedCodes) {
+         await deleteDiscount(code).catch(err => console.error('Failed to delete discount:', err));
+       }
+       
+       // Find new or updated discounts
+       for (const discount of newDiscounts) {
+         if (!oldDiscountCodes.has(discount.code)) {
+           await createDiscount(discount).catch(err => console.error('Failed to create discount:', err));
+         } else {
+           const oldDiscount = discounts.find(d => d.code === discount.code);
+           if (JSON.stringify(oldDiscount) !== JSON.stringify(discount)) {
+             await updateDiscount(discount).catch(err => console.error('Failed to update discount:', err));
+           }
+         }
+       }
+     } catch (error) {
+       console.error('Error syncing discounts with Postgres:', error);
+     }
   };
 
-  const updateExtrasWithHistory = (newExtras: ExtraService[]) => {
+  const updateExtrasWithHistory = async (newExtras: ExtraService[]) => {
      saveCheckpoint();
      setExtras(newExtras);
+     
+     // Sync with Postgres
+     try {
+       const oldExtraIds = new Set(extras.map(e => e.id));
+       const newExtraIds = new Set(newExtras.map(e => e.id));
+       
+       // Find deleted extras
+       const deletedIds = [...oldExtraIds].filter(id => !newExtraIds.has(id));
+       for (const id of deletedIds) {
+         await deleteExtra(id).catch(err => console.error('Failed to delete extra:', err));
+       }
+       
+       // Find new or updated extras
+       for (const extra of newExtras) {
+         if (!oldExtraIds.has(extra.id)) {
+           await createExtra(extra).catch(err => console.error('Failed to create extra:', err));
+         } else {
+           const oldExtra = extras.find(e => e.id === extra.id);
+           if (JSON.stringify(oldExtra) !== JSON.stringify(extra)) {
+             await updateExtra(extra).catch(err => console.error('Failed to update extra:', err));
+           }
+         }
+       }
+     } catch (error) {
+       console.error('Error syncing extras with Postgres:', error);
+     }
   };
 
   // --- RESERVATION HANDLERS ---
@@ -714,7 +821,14 @@ const App: React.FC = () => {
         onUpdatePackages={updatePackagesWithHistory}
         onUpdateDiscounts={updateDiscountsWithHistory}
         onUpdateExtras={updateExtrasWithHistory}
-        onUpdateConfig={setConfig}
+        onUpdateConfig={async (newConfig: HotelConfig) => {
+          setConfig(newConfig);
+          try {
+            await updateConfigAPI(newConfig).catch(err => console.error('Failed to update config:', err));
+          } catch (error) {
+            console.error('Error syncing config with Postgres:', error);
+          }
+        }}
         onUpdateReservationStatus={handleUpdateReservationStatus}
         onLogout={() => { setIsAdminLoggedIn(false); setCurrentView(ViewState.HOME); }}
         
