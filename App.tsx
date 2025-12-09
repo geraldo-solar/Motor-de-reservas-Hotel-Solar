@@ -736,8 +736,12 @@ const App: React.FC = () => {
       {/* Footer */}
       <footer className="bg-[#0F2820] text-white pt-20 pb-10 border-t border-[#D4AF37]">
          <div className="max-w-7xl mx-auto px-4 text-center">
-            <div className="mb-8">
-               <h2 className="text-3xl font-serif text-[#D4AF37]">SOLAR</h2>
+            <div className="mb-8 flex justify-center">
+               <img 
+                 src="/hotel-solar-logo.jpg" 
+                 alt="Hotel Solar" 
+                 className="h-24 w-auto object-contain"
+               />
             </div>
             
             <div className="space-y-2 text-sm text-gray-400 font-light mb-12">

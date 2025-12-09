@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Sun } from 'lucide-react';
 import { ViewState } from '../types';
 
 interface NavbarProps {
@@ -24,12 +23,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
           
           {/* Linha 1: Logomarca Centralizada */}
           <div className="flex items-center cursor-pointer mb-3 md:mb-4 group" onClick={() => onNavigate(ViewState.HOME)}>
-            <div className="bg-gradient-to-br from-solar-gold to-yellow-600 rounded-full p-1.5 mr-3 shadow-lg shadow-black/20 group-hover:scale-110 transition-transform duration-500">
-              <Sun className="h-5 w-5 md:h-6 md:w-6 text-solar-green" />
-            </div>
-            <div className="flex flex-col justify-center items-center">
-              <span className="font-serif font-bold text-2xl md:text-3xl text-solar-gold tracking-[0.2em] leading-none">SOLAR</span>
-            </div>
+            <img 
+              src="/hotel-solar-logo.jpg" 
+              alt="Hotel Solar" 
+              className="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
           </div>
           
           {/* Linha 2: Menu Horizontal (Sempre Visível) */}
