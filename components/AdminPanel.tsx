@@ -598,6 +598,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     name: '', description: '', price: 0, capacity: 2, totalQuantity: 1, active: true, imageUrl: 'https://picsum.photos/800/600'
   });
   const [newRoomFeatures, setNewRoomFeatures] = useState('');
+  const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
 
   const [isAddingPackage, setIsAddingPackage] = useState(false);
   
@@ -606,11 +607,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [],
     roomPrices: []
   });
+  const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
 
   const [isAddingExtra, setIsAddingExtra] = useState(false);
   const [newExtra, setNewExtra] = useState<Partial<ExtraService>>({
      name: '', description: '', price: 0, imageUrl: 'https://picsum.photos/400/300', active: true
   });
+  const [editingExtraId, setEditingExtraId] = useState<string | null>(null);
 
   const [newDiscountCode, setNewDiscountCode] = useState('');
   const [newDiscountPercent, setNewDiscountPercent] = useState(10);
@@ -709,6 +712,54 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleEditRoom = (id: string) => {
+      const room = rooms.find(r => r.id === id);
+      if (room) {
+          setNewRoom({
+              name: room.name,
+              description: room.description,
+              price: room.price,
+              capacity: room.capacity,
+              totalQuantity: room.totalQuantity,
+              active: room.active,
+              imageUrl: room.imageUrl
+          });
+          setNewRoomFeatures(room.features.join(', '));
+          setEditingRoomId(id);
+          setIsAddingRoom(true);
+      }
+  };
+
+  const handleUpdateRoom = () => {
+      if (!newRoom.name || !editingRoomId) return;
+      const updatedRooms = rooms.map(r => 
+          r.id === editingRoomId 
+              ? { 
+                  ...r, 
+                  name: newRoom.name!, 
+                  description: newRoom.description || '', 
+                  price: newRoom.price || 0, 
+                  capacity: newRoom.capacity || 2,
+                  totalQuantity: newRoom.totalQuantity || 1,
+                  imageUrl: newRoom.imageUrl || '',
+                  features: newRoomFeatures.split(',').map(f => f.trim()).filter(f => f)
+                }
+              : r
+      );
+      onUpdateRooms(updatedRooms);
+      setIsAddingRoom(false);
+      setEditingRoomId(null);
+      setNewRoom({ name: '', description: '', price: 0, capacity: 2, totalQuantity: 1, active: true, imageUrl: 'https://picsum.photos/800/600' });
+      setNewRoomFeatures('');
+  };
+
+  const handleCancelEditRoom = () => {
+      setIsAddingRoom(false);
+      setEditingRoomId(null);
+      setNewRoom({ name: '', description: '', price: 0, capacity: 2, totalQuantity: 1, active: true, imageUrl: 'https://picsum.photos/800/600' });
+      setNewRoomFeatures('');
+  };
+
   // ---- Handlers for Packages ----
   const handleUpdatePackage = (id: string, updates: Partial<HolidayPackage>) => {
       onUpdatePackages(packages.map(p => p.id === id ? { ...p, ...updates } : p));
@@ -741,6 +792,56 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       }
   };
 
+  const handleEditPackage = (id: string) => {
+      const pkg = packages.find(p => p.id === id);
+      if (pkg) {
+          setNewPackage({
+              name: pkg.name,
+              description: pkg.description,
+              imageUrl: pkg.imageUrl,
+              includes: pkg.includes.join(', ') as any,
+              active: pkg.active,
+              startIsoDate: pkg.startIsoDate,
+              endIsoDate: pkg.endIsoDate,
+              roomPrices: pkg.roomPrices,
+              noCheckoutDates: pkg.noCheckoutDates,
+              noCheckInDates: pkg.noCheckInDates
+          });
+          setEditingPackageId(id);
+          setIsAddingPackage(true);
+      }
+  };
+
+  const handleUpdatePackage2 = () => {
+      if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) return;
+      const updatedPackages = packages.map(p => 
+          p.id === editingPackageId 
+              ? { 
+                  ...p, 
+                  name: newPackage.name!, 
+                  description: newPackage.description || '', 
+                  imageUrl: newPackage.imageUrl || '',
+                  includes: (newPackage.includes as unknown as string || '').split(',').map((s:string) => s.trim()).filter((s:string) => s),
+                  startIsoDate: newPackage.startIsoDate!,
+                  endIsoDate: newPackage.endIsoDate!,
+                  roomPrices: newPackage.roomPrices || [],
+                  noCheckoutDates: newPackage.noCheckoutDates || [],
+                  noCheckInDates: newPackage.noCheckInDates || []
+                }
+              : p
+      );
+      onUpdatePackages(updatedPackages);
+      setIsAddingPackage(false);
+      setEditingPackageId(null);
+      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', roomPrices: [] });
+  };
+
+  const handleCancelEditPackage = () => {
+      setIsAddingPackage(false);
+      setEditingPackageId(null);
+      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', roomPrices: [] });
+  };
+
   // ---- Handlers for Extras ----
   const handleCreateExtra = () => {
       if (!newExtra.name) return;
@@ -761,6 +862,40 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       if(window.confirm('Excluir este item extra?')) {
           onUpdateExtras(extras.filter(e => e.id !== id));
       }
+  };
+
+  const handleEditExtra = (id: string) => {
+      const extra = extras.find(e => e.id === id);
+      if (extra) {
+          setNewExtra({
+              name: extra.name,
+              description: extra.description,
+              price: extra.price,
+              imageUrl: extra.imageUrl,
+              active: extra.active
+          });
+          setEditingExtraId(id);
+          setIsAddingExtra(true);
+      }
+  };
+
+  const handleUpdateExtra = () => {
+      if (!newExtra.name || !editingExtraId) return;
+      const updatedExtras = extras.map(e => 
+          e.id === editingExtraId 
+              ? { ...e, name: newExtra.name!, description: newExtra.description || '', price: newExtra.price || 0, imageUrl: newExtra.imageUrl || '' }
+              : e
+      );
+      onUpdateExtras(updatedExtras);
+      setIsAddingExtra(false);
+      setEditingExtraId(null);
+      setNewExtra({ name: '', description: '', price: 0, imageUrl: 'https://picsum.photos/400/300', active: true });
+  };
+
+  const handleCancelEditExtra = () => {
+      setIsAddingExtra(false);
+      setEditingExtraId(null);
+      setNewExtra({ name: '', description: '', price: 0, imageUrl: 'https://picsum.photos/400/300', active: true });
   };
 
   // ---- Handlers for Discounts ----
@@ -1178,7 +1313,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
             {isAddingRoom && (
                <div className="bg-white p-4 md:p-6 rounded-xl border border-[#D4AF37] shadow-xl animate-in fade-in">
-                  <h3 className="font-bold text-lg mb-4 text-[#0F2820]">Nova Acomodação</h3>
+                  <h3 className="font-bold text-lg mb-4 text-[#0F2820]">{editingRoomId ? 'Editar Acomodação' : 'Nova Acomodação'}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <div>
                         <label className={labelStyle}>Nome</label>
@@ -1248,8 +1383,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                      </div>
                   </div>
                   <div className="flex gap-2 mt-4 justify-end">
-                     <button onClick={() => setIsAddingRoom(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
-                     <button onClick={handleCreateRoom} className="bg-[#0F2820] text-white px-6 py-2 rounded shadow hover:bg-[#1a3c30]">Salvar</button>
+                     {editingRoomId ? (
+                        <>
+                           <button onClick={handleCancelEditRoom} className="px-4 py-2 bg-gray-400 text-white rounded shadow hover:bg-gray-500">Cancelar</button>
+                           <button onClick={handleUpdateRoom} className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Atualizar</button>
+                        </>
+                     ) : (
+                        <>
+                           <button onClick={() => setIsAddingRoom(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+                           <button onClick={handleCreateRoom} className="bg-[#0F2820] text-white px-6 py-2 rounded shadow hover:bg-[#1a3c30]">Salvar</button>
+                        </>
+                     )}
                   </div>
                </div>
             )}
@@ -1261,8 +1405,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         <img src={room.imageUrl} alt={room.name} className="w-full h-full object-cover" />
                         <div className="absolute top-2 right-2 flex gap-2">
                            <button 
+                             onClick={() => handleEditRoom(room.id)}
+                             className="p-2 bg-blue-500 text-white rounded-full shadow hover:bg-blue-600 transition"
+                             title="Editar acomodação"
+                           >
+                             <Edit size={14} />
+                           </button>
+                           <button 
                              onClick={() => handleDeleteRoom(room.id)}
                              className="p-2 bg-red-500 text-white rounded-full shadow hover:bg-red-600 transition"
+                             title="Deletar acomodação"
                            >
                              <Trash2 size={14} />
                            </button>
@@ -1330,7 +1482,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
               {isAddingPackage && (
                  <div className="bg-white p-4 md:p-6 rounded-xl border border-[#D4AF37] shadow-xl animate-in fade-in">
-                    <h3 className="font-bold text-lg mb-4 text-[#0F2820]">Novo Pacote</h3>
+                    <h3 className="font-bold text-lg mb-4 text-[#0F2820]">{editingPackageId ? 'Editar Pacote' : 'Novo Pacote'}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        <div className="md:col-span-2">
                           <label className={labelStyle}>Nome do Pacote</label>
@@ -1397,8 +1549,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                       </div>
                     </div>
                     <div className="flex gap-2 mt-4 justify-end">
-                       <button onClick={() => setIsAddingPackage(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
-                       <button onClick={handleCreatePackage} className="bg-[#0F2820] text-white px-6 py-2 rounded shadow hover:bg-[#1a3c30]">Criar Pacote</button>
+                       {editingPackageId ? (
+                          <>
+                             <button onClick={handleCancelEditPackage} className="px-4 py-2 bg-gray-400 text-white rounded shadow hover:bg-gray-500">Cancelar</button>
+                             <button onClick={handleUpdatePackage2} className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Atualizar</button>
+                          </>
+                       ) : (
+                          <>
+                             <button onClick={() => setIsAddingPackage(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+                             <button onClick={handleCreatePackage} className="bg-[#0F2820] text-white px-6 py-2 rounded shadow hover:bg-[#1a3c30]">Criar Pacote</button>
+                          </>
+                       )}
                     </div>
                  </div>
               )}
@@ -1426,7 +1587,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                            />
                                            <span className="text-xs font-bold text-gray-600">Ativo</span>
                                        </label>
-                                       <button onClick={() => handleDeletePackage(pkg.id)} className="text-red-400 hover:text-red-600"><Trash2 size={18}/></button>
+                                       <button onClick={() => handleEditPackage(pkg.id)} className="text-blue-500 hover:text-blue-700" title="Editar pacote"><Edit size={18}/></button>
+                                       <button onClick={() => handleDeletePackage(pkg.id)} className="text-red-400 hover:text-red-600" title="Deletar pacote"><Trash2 size={18}/></button>
                                    </div>
                                </div>
 
@@ -1491,7 +1653,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
               {isAddingExtra && (
                  <div className="bg-white p-4 md:p-6 rounded-xl border border-[#D4AF37] shadow-xl animate-in fade-in">
-                    <h3 className="font-bold text-lg mb-4 text-[#0F2820]">Novo Item Extra</h3>
+                    <h3 className="font-bold text-lg mb-4 text-[#0F2820]">{editingExtraId ? 'Editar Item Extra' : 'Novo Item Extra'}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        <div className="md:col-span-2">
                           <label className={labelStyle}>Nome do Item</label>
@@ -1505,14 +1667,61 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                           <label className={labelStyle}>Preço Unitário (R$)</label>
                           <input type="number" value={newExtra.price} onChange={e => setNewExtra({...newExtra, price: Number(e.target.value)})} className={inputStyle} />
                        </div>
-                       <div>
-                          <label className={labelStyle}>Imagem URL</label>
-                          <input value={newExtra.imageUrl} onChange={e => setNewExtra({...newExtra, imageUrl: e.target.value})} className={inputStyle} />
+                       <div className="md:col-span-2">
+                          <label className={labelStyle}>Imagem do Produto Extra</label>
+                          <div className="space-y-2">
+                             <div className="flex gap-2">
+                                <input 
+                                   type="url"
+                                   value={newExtra.imageUrl || ''} 
+                                   onChange={e => setNewExtra({...newExtra, imageUrl: e.target.value})} 
+                                   className={inputStyle} 
+                                   placeholder="Cole a URL da imagem ou faça upload abaixo"
+                                />
+                             </div>
+                             <div className="flex items-center gap-2">
+                                <label className="flex-1 cursor-pointer">
+                                   <div className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-sm text-gray-700">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                      Fazer Upload de Imagem
+                                   </div>
+                                   <input 
+                                      type="file" 
+                                      accept="image/*" 
+                                      className="hidden"
+                                      onChange={(e) => {
+                                         const file = e.target.files?.[0];
+                                         if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                               setNewExtra({...newExtra, imageUrl: reader.result as string});
+                                            };
+                                            reader.readAsDataURL(file);
+                                         }
+                                      }}
+                                   />
+                                </label>
+                                {newExtra.imageUrl && (
+                                   <div className="w-20 h-20 border border-gray-300 rounded overflow-hidden shrink-0">
+                                      <img src={newExtra.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                   </div>
+                                )}
+                             </div>
+                          </div>
                        </div>
                     </div>
                     <div className="flex gap-2 mt-4 justify-end">
-                       <button onClick={() => setIsAddingExtra(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
-                       <button onClick={handleCreateExtra} className="bg-[#0F2820] text-white px-6 py-2 rounded shadow hover:bg-[#1a3c30]">Adicionar</button>
+                       {editingExtraId ? (
+                          <>
+                             <button onClick={handleCancelEditExtra} className="px-4 py-2 bg-gray-400 text-white rounded shadow hover:bg-gray-500">Cancelar</button>
+                             <button onClick={handleUpdateExtra} className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Atualizar</button>
+                          </>
+                       ) : (
+                          <>
+                             <button onClick={() => setIsAddingExtra(false)} className="px-4 py-2 text-gray-500 hover:text-gray-700">Cancelar</button>
+                             <button onClick={handleCreateExtra} className="bg-[#0F2820] text-white px-6 py-2 rounded shadow hover:bg-[#1a3c30]">Adicionar</button>
+                          </>
+                       )}
                     </div>
                  </div>
               )}
@@ -1526,7 +1735,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                               <p className="text-xs text-gray-500 line-clamp-1">{extra.description}</p>
                               <div className="flex justify-between items-center mt-2">
                                   <span className="font-bold text-[#D4AF37]">R$ {extra.price}</span>
-                                  <button onClick={() => handleDeleteExtra(extra.id)} className="text-red-400 hover:text-red-600"><Trash2 size={16}/></button>
+                                  <div className="flex gap-2">
+                                      <button onClick={() => handleEditExtra(extra.id)} className="text-blue-500 hover:text-blue-700" title="Editar item"><Edit size={16}/></button>
+                                      <button onClick={() => handleDeleteExtra(extra.id)} className="text-red-400 hover:text-red-600" title="Deletar item"><Trash2 size={16}/></button>
+                                  </div>
                               </div>
                           </div>
                       </div>
