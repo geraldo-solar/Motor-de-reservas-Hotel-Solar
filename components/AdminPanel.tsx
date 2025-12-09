@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef } from 'react';
-import { Lock, Settings, Package, BedDouble, Tag, Save, LogOut, Plus, Trash2, AlertTriangle, X, Image as ImageIcon, Sparkles, Wand2, Loader2, CheckSquare, Square, ChevronLeft, ChevronRight, LogIn, Pencil, Calendar as CalendarIcon, BrainCircuit, ShoppingBag, Grid, DollarSign, Users, Ban, RotateCcw, RotateCw, Upload, Layers, ArrowRight, ArrowLeft, RefreshCcw, Percent, FileText, CheckCircle, XCircle, Info, CreditCard, Menu } from 'lucide-react';
+import { Lock, Settings, Package, BedDouble, Tag, Save, LogOut, Plus, Trash2, AlertTriangle, X, Image as ImageIcon, Sparkles, Wand2, Loader2, CheckSquare, Square, ChevronLeft, ChevronRight, LogIn, Pencil, Calendar as CalendarIcon, BrainCircuit, ShoppingBag, Grid, DollarSign, Users, Ban, RotateCcw, RotateCw, Upload, Layers, ArrowRight, ArrowLeft, RefreshCcw, Percent, FileText, CheckCircle, XCircle, Info, CreditCard, Menu, Edit } from 'lucide-react';
 import { Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, RoomDateOverride, Reservation, ReservationStatus } from '../types';
 import { ADMIN_CREDENTIALS } from '../constants';
 import { processAdminCommand } from '../services/geminiService';
@@ -618,6 +618,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [newDiscountEndDate, setNewDiscountEndDate] = useState('');
   const [newDiscountMinNights, setNewDiscountMinNights] = useState<number | ''>('');
   const [newDiscountFullPeriod, setNewDiscountFullPeriod] = useState(false);
+  const [editingDiscountCode, setEditingDiscountCode] = useState<string | null>(null);
   
   // Styles
   const inputStyle = "w-full border border-[#4A5D43] bg-[#2F3A2F] text-[#E5D3B3] placeholder-[#E5D3B3]/50 rounded-lg p-2 text-sm focus:ring-1 focus:ring-amber-500 focus:border-amber-500 outline-none transition [color-scheme:dark]";
@@ -785,6 +786,53 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleDeleteDiscount = (code: string) => {
       onUpdateDiscounts(discounts.filter(d => d.code !== code));
+  };
+
+  const handleEditDiscount = (code: string) => {
+      const discount = discounts.find(d => d.code === code);
+      if (!discount) return;
+      setEditingDiscountCode(code);
+      setNewDiscountCode(discount.code);
+      setNewDiscountPercent(discount.percentage);
+      setNewDiscountStartDate(discount.startDate || '');
+      setNewDiscountEndDate(discount.endDate || '');
+      setNewDiscountMinNights(discount.minNights || '');
+      setNewDiscountFullPeriod(discount.fullPeriodRequired || false);
+  };
+
+  const handleUpdateDiscount = () => {
+      if (!newDiscountCode || !editingDiscountCode) return;
+      const updatedDiscounts = discounts.map(d => 
+          d.code === editingDiscountCode
+              ? {
+                  code: newDiscountCode.toUpperCase(),
+                  percentage: newDiscountPercent,
+                  active: d.active,
+                  startDate: newDiscountStartDate || undefined,
+                  endDate: newDiscountEndDate || undefined,
+                  minNights: typeof newDiscountMinNights === 'number' ? newDiscountMinNights : undefined,
+                  fullPeriodRequired: newDiscountFullPeriod
+              }
+              : d
+      );
+      onUpdateDiscounts(updatedDiscounts);
+      setEditingDiscountCode(null);
+      setNewDiscountCode('');
+      setNewDiscountPercent(10);
+      setNewDiscountStartDate('');
+      setNewDiscountEndDate('');
+      setNewDiscountMinNights('');
+      setNewDiscountFullPeriod(false);
+  };
+
+  const handleCancelEdit = () => {
+      setEditingDiscountCode(null);
+      setNewDiscountCode('');
+      setNewDiscountPercent(10);
+      setNewDiscountStartDate('');
+      setNewDiscountEndDate('');
+      setNewDiscountMinNights('');
+      setNewDiscountFullPeriod(false);
   };
 
   // ---- Handlers for Calendar/Overrides ----
@@ -1413,7 +1461,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                <h2 className="text-2xl font-serif text-[#0F2820]">Cupons de Desconto</h2>
                
                <div className="bg-white p-4 md:p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <h3 className="font-bold text-sm mb-4 uppercase text-gray-500">Criar Novo Cupom</h3>
+                  <h3 className="font-bold text-sm mb-4 uppercase text-gray-500">{editingDiscountCode ? 'Editar Cupom' : 'Criar Novo Cupom'}</h3>
                   <div className="flex flex-wrap gap-4 items-end">
                      <div className="flex-1 min-w-[200px]">
                         <label className={labelStyle}>Código (Ex: VERAO10)</label>
@@ -1427,9 +1475,20 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         <label className={labelStyle}>Mín. Noites</label>
                         <input type="number" value={newDiscountMinNights} onChange={e => setNewDiscountMinNights(Number(e.target.value) || '')} className={inputStyle} placeholder="Opcional" />
                      </div>
-                     <button onClick={handleCreateDiscount} className="bg-[#0F2820] text-white px-6 py-2 rounded h-[42px] shadow hover:bg-[#1a3c30] font-bold">
-                        Criar
-                     </button>
+                     {editingDiscountCode ? (
+                        <>
+                           <button onClick={handleUpdateDiscount} className="bg-blue-600 text-white px-6 py-2 rounded h-[42px] shadow hover:bg-blue-700 font-bold">
+                              Atualizar
+                           </button>
+                           <button onClick={handleCancelEdit} className="bg-gray-400 text-white px-6 py-2 rounded h-[42px] shadow hover:bg-gray-500 font-bold">
+                              Cancelar
+                           </button>
+                        </>
+                     ) : (
+                        <button onClick={handleCreateDiscount} className="bg-[#0F2820] text-white px-6 py-2 rounded h-[42px] shadow hover:bg-[#1a3c30] font-bold">
+                           Criar
+                        </button>
+                     )}
                   </div>
                </div>
 
@@ -1443,7 +1502,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                            </div>
                            {d.minNights && <p className="text-xs text-gray-500">Mínimo {d.minNights} noites</p>}
                         </div>
-                        <button onClick={() => handleDeleteDiscount(d.code)} className="text-red-400 hover:text-red-600 p-2"><Trash2 size={18}/></button>
+                        <div className="flex gap-2">
+                           <button onClick={() => handleEditDiscount(d.code)} className="text-blue-500 hover:text-blue-700 p-2" title="Editar cupom"><Edit size={18}/></button>
+                           <button onClick={() => handleDeleteDiscount(d.code)} className="text-red-400 hover:text-red-600 p-2" title="Deletar cupom"><Trash2 size={18}/></button>
+                        </div>
                      </div>
                   ))}
                </div>
