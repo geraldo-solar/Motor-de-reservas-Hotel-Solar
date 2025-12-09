@@ -151,14 +151,20 @@ export const processAdminCommand = async (
          ESTRUTURA DE "OVERRIDES" (Exceções):
          overrides: [
            {
-             "dateIso": "YYYY-MM-DD", (Data específica)
+             "dateIso": "YYYY-MM-DD", (Data específica no formato ISO)
              "price": 500, (Novo preço para este dia)
              "availableQuantity": 5, (Estoque para este dia)
+             "noCheckIn": true/false, (Se true, bloqueia check-in neste dia)
+             "noCheckOut": true/false, (Se true, bloqueia check-out neste dia)
              "isClosed": true/false (Se true, fecha a venda neste dia)
            }
          ]
          
-         IMPORTANTE: Ao adicionar um override, mantenha os overrides existentes se forem de outras datas.
+         IMPORTANTE: 
+         - Ao adicionar um override, mantenha os overrides existentes se forem de outras datas.
+         - Se o comando mencionar "bloquear check-in" ou "restringir entrada", defina "noCheckIn": true.
+         - Se o comando mencionar "bloquear check-out" ou "restringir saída", defina "noCheckOut": true.
+         - Use o formato de data ISO (YYYY-MM-DD) para dateIso. Exemplo: 25 de dezembro de 2025 = "2025-12-25".
 
       INSTRUÇÕES GERAIS:
       1. Analise o comando e modifique os dados.
