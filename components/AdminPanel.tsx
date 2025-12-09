@@ -179,18 +179,16 @@ const GeneralMapCalendar: React.FC<{
   };
 
   const handleBulkReset = () => {
-      if (!bulkStart || !bulkEnd) {
-          alert("Selecione a data de início e fim.");
-          return;
-      }
-      if (window.confirm("ATENÇÃO: Isso irá APAGAR todas as personalizações (preços, bloqueios, estoque) do período selecionado e voltará ao padrão do cadastro da acomodação. Deseja continuar?")) {
-          onBulkUpdate(bulkStart, bulkEnd, bulkRoomId, null); // null triggers delete
-          
-           // Scroll to map
-           setTimeout(() => {
-            mapGridRef.current?.scrollIntoView({ behavior: 'smooth' });
-         }, 100);
-      }
+      // Limpar todos os campos do formulário de edição em massa
+      setBulkStart('');
+      setBulkEnd('');
+      setBulkRoomId('all');
+      setBulkPrice('');
+      setBulkPriceMode('fixed');
+      setBulkQty('');
+      setBulkIsClosed('no_change');
+      setBulkNoCheckIn('no_change');
+      setBulkNoCheckOut('no_change');
   };
 
   // Style constants
@@ -294,7 +292,7 @@ const GeneralMapCalendar: React.FC<{
                  <button 
                    onClick={handleBulkReset}
                    className="w-10 bg-red-100 text-red-700 h-[36px] rounded font-bold text-xs hover:bg-red-200 transition border border-red-200 flex items-center justify-center"
-                   title="Resetar para Padrão (Apagar Exceções)"
+                   title="Limpar Formulário"
                    type="button"
                  >
                     <RefreshCcw size={16}/>
