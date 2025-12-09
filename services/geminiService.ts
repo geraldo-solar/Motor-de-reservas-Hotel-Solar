@@ -2,7 +2,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { Room, HolidayPackage, DiscountCode, ViewState, ExtraService } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazy initialization to avoid errors when API key is not set
+let ai: GoogleGenAI | null = null;
+
+const getAI = (): GoogleGenAI => {
+  if (!ai) {
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+      console.warn('GEMINI_API_KEY not configured. AI features will be disabled.');
+      throw new Error('API key not configured');
+    }
+    ai = new GoogleGenAI({ apiKey });
+  }
+  return ai;
+};
 
 // Define context interface
 export interface UserContext {
@@ -72,7 +85,7 @@ export const sendMessageToAI = async (
     const model = 'gemini-2.5-flash';
     const instruction = generateSystemInstruction(currentRooms, currentPackages, currentExtras, hotelInfo, userContext);
     
-    const chat = ai.chats.create({
+    const chat = getAI().chats.create({
       model: model,
       config: {
         systemInstruction: instruction,
@@ -164,7 +177,7 @@ export const processAdminCommand = async (
       }
     `;
 
-    const result = await ai.models.generateContent({
+    const result = await getAI().models.generateContent({
       model: model,
       contents: prompt,
       config: {
