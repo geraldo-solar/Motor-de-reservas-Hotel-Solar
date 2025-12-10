@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { generateClientConfirmationEmail, generateAdminNotificationEmail } from './emailTemplatesSimple';
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 
@@ -18,19 +17,36 @@ export default async function handler(
       return res.status(400).json({ error: 'Missing reservation data' });
     }
 
-    const checkInDate = new Date(reservation.checkIn).toLocaleDateString('pt-BR');
-    const checkOutDate = new Date(reservation.checkOut).toLocaleDateString('pt-BR');
+    // Simple email HTML
+    const guestName = reservation?.mainGuest?.name || 'Cliente';
+    const guestEmail = reservation?.mainGuest?.email || '';
     const reservationNumber = reservation.id.toUpperCase().substring(0, 8);
+    const totalPrice = reservation?.totalPrice || 0;
+
+    const clientEmailHtml = `
+      <h1>Reserva Confirmada!</h1>
+      <p>Olá ${guestName},</p>
+      <p>Sua reserva #${reservationNumber} foi recebida.</p>
+      <p>Valor Total: R$ ${totalPrice.toFixed(2)}</p>
+      <p>Hotel Solar - Belém, PA</p>
+    `;
+
+    const adminEmailHtml = `
+      <h1>Nova Reserva</h1>
+      <p>Reserva #${reservationNumber}</p>
+      <p>Hóspede: ${guestName}</p>
+      <p>Email: ${guestEmail}</p>
+      <p>Valor: R$ ${totalPrice.toFixed(2)}</p>
+    `;
 
     const results = {
       clientEmail: { sent: false, error: null as string | null },
       adminEmail: { sent: false, error: null as string | null }
     };
 
-    // Send client confirmation email
-    if (reservation.mainGuest && reservation.mainGuest.email) {
+    // Send client email
+    if (guestEmail) {
       try {
-        const clientEmailHtml = generateClientConfirmationEmail(reservation, checkInDate, checkOutDate, reservationNumber);
         const response = await fetch('https://api.brevo.com/v3/smtp/email', {
           method: 'POST',
           headers: {
@@ -40,7 +56,7 @@ export default async function handler(
           },
           body: JSON.stringify({
             sender: { name: 'Hotel Solar', email: 'geraldo@hotelsolar.tur.br' },
-            to: [{ email: reservation.mainGuest.email, name: reservation.mainGuest.name }],
+            to: [{ email: guestEmail, name: guestName }],
             subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
             htmlContent: clientEmailHtml
           })
@@ -48,21 +64,17 @@ export default async function handler(
 
         if (response.ok) {
           results.clientEmail.sent = true;
-          console.log('[SEND EMAIL] Client email sent successfully');
         } else {
           const errorData = await response.json();
           results.clientEmail.error = JSON.stringify(errorData);
-          console.error('[SEND EMAIL] Brevo API error (client):', errorData);
         }
       } catch (err) {
         results.clientEmail.error = err instanceof Error ? err.message : 'Unknown error';
-        console.error('[SEND EMAIL] Error sending client email:', err);
       }
     }
 
-    // Send admin notification email
+    // Send admin email
     try {
-      const adminEmailHtml = generateAdminNotificationEmail(reservation, checkInDate, checkOutDate, reservationNumber);
       const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
@@ -80,15 +92,12 @@ export default async function handler(
 
       if (response.ok) {
         results.adminEmail.sent = true;
-        console.log('[SEND EMAIL] Admin email sent successfully');
       } else {
         const errorData = await response.json();
         results.adminEmail.error = JSON.stringify(errorData);
-        console.error('[SEND EMAIL] Brevo API error (admin):', errorData);
       }
     } catch (err) {
       results.adminEmail.error = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[SEND EMAIL] Error sending admin email:', err);
     }
 
     return res.status(200).json({
