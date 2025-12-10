@@ -24,12 +24,14 @@ export function generateClientConfirmationEmail(
     extras = [];
   }
   
-  const roomsList = rooms.map((room: any) => 
-    `<tr>
-      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${room.name}</td>
-      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">R$ ${room.priceSnapshot.toFixed(2)}</td>
-    </tr>`
-  ).join('');
+  const roomsList = rooms && rooms.length > 0 
+    ? rooms.map((room: any) => 
+        `<tr>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${room.name || 'Acomodação'}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">R$ ${(room.priceSnapshot || 0).toFixed(2)}</td>
+        </tr>`
+      ).join('')
+    : '<tr><td colspan="2" style="padding: 8px; text-align: center;">Nenhuma acomodação</td></tr>';
 
   const extrasRows = extras && extras.length > 0
     ? extras.map((extra: any) => 
@@ -40,12 +42,12 @@ export function generateClientConfirmationEmail(
       ).join('')
     : '<tr><td colspan="2" style="padding: 8px; text-align: center; color: #6b7280;">Nenhum serviço extra</td></tr>';
 
-  const paymentInstructions = reservation.paymentMethod === 'PIX' 
+  const paymentInstructions = (reservation.paymentMethod || '').toUpperCase() === 'PIX' 
     ? `
       <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; border-radius: 4px;">
         <h3 style="color: #92400e; margin: 0 0 12px 0; font-size: 16px;">📱 Instruções de Pagamento via PIX</h3>
         <ol style="margin: 0; padding-left: 20px; color: #78350f;">
-          <li style="margin-bottom: 8px;">Realize o pagamento via PIX no valor de <strong>R$ ${reservation.totalPrice.toFixed(2)}</strong></li>
+          <li style="margin-bottom: 8px;">Realize o pagamento via PIX no valor de <strong>R$ ${(reservation.totalPrice || 0).toFixed(2)}</strong></li>
           <li style="margin-bottom: 8px;">Envie o comprovante de pagamento para: <a href="mailto:reserva@hotelsolar.tur.br" style="color: #92400e; font-weight: bold;">reserva@hotelsolar.tur.br</a></li>
           <li style="margin-bottom: 8px;">Após recebermos o comprovante, enviaremos um email de confirmação da reserva</li>
         </ol>
@@ -84,7 +86,7 @@ export function generateClientConfirmationEmail(
                   <td style="padding: 30px;">
                     
                     <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
-                      Olá <strong>${reservation.mainGuest.name}</strong>,
+                      Olá <strong>${reservation.mainGuest?.name || 'Cliente'}</strong>,
                     </p>
 
                     <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
@@ -112,7 +114,7 @@ export function generateClientConfirmationEmail(
                         </tr>
                         <tr>
                           <td style="color: #6b7280; padding: 4px 0;">Noites:</td>
-                          <td style="color: #111827; font-weight: bold; text-align: right; padding: 4px 0;">${reservation.nights}</td>
+                          <td style="color: #111827; font-weight: bold; text-align: right; padding: 4px 0;">${reservation.nights || 1}</td>
                         </tr>
                       </table>
 
@@ -130,7 +132,7 @@ export function generateClientConfirmationEmail(
                         <table width="100%" cellpadding="0" cellspacing="0">
                           <tr>
                             <td style="color: #111827; font-size: 18px; font-weight: bold;">Valor Total:</td>
-                            <td style="color: #D4AF37; font-size: 24px; font-weight: bold; text-align: right;">R$ ${reservation.totalPrice.toFixed(2)}</td>
+                            <td style="color: #D4AF37; font-size: 24px; font-weight: bold; text-align: right;">R$ ${(reservation.totalPrice || 0).toFixed(2)}</td>
                           </tr>
                         </table>
                       </div>
@@ -214,9 +216,11 @@ export function generateAdminNotificationEmail(
     extras = [];
   }
   
-  const roomsList = rooms.map((room: any) => 
-    `<li>${room.name} - R$ ${room.priceSnapshot.toFixed(2)}</li>`
-  ).join('');
+  const roomsList = rooms && rooms.length > 0
+    ? rooms.map((room: any) => 
+        `<li>${room.name || 'Acomodação'} - R$ ${(room.priceSnapshot || 0).toFixed(2)}</li>`
+      ).join('')
+    : '<li>Nenhuma acomodação</li>';
 
   const extrasList = extras && extras.length > 0
     ? extras.map((extra: any) => 
@@ -237,15 +241,15 @@ export function generateAdminNotificationEmail(
           <p><strong>Número da Reserva:</strong> ${reservationNumber}</p>
           
           <h2 style="color: #2F3A2F; margin-top: 30px;">Dados do Hóspede</h2>
-          <p><strong>Nome:</strong> ${reservation.mainGuest.name}</p>
-          <p><strong>CPF:</strong> ${reservation.mainGuest.cpf}</p>
-          <p><strong>Email:</strong> ${reservation.mainGuest.email}</p>
-          <p><strong>Telefone:</strong> ${reservation.mainGuest.phone}</p>
+          <p><strong>Hóspede:</strong> ${reservation.mainGuest?.name || 'N/A'}</p>
+          <p><strong>Email:</strong> ${reservation.mainGuest?.email || 'N/A'}</p>
+          <p><strong>Telefone:</strong> ${reservation.mainGuest?.phone || 'N/A'}</p>
+          <p><strong>CPF:</strong> ${reservation.mainGuest?.cpf || 'N/A'}</p>
           
           <h2 style="color: #2F3A2F; margin-top: 30px;">Detalhes da Reserva</h2>
           <p><strong>Check-in:</strong> ${checkInDate}</p>
           <p><strong>Check-out:</strong> ${checkOutDate}</p>
-          <p><strong>Noites:</strong> ${reservation.nights}</p>
+          <p><strong>Noites:</strong> ${reservation.nights || 1}</p>
           
           <h3 style="color: #2F3A2F; margin-top: 20px;">Acomodações:</h3>
           <ul>${roomsList}</ul>
@@ -253,8 +257,8 @@ export function generateAdminNotificationEmail(
           <h3 style="color: #2F3A2F; margin-top: 20px;">Serviços Extras:</h3>
           <ul>${extrasList}</ul>
           
-          <p style="font-size: 18px; margin-top: 30px;"><strong>Valor Total: R$ ${reservation.totalPrice.toFixed(2)}</strong></p>
-          <p><strong>Forma de Pagamento:</strong> ${reservation.paymentMethod}</p>
+          <p style="font-size: 18px; margin-top: 20px;"><strong>Valor Total:</strong> R$ ${(reservation.totalPrice || 0).toFixed(2)}</p>
+          <p><strong>Forma de Pagamento:</strong> ${reservation.paymentMethod || 'N/A'}</p>
           
           ${reservation.observations ? `<p><strong>Observações:</strong> ${reservation.observations}</p>` : ''}
           
