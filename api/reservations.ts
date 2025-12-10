@@ -152,43 +152,48 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     status: reservation.status,
   };
 
-  // Send emails directly using Resend with detailed logging
-  const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
-  const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
-  const reservationNumber = reservationData.id.toUpperCase().substring(0, 8);
-  
-  console.log('[CREATE RESERVATION] About to send emails for reservation:', reservationData.id);
-  
-  // Send client confirmation email
-  if (reservationData.mainGuest.email) {
-    console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
+  // Send emails in background (non-blocking) - don't let email errors break reservation creation
+  try {
+    const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
+    const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
+    const reservationNumber = reservationData.id.toUpperCase().substring(0, 8);
+    
+    console.log('[CREATE RESERVATION] About to send emails for reservation:', reservationData.id);
+    
+    // Send client confirmation email
+    if (reservationData.mainGuest.email) {
+      console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
+      try {
+        const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+        await resend.emails.send({
+          from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
+          to: reservationData.mainGuest.email,
+          subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
+          html: clientEmailHtml,
+        });
+        console.log('[CREATE RESERVATION] Client email sent successfully');
+      } catch (err) {
+        console.error('[CREATE RESERVATION] Error sending client email:', err);
+      }
+    }
+
+    // Send admin notification email
+    console.log('[CREATE RESERVATION] Sending admin email');
     try {
-      const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+      const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
       await resend.emails.send({
         from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-        to: reservationData.mainGuest.email,
-        subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
-        html: clientEmailHtml,
+        to: 'geraldo@hotelsolar.tur.br',
+        subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
+        html: adminEmailHtml,
       });
-      console.log('[CREATE RESERVATION] Client email sent successfully');
+      console.log('[CREATE RESERVATION] Admin email sent successfully');
     } catch (err) {
-      console.error('[CREATE RESERVATION] Error sending client email:', err);
+      console.error('[CREATE RESERVATION] Error sending admin email:', err);
     }
-  }
-
-  // Send admin notification email
-  console.log('[CREATE RESERVATION] Sending admin email');
-  try {
-    const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
-    await resend.emails.send({
-      from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-      to: 'geraldo@hotelsolar.tur.br',
-      subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
-      html: adminEmailHtml,
-    });
-    console.log('[CREATE RESERVATION] Admin email sent successfully');
-  } catch (err) {
-    console.error('[CREATE RESERVATION] Error sending admin email:', err);
+  } catch (emailError) {
+    // Don't let email errors break the reservation creation
+    console.error('[CREATE RESERVATION] Email sending failed, but reservation was created:', emailError);
   }
 
   // Return the created reservation
