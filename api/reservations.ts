@@ -163,7 +163,8 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     if (reservationData.mainGuest.email) {
       console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
       try {
-        const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+        // const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+        const clientEmailHtml = `<h1>Teste de Email</h1><p>Reserva #${reservationNumber} criada com sucesso!</p>`;
         const response = await fetch('https://api.brevo.com/v3/smtp/email', {
           method: 'POST',
           headers: {
@@ -192,7 +193,8 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     // Send admin notification email
     console.log('[CREATE RESERVATION] Sending admin email');
     try {
-      const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+      // const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+      const adminEmailHtml = `<h1>Nova Reserva</h1><p>Reserva #${reservationNumber} de ${reservationData.mainGuest.name}</p>`;
       const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
