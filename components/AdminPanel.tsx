@@ -34,9 +34,11 @@ const toLocalISO = (date: Date) => {
   return `${y}-${m}-${d}`;
 };
 
-// --- HELPER: Format date string (YYYY-MM-DD) to DD/MM/YYYY without timezone conversion ---
+// --- HELPER: Format date string to DD/MM/YYYY without timezone conversion ---
 const formatDateLocal = (dateString: string) => {
-  const [year, month, day] = dateString.split('-');
+  // Handle both "YYYY-MM-DD" and "YYYY-MM-DDTHH:MM:SS.SSSZ" formats
+  const dateOnly = dateString.split('T')[0]; // Get only the date part
+  const [year, month, day] = dateOnly.split('-');
   return `${day}/${month}/${year}`;
 };
 
