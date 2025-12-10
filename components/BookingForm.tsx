@@ -282,11 +282,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
         if (cardCvv.length < 3) { newErrors.cardCvv = 'CVV inválido'; if(!firstErrorRef) firstErrorRef = cardRef; }
     }
 
-    // Validate Additional Guests
-    const guestErrors = additionalGuests.some(g => !g.name || !g.cpf || !g.age);
-    if (guestErrors) {
-        newErrors.guests = 'Preencha todos os dados dos acompanhantes.';
-    }
+    // Additional Guests are now optional - no validation required
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -551,8 +547,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
             {/* Additional Guests Form */}
             {additionalGuests.length > 0 && (
                 <div className="space-y-4 pt-4 border-t border-gray-100">
-                    <h3 className="font-bold text-[#0F2820] uppercase tracking-wide flex items-center gap-2"><Users size={20}/> Dados dos Acompanhantes</h3>
-                    {errors.guests && <p className="text-red-500 text-sm font-bold bg-red-50 p-2 rounded">{errors.guests}</p>}
+                    <h3 className="font-bold text-[#0F2820] uppercase tracking-wide flex items-center gap-2"><Users size={20}/> Dados dos Acompanhantes <span className="text-xs font-normal text-gray-500">(Opcional)</span></h3>
                     <div className="space-y-3">
                         {additionalGuests.map((guest, index) => (
                             <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
