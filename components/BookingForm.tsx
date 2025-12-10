@@ -730,7 +730,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                )}
             </div>
 
-            {/* Aceite do Regulamento */}
+            {/* Aceite do Regulamento - Obrigatório para finalizar reserva */}
             <div className="border border-[#D4AF37] rounded-lg p-4 bg-[#F9F8F6]">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
