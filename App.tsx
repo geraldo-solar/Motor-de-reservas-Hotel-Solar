@@ -888,6 +888,9 @@ const App: React.FC = () => {
   const cancelReservationId = urlParams.get('id');
   const showCancelPage = window.location.pathname === '/cancelar-reserva' && cancelReservationId;
 
+  // Debug: Log current view
+  console.log('DEBUG: App render - currentView =', currentView);
+  
   // Render special pages
   if (showRegulamento) {
     return <RegulamentoHospedagem onClose={() => window.location.href = '/'} />;
@@ -1000,10 +1003,13 @@ const App: React.FC = () => {
                 onRemoveRoom={handleRemoveFromBooking}
                 onAddReservation={handleAddReservation}
                 onReservationComplete={(reservationId, guestEmail, paymentMethod) => {
+                  console.log('DEBUG: onReservationComplete callback received', { reservationId, guestEmail, paymentMethod });
                   setCompletedReservationId(reservationId);
                   setCompletedGuestEmail(guestEmail);
                   setCompletedPaymentMethod(paymentMethod);
+                  console.log('DEBUG: Setting currentView to THANK_YOU');
                   setCurrentView(ViewState.THANK_YOU);
+                  console.log('DEBUG: currentView set to THANK_YOU');
                 }}
              />
          </div>

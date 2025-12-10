@@ -338,9 +338,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
       onAddReservation(reservation);
       
       // Call completion callback to show thank you page
+      console.log('DEBUG: About to call onReservationComplete', { reservationId: reservation.id, email, paymentMethod });
       if (onReservationComplete) {
         const payMethod = paymentMethod === 'PIX' ? 'pix' : 'credit_card';
+        console.log('DEBUG: Calling onReservationComplete with', { reservationId: reservation.id, email, payMethod });
         onReservationComplete(reservation.id, email, payMethod);
+        console.log('DEBUG: onReservationComplete called successfully');
       } else {
         // Fallback for backward compatibility
         alert('Reserva criada com sucesso! Um e-mail foi enviado para você com os detalhes.');
