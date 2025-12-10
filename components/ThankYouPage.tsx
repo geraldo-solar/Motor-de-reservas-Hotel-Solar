@@ -15,7 +15,24 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({
   onBackToHome 
 }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2F3A2F] to-[#1a221a] flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-[#2F3A2F] to-[#1a221a]">
+      {/* Header */}
+      <nav className="bg-solar-green shadow-lg border-b border-white/10 py-3">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex items-center cursor-pointer mb-3 md:mb-4 group" onClick={onBackToHome}>
+              <img 
+                src="/hotel-solar-logo.png" 
+                alt="Hotel Solar" 
+                className="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          </div>
+        </div>
+      </nav>
+      
+      {/* Content */}
+      <div className="flex items-center justify-center px-4 py-12">
       <div className="max-w-2xl w-full">
         {/* Success Icon */}
         <div className="text-center mb-8">
@@ -23,10 +40,10 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({
             <CheckCircle className="w-12 h-12 text-green-400" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-[#E5D3B3] mb-2">
-            Reserva Solicitada com Sucesso!
+            Reserva efetuada
           </h1>
           <p className="text-lg text-gray-300">
-            Obrigado por escolher o Hotel Solar
+            Você receberá um email com os dados da sua reserva.
           </p>
         </div>
 
@@ -127,6 +144,7 @@ const ThankYouPage: React.FC<ThankYouPageProps> = ({
           <p>Av. Atlântica • CEP 68721-000 • Salinópolis - PA</p>
           <p>Tel: (91) 98100-0800</p>
         </div>
+      </div>
       </div>
     </div>
   );
