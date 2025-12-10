@@ -152,6 +152,7 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   };
 
   // Send confirmation emails
+  /* TEMPORARILY DISABLED FOR DEBUG
   try {
     const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
     const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
@@ -220,6 +221,7 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     // Don't let email errors break the reservation creation
     console.error('[CREATE RESERVATION] Email sending failed, but reservation was created:', emailError);
   }
+  */
 
   // Return the created reservation
   return res.status(201).json({
