@@ -909,6 +909,34 @@ const App: React.FC = () => {
       {/* Floating Cart Bar */}
       {currentView !== ViewState.THANK_YOU && renderFloatingBar()}
       
+      {/* DEBUG: Test button to force THANK_YOU view */}
+      {currentView === ViewState.HOME && (
+        <button
+          onClick={() => {
+            console.log('DEBUG: Forcing THANK_YOU view');
+            setCompletedReservationId('test-123-456');
+            setCompletedGuestEmail('teste@example.com');
+            setCompletedPaymentMethod('pix');
+            setCurrentView(ViewState.THANK_YOU);
+          }}
+          style={{
+            position: 'fixed',
+            top: '100px',
+            right: '20px',
+            zIndex: 9999,
+            backgroundColor: 'red',
+            color: 'white',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          TEST THANK YOU
+        </button>
+      )}
+      
       {/* Home View */}
       {currentView === ViewState.HOME && (
         <>
