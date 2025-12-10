@@ -120,6 +120,55 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
 
   const reservation = result.rows[0];
 
+  // Update room availability (decrement stock for each reserved night)
+  try {
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    const roomsArray = JSON.parse(JSON.stringify(rooms));
+
+    // For each room in the reservation
+    for (const room of roomsArray) {
+      const roomId = room.id;
+      
+      // For each night between check-in and check-out
+      const currentDate = new Date(checkInDate);
+      while (currentDate < checkOutDate) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        
+        // Check if there's already an override for this room/date
+        const existingOverride = await sql`
+          SELECT * FROM room_date_overrides 
+          WHERE room_id = ${roomId} AND date = ${dateStr}
+        `;
+
+        if (existingOverride.rows.length > 0) {
+          // Update existing override - decrement available quantity
+          const currentQty = existingOverride.rows[0].available_quantity;
+          if (currentQty !== null && currentQty > 0) {
+            await sql`
+              UPDATE room_date_overrides 
+              SET available_quantity = ${currentQty - 1}
+              WHERE room_id = ${roomId} AND date = ${dateStr}
+            `;
+          }
+        } else {
+          // Create new override with decremented quantity
+          // Assume default quantity is 1, so after reservation it becomes 0
+          await sql`
+            INSERT INTO room_date_overrides (room_id, date, available_quantity)
+            VALUES (${roomId}, ${dateStr}, 0)
+          `;
+        }
+        
+        // Move to next day
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    }
+  } catch (error) {
+    console.error('Error updating room availability:', error);
+    // Don't fail the reservation if stock update fails
+  }
+
   // Prepare reservation data for emails
   const reservationData = {
     id: reservation.id,
