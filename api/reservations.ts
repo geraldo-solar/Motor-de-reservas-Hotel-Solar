@@ -141,21 +141,15 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     observations: reservation.observations,
     rooms: reservation.rooms,
     extras: reservation.extras,
-    totalPrice: parseFloat(reservation.total_price),
+    totalPrice: reservation.total_price ? parseFloat(reservation.total_price) : 0,
     discountApplied: reservation.discount_code ? {
       code: reservation.discount_code,
-      amount: parseFloat(reservation.discount_amount),
+      amount: reservation.discount_amount ? parseFloat(reservation.discount_amount) : 0,
     } : undefined,
     paymentMethod: reservation.payment_method,
     cardDetails: reservation.card_details,
     status: reservation.status,
   };
-
-  // Return the created reservation immediately
-  res.status(201).json({
-    success: true,
-    reservation: reservationData,
-  });
 
   // Send confirmation emails asynchronously (non-blocking)
   Promise.resolve().then(async () => {
@@ -230,6 +224,12 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   }
   }).catch(err => {
     console.error('[CREATE RESERVATION] Async email error:', err);
+  });
+
+  // Return the created reservation
+  return res.status(201).json({
+    success: true,
+    reservation: reservationData,
   });
 }
 
