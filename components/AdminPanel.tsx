@@ -432,6 +432,11 @@ const GeneralMapCalendar: React.FC<{
                       const dateObj = new Date(year, month, day);
                       const isoDate = toLocalISO(dateObj);
                       
+                      // Check if date is in the past
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const isPastDate = dateObj < today;
+                      
                       const override = room.overrides?.find(o => o.dateIso === isoDate);
                       
                       const displayPrice = override?.price !== undefined ? override.price : room.price;
@@ -456,7 +461,7 @@ const GeneralMapCalendar: React.FC<{
                       return (
                         <div 
                           key={`${room.id}-${day}`} 
-                          className={`${cellStyle} ${isClosed ? 'bg-red-900/30 border-red-800/50' : ''}`}
+                          className={`${cellStyle} ${isClosed ? 'bg-red-900/30 border-red-800/50' : ''} ${isPastDate ? 'bg-red-900/20 opacity-60' : ''}`}
                         >
                           {/* Price Input */}
                           <div className={`flex items-center gap-0.5 md:gap-1 bg-[#2F3A2F] rounded px-0.5 md:px-1 border border-[#4A5D43] ${isClosed ? 'opacity-50' : ''}`}>
