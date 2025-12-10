@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
 import { v4 as uuidv4 } from 'uuid';
 import { Resend } from 'resend';
+import { generateClientConfirmationEmail, generateAdminNotificationEmail } from './emailTemplates';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -151,47 +152,41 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     status: reservation.status,
   };
 
-  // Send emails using internal API calls with detailed logging
-  const baseUrl = 'https://motor-de-reservas-hotel-solar.vercel.app';
+  // Send emails directly using Resend with detailed logging
+  const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
+  const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
+  const reservationNumber = reservationData.id.toUpperCase().substring(0, 8);
   
   console.log('[CREATE RESERVATION] About to send emails for reservation:', reservationData.id);
   
-  // Send client confirmation email (with await to ensure it completes)
+  // Send client confirmation email
   if (reservationData.mainGuest.email) {
     console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
     try {
-      const clientEmailResponse = await fetch(`${baseUrl}/api/email?action=send-client-confirmation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservation: reservationData }),
+      const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+      await resend.emails.send({
+        from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
+        to: reservationData.mainGuest.email,
+        subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
+        html: clientEmailHtml,
       });
-      
-      if (clientEmailResponse.ok) {
-        console.log('[CREATE RESERVATION] Client email sent successfully');
-      } else {
-        const errorData = await clientEmailResponse.json();
-        console.error('[CREATE RESERVATION] Client email failed:', errorData);
-      }
+      console.log('[CREATE RESERVATION] Client email sent successfully');
     } catch (err) {
       console.error('[CREATE RESERVATION] Error sending client email:', err);
     }
   }
 
-  // Send admin notification email (with await to ensure it completes)
+  // Send admin notification email
   console.log('[CREATE RESERVATION] Sending admin email');
   try {
-    const adminEmailResponse = await fetch(`${baseUrl}/api/email?action=send-reservation`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reservation: reservationData }),
+    const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
+    await resend.emails.send({
+      from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
+      to: 'geraldo@hotelsolar.tur.br',
+      subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
+      html: adminEmailHtml,
     });
-    
-    if (adminEmailResponse.ok) {
-      console.log('[CREATE RESERVATION] Admin email sent successfully');
-    } else {
-      const errorData = await adminEmailResponse.json();
-      console.error('[CREATE RESERVATION] Admin email failed:', errorData);
-    }
+    console.log('[CREATE RESERVATION] Admin email sent successfully');
   } catch (err) {
     console.error('[CREATE RESERVATION] Error sending admin email:', err);
   }
