@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ChatAssistant from './components/ChatAssistant';
 import BookingForm from './components/BookingForm';
-import ThankYouPage from './components/ThankYouPage';
+import ThankYouPage from './components/ThankYouPageSimple';
 import AdminPanel, { AdminLogin } from './components/AdminPanel';
 import RegulamentoHospedagem from './components/RegulamentoHospedagem';
 import CancelReservationPage from './components/CancelReservationPage';
@@ -970,6 +970,8 @@ const App: React.FC = () => {
 
       {/* Thank You Page */}
       {currentView === ViewState.THANK_YOU && (
+        <>
+        {console.log('RENDERING THANK YOU PAGE', { reservationId: completedReservationId, guestEmail: completedGuestEmail, paymentMethod: completedPaymentMethod })}
         <ThankYouPage
           reservationId={completedReservationId}
           guestEmail={completedGuestEmail}
@@ -982,6 +984,7 @@ const App: React.FC = () => {
             setSelectedPackagePrice(null);
           }}
         />
+        </>
       )}
 
       {/* Booking View */}
