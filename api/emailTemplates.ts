@@ -7,8 +7,22 @@ export function generateClientConfirmationEmail(
   reservationNumber: string
 ): string {
   // Parse rooms and extras if they are JSON strings
-  const rooms = typeof reservation.rooms === 'string' ? JSON.parse(reservation.rooms) : reservation.rooms;
-  const extras = typeof reservation.extras === 'string' ? JSON.parse(reservation.extras) : reservation.extras;
+  let rooms = [];
+  let extras = [];
+  
+  try {
+    rooms = typeof reservation.rooms === 'string' ? JSON.parse(reservation.rooms) : (reservation.rooms || []);
+  } catch (e) {
+    console.error('Error parsing rooms:', e);
+    rooms = [];
+  }
+  
+  try {
+    extras = typeof reservation.extras === 'string' ? JSON.parse(reservation.extras) : (reservation.extras || []);
+  } catch (e) {
+    console.error('Error parsing extras:', e);
+    extras = [];
+  }
   
   const roomsList = rooms.map((room: any) => 
     `<tr>
@@ -183,8 +197,22 @@ export function generateAdminNotificationEmail(
   reservationNumber: string
 ): string {
   // Parse rooms and extras if they are JSON strings
-  const rooms = typeof reservation.rooms === 'string' ? JSON.parse(reservation.rooms) : reservation.rooms;
-  const extras = typeof reservation.extras === 'string' ? JSON.parse(reservation.extras) : reservation.extras;
+  let rooms = [];
+  let extras = [];
+  
+  try {
+    rooms = typeof reservation.rooms === 'string' ? JSON.parse(reservation.rooms) : (reservation.rooms || []);
+  } catch (e) {
+    console.error('Error parsing rooms:', e);
+    rooms = [];
+  }
+  
+  try {
+    extras = typeof reservation.extras === 'string' ? JSON.parse(reservation.extras) : (reservation.extras || []);
+  } catch (e) {
+    console.error('Error parsing extras:', e);
+    extras = [];
+  }
   
   const roomsList = rooms.map((room: any) => 
     `<li>${room.name} - R$ ${room.priceSnapshot.toFixed(2)}</li>`
