@@ -100,7 +100,8 @@ const GeneralMapCalendar: React.FC<{
       endIso: string, 
       roomId: string, 
       updates: Partial<RoomDateOverride> | null, // null means Reset
-      priceOp?: { mode: 'fixed' | 'inc_pct' | 'dec_pct' | 'inc_val' | 'dec_val', value: number }
+      priceOp?: { mode: 'fixed' | 'inc_pct' | 'dec_pct' | 'inc_val' | 'dec_val', value: number },
+      weekdays?: number[]
   ) => void;
 }> = ({ rooms, onUpdateRoomOverride, onBulkUpdate }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -121,6 +122,7 @@ const GeneralMapCalendar: React.FC<{
   const [bulkIsClosed, setBulkIsClosed] = useState<string>('no_change'); // no_change, true, false
   const [bulkNoCheckIn, setBulkNoCheckIn] = useState<string>('no_change');
   const [bulkNoCheckOut, setBulkNoCheckOut] = useState<string>('no_change');
+  const [bulkWeekdays, setBulkWeekdays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]); // 0=Dom, 1=Seg, ..., 6=Sáb
 
   const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const year = currentDate.getFullYear();
@@ -158,14 +160,15 @@ const GeneralMapCalendar: React.FC<{
         ? "Aplicar alterações em massa? Isso substituirá os valores existentes no período selecionado."
         : "Aplicar AJUSTE MATEMÁTICO em massa? Isso alterará os preços atuais baseados na fórmula selecionada.";
 
-     if (window.confirm(confirmMsg)) {
-         onBulkUpdate(
-             bulkStart, 
-             bulkEnd, 
-             bulkRoomId, 
-             updates,
-             hasPriceUpdate ? { mode: bulkPriceMode, value: priceValue } : undefined
-         );
+      if (window.confirm(confirmMsg)) {
+          onBulkUpdate(
+              bulkStart, 
+              bulkEnd, 
+              bulkRoomId, 
+              updates,
+              hasPriceUpdate ? { mode: bulkPriceMode, value: priceValue } : undefined,
+              bulkWeekdays
+          );
          
          // Scroll to map
          setTimeout(() => {
@@ -219,6 +222,48 @@ const GeneralMapCalendar: React.FC<{
               <div className="space-y-1">
                  <label className="text-[10px] font-bold uppercase text-gray-500">Fim</label>
                  <input type="date" value={bulkEnd} onChange={e => setBulkEnd(e.target.value)} className={inputStyle} />
+              </div>
+              
+              {/* Weekday Selector */}
+              <div className="col-span-1 md:col-span-2 space-y-2">
+                 <label className="text-[10px] font-bold uppercase text-gray-500">Dias da Semana</label>
+                 <div className="flex flex-wrap gap-2">
+                    {[
+                       { label: 'Dom', value: 0 },
+                       { label: 'Seg', value: 1 },
+                       { label: 'Ter', value: 2 },
+                       { label: 'Qua', value: 3 },
+                       { label: 'Qui', value: 4 },
+                       { label: 'Sex', value: 5 },
+                       { label: 'Sáb', value: 6 }
+                    ].map(day => (
+                       <button
+                          key={day.value}
+                          type="button"
+                          onClick={() => {
+                             setBulkWeekdays(prev => 
+                                prev.includes(day.value) 
+                                   ? prev.filter(d => d !== day.value)
+                                   : [...prev, day.value].sort()
+                             );
+                          }}
+                          className={`px-3 py-1.5 text-xs font-medium rounded transition ${
+                             bulkWeekdays.includes(day.value)
+                                ? 'bg-[#D4AF37] text-[#0F2820] shadow-md'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                       >
+                          {day.label}
+                       </button>
+                    ))}
+                    <button
+                       type="button"
+                       onClick={() => setBulkWeekdays([0, 1, 2, 3, 4, 5, 6])}
+                       className="px-3 py-1.5 text-xs font-medium rounded bg-gray-50 text-gray-500 hover:bg-gray-100 transition border border-gray-300"
+                    >
+                       Todos
+                    </button>
+                 </div>
               </div>
               
               {/* Target */}
@@ -987,7 +1032,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
      handleRoomChange(roomId, 'overrides', newOverrides);
   };
 
-  const handleBulkUpdate = (startIso: string, endIso: string, roomId: string, updates: Partial<RoomDateOverride> | null, priceOp?: { mode: 'fixed' | 'inc_pct' | 'dec_pct' | 'inc_val' | 'dec_val', value: number }) => {
+  const handleBulkUpdate = (startIso: string, endIso: string, roomId: string, updates: Partial<RoomDateOverride> | null, priceOp?: { mode: 'fixed' | 'inc_pct' | 'dec_pct' | 'inc_val' | 'dec_val', value: number }, weekdays?: number[]) => {
      let targets = roomId === 'all' ? rooms : rooms.filter(r => r.id === roomId);
      
      // Generate dates
@@ -998,7 +1043,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
      endD.setUTCHours(12);
 
      while (curr <= endD) {
-         dates.push(curr.toISOString().split('T')[0]);
+         const dayOfWeek = curr.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
+         // Se weekdays foi fornecido, filtrar por dia da semana
+         if (!weekdays || weekdays.includes(dayOfWeek)) {
+             dates.push(curr.toISOString().split('T')[0]);
+         }
          curr.setDate(curr.getDate() + 1);
      }
 
