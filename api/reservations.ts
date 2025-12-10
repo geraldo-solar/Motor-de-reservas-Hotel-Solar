@@ -172,7 +172,7 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
             'content-type': 'application/json'
           },
           body: JSON.stringify({
-            sender: { name: 'Hotel Solar', email: 'reserva@hotelsolar.tur.br' },
+            sender: { name: 'Hotel Solar', email: 'geraldo@hotelsolar.tur.br' },
             to: [{ email: reservationData.mainGuest.email, name: reservationData.mainGuest.name }],
             subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
             htmlContent: clientEmailHtml
@@ -200,9 +200,9 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
           'api-key': BREVO_API_KEY,
           'content-type': 'application/json'
         },
-        body: JSON.stringify({
-          sender: { name: 'Hotel Solar', email: 'reserva@hotelsolar.tur.br' },
-          to: [{ email: 'geraldo@hotelsolar.tur.br', name: 'Administrador Hotel Solar' }],
+          body: JSON.stringify({
+            sender: { name: 'Hotel Solar', email: 'geraldo@hotelsolar.tur.br' },
+            to: [{ email: 'geraldo@hotelsolar.tur.br', name: 'Geraldo - Hotel Solar' }],
           subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
           htmlContent: adminEmailHtml
         })
