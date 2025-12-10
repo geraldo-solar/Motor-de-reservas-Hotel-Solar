@@ -1,10 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
 import { v4 as uuidv4 } from 'uuid';
-import { Resend } from 'resend';
 import { generateClientConfirmationEmail, generateAdminNotificationEmail } from './emailTemplates';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 
 export default async function handler(
   req: VercelRequest,
@@ -165,13 +164,26 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
       console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
       try {
         const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
-        await resend.emails.send({
-          from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-          to: reservationData.mainGuest.email,
-          subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
-          html: clientEmailHtml,
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'api-key': BREVO_API_KEY,
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            sender: { name: 'Hotel Solar', email: 'reserva@hotelsolar.tur.br' },
+            to: [{ email: reservationData.mainGuest.email, name: reservationData.mainGuest.name }],
+            subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
+            htmlContent: clientEmailHtml
+          })
         });
-        console.log('[CREATE RESERVATION] Client email sent successfully');
+        if (response.ok) {
+          console.log('[CREATE RESERVATION] Client email sent successfully via Brevo');
+        } else {
+          const errorData = await response.json();
+          console.error('[CREATE RESERVATION] Brevo API error:', errorData);
+        }
       } catch (err) {
         console.error('[CREATE RESERVATION] Error sending client email:', err);
       }
@@ -181,13 +193,26 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     console.log('[CREATE RESERVATION] Sending admin email');
     try {
       const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
-      await resend.emails.send({
-        from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-        to: 'geraldo@hotelsolar.tur.br',
-        subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
-        html: adminEmailHtml,
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': BREVO_API_KEY,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'Hotel Solar', email: 'reserva@hotelsolar.tur.br' },
+          to: [{ email: 'geraldo@hotelsolar.tur.br', name: 'Administrador Hotel Solar' }],
+          subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
+          htmlContent: adminEmailHtml
+        })
       });
-      console.log('[CREATE RESERVATION] Admin email sent successfully');
+      if (response.ok) {
+        console.log('[CREATE RESERVATION] Admin email sent successfully via Brevo');
+      } else {
+        const errorData = await response.json();
+        console.error('[CREATE RESERVATION] Brevo API error:', errorData);
+      }
     } catch (err) {
       console.error('[CREATE RESERVATION] Error sending admin email:', err);
     }
