@@ -72,7 +72,7 @@ export default function CancelReservationPage({ reservationId, onClose }: Cancel
     setCanceling(true);
 
     try {
-      const response = await fetch('/api/reservations/cancel', {
+      const response = await fetch('/api/reservations?action=cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

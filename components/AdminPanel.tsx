@@ -1238,7 +1238,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             onClick={async () => {
                               if (confirm('Confirmar pagamento desta reserva? Um email será enviado ao cliente.')) {
                                 try {
-                                  await fetch('/api/reservations/confirm-payment', {
+                                  await fetch('/api/reservations?action=confirm-payment', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ reservationId: selectedReservation.id, approved: true }),
@@ -1259,7 +1259,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             onClick={async () => {
                               if (confirm('Reprovar pagamento desta reserva? A reserva será cancelada.')) {
                                 try {
-                                  await fetch('/api/reservations/confirm-payment', {
+                                  await fetch('/api/reservations?action=confirm-payment', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ reservationId: selectedReservation.id, approved: false }),
