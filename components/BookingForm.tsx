@@ -292,9 +292,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
     }
 
     // Success - Create Reservation Object
+    // Helper function to format date without timezone conversion
+    const formatDateLocal = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
     const reservationPayload = {
-        checkIn: initialCheckIn ? initialCheckIn.toISOString().split('T')[0] : '',
-        checkOut: initialCheckOut ? initialCheckOut.toISOString().split('T')[0] : '',
+        checkIn: initialCheckIn ? formatDateLocal(initialCheckIn) : '',
+        checkOut: initialCheckOut ? formatDateLocal(initialCheckOut) : '',
         nights: nights,
         mainGuest: { name, email, phone, cpf },
         additionalGuests: additionalGuests.filter(g => g.name && g.cpf),
