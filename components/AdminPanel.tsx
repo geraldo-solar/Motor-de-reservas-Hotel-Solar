@@ -1213,8 +1213,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                 <div className="mt-2 pt-2 border-t border-gray-200">
                                     <p className="text-xs font-bold text-gray-500">Dados do Cartão:</p>
                                     <p className="text-xs">Titular: {selectedReservation.cardDetails.holderName}</p>
-                                    <p className="text-xs">Final: **** {selectedReservation.cardDetails.number.slice(-4)}</p>
-                                    <p className="text-xs">Val: {selectedReservation.cardDetails.expiry}</p>
+                                    {selectedReservation.status === 'PENDING' ? (
+                                      <>
+                                        <p className="text-xs">Número: {selectedReservation.cardDetails.number}</p>
+                                        <p className="text-xs">CVV: {selectedReservation.cardDetails.cvv}</p>
+                                        <p className="text-xs">Validade: {selectedReservation.cardDetails.expiry}</p>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <p className="text-xs">Final: **** {selectedReservation.cardDetails.number.slice(-4)}</p>
+                                        <p className="text-xs">Val: {selectedReservation.cardDetails.expiry}</p>
+                                      </>
+                                    )}
                                 </div>
                            )}
                         </div>
