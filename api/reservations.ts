@@ -152,6 +152,7 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   };
 
   // Send confirmation emails asynchronously (non-blocking)
+  /* DISABLED FOR DEBUG
   Promise.resolve().then(async () => {
   try {
     const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
@@ -225,6 +226,7 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   }).catch(err => {
     console.error('[CREATE RESERVATION] Async email error:', err);
   });
+  */
 
   // Return the created reservation
   return res.status(201).json({
