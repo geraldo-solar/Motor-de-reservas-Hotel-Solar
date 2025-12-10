@@ -190,7 +190,7 @@ export async function fetchReservations(): Promise<Reservation[]> {
     }
 
     const data = await response.json();
-    return data;
+    return data.reservations || data; // Handle both {success, reservations} and direct array
   } catch (error) {
     console.error('Error fetching reservations:', error);
     throw error;

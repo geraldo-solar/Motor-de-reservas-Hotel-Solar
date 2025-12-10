@@ -322,8 +322,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Create reservation in database
       const { reservation } = await createReservation(reservationPayload);
       
-      // Send email notification
-      await sendReservationEmail(reservation);
+      // Send email notification (non-blocking)
+      sendReservationEmail(reservation).catch(err => console.error('Error sending email:', err));
       
       // If PIX payment, generate PIX code
       if (paymentMethod === 'PIX') {
