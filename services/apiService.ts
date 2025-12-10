@@ -204,7 +204,7 @@ export async function createReservation(
   payload: CreateReservationPayload
 ): Promise<{ success: boolean; reservation: Reservation }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/reservations/create`, {
+    const response = await fetch(`${API_BASE_URL}/reservations?action=create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ export async function sendReservationEmail(
   reservation: Reservation
 ): Promise<{ success: boolean; emailId?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/email/send-reservation`, {
+    const response = await fetch(`${API_BASE_URL}/email?action=send-reservation`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -295,8 +295,8 @@ export async function listReservations(
 ): Promise<{ success: boolean; reservations: Reservation[] }> {
   try {
     const url = status 
-      ? `${API_BASE_URL}/reservations/list?status=${status}`
-      : `${API_BASE_URL}/reservations/list`;
+      ? `${API_BASE_URL}/reservations?action=list&status=${status}`
+      : `${API_BASE_URL}/reservations?action=list`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -642,7 +642,7 @@ export async function updateConfig(config: HotelConfig): Promise<{ success: bool
 
 // Confirm or reject payment
 export async function confirmPayment(reservationId: string, approved: boolean) {
-  const response = await fetch(`${API_BASE_URL}/reservations/confirm-payment`, {
+  const response = await fetch(`${API_BASE_URL}/reservations?action=confirm-payment`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ reservationId, approved }),
