@@ -149,7 +149,7 @@ export default async function handler(
 
     // Send email using Resend
     const emailResult = await resend.emails.send({
-      from: 'Hotel Solar <reservas@hotelsolar.tur.br>',
+      from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
       to: 'reserva@hotelsolar.tur.br',
       subject: `Nova Reserva #${reservation.id.slice(0, 8)} - ${reservation.mainGuest.name}`,
       html: htmlContent,

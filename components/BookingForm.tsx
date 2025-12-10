@@ -13,6 +13,7 @@ interface BookingFormProps {
   preSelectedPackagePrice?: number | null; // Note: If package is selected, selectedRooms likely has 1 item
   onRemoveRoom: (index: number) => void;
   onAddReservation: (reservation: Reservation) => void;
+  onReservationComplete?: (reservationId: string, guestEmail: string, paymentMethod: 'pix' | 'credit_card') => void;
 }
 
 interface AdditionalGuest {
@@ -76,7 +77,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   initialCheckOut,
   preSelectedPackagePrice,
   onRemoveRoom,
-  onAddReservation
+  onAddReservation,
+  onReservationComplete
 }) => {
   const [step, setStep] = useState(1);
   const [discountCode, setDiscountCode] = useState('');
@@ -326,13 +328,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Add to local state (for backward compatibility)
       onAddReservation(reservation);
       
-      alert('Reserva criada com sucesso! Um e-mail foi enviado para reserva@hotelsolar.tur.br com os detalhes.');
-      
-      // If credit card, show success and reload
-      if (paymentMethod === 'CREDIT_CARD') {
-        window.location.reload();
+      // Call completion callback to show thank you page
+      if (onReservationComplete) {
+        const payMethod = paymentMethod === 'PIX' ? 'pix' : 'credit_card';
+        onReservationComplete(reservation.id, email, payMethod);
+      } else {
+        // Fallback for backward compatibility
+        alert('Reserva criada com sucesso! Um e-mail foi enviado para você com os detalhes.');
+        if (paymentMethod === 'CREDIT_CARD') {
+          window.location.reload();
+        }
       }
-      // If PIX, pixData will be shown in the UI
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('Erro ao criar reserva. Por favor, tente novamente.');

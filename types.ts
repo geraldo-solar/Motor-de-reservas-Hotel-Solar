@@ -66,7 +66,8 @@ export enum ViewState {
   ROOMS = 'ROOMS',
   PACKAGES = 'PACKAGES',
   BOOKING = 'BOOKING',
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
+  THANK_YOU = 'THANK_YOU'
 }
 
 export interface HotelConfig {

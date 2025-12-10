@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ChatAssistant from './components/ChatAssistant';
 import BookingForm from './components/BookingForm';
+import ThankYouPage from './components/ThankYouPage';
 import AdminPanel, { AdminLogin } from './components/AdminPanel';
 import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
@@ -44,6 +45,11 @@ const App: React.FC = () => {
   const [currentCalendarDate, setCurrentCalendarDate] = useState(new Date());
   const [checkIn, setCheckIn] = useState<Date | null>(null);
   const [checkOut, setCheckOut] = useState<Date | null>(null);
+
+  // Thank You Page State
+  const [completedReservationId, setCompletedReservationId] = useState<string>('');
+  const [completedGuestEmail, setCompletedGuestEmail] = useState<string>('');
+  const [completedPaymentMethod, setCompletedPaymentMethod] = useState<'pix' | 'credit_card'>('pix');
 
   // Refs for scrolling
   const roomsSectionRef = useRef<HTMLDivElement>(null);
@@ -914,19 +920,41 @@ const App: React.FC = () => {
          </div>
       )}
 
+      {/* Thank You Page */}
+      {currentView === ViewState.THANK_YOU && (
+        <ThankYouPage
+          reservationId={completedReservationId}
+          guestEmail={completedGuestEmail}
+          paymentMethod={completedPaymentMethod}
+          onBackToHome={() => {
+            setCurrentView(ViewState.HOME);
+            setSelectedRooms([]);
+            setCheckIn(null);
+            setCheckOut(null);
+            setSelectedPackagePrice(null);
+          }}
+        />
+      )}
+
       {/* Booking View */}
       {currentView === ViewState.BOOKING && (
          <div className="py-12 max-w-4xl mx-auto px-4">
-            <BookingForm 
-               selectedRooms={selectedRooms} 
-               discountCodes={discounts}
-               extras={extras}
-               initialCheckIn={checkIn}
-               initialCheckOut={checkOut}
-               preSelectedPackagePrice={selectedPackagePrice}
-               onRemoveRoom={handleRemoveFromBooking}
-               onAddReservation={handleAddReservation} // PASS HANDLER
-            />
+             <BookingForm 
+                selectedRooms={selectedRooms} 
+                discountCodes={discounts}
+                extras={extras}
+                initialCheckIn={checkIn}
+                initialCheckOut={checkOut}
+                preSelectedPackagePrice={selectedPackagePrice}
+                onRemoveRoom={handleRemoveFromBooking}
+                onAddReservation={handleAddReservation}
+                onReservationComplete={(reservationId, guestEmail, paymentMethod) => {
+                  setCompletedReservationId(reservationId);
+                  setCompletedGuestEmail(guestEmail);
+                  setCompletedPaymentMethod(paymentMethod);
+                  setCurrentView(ViewState.THANK_YOU);
+                }}
+             />
          </div>
       )}
 

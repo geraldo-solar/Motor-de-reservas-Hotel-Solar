@@ -87,35 +87,59 @@ export default async function handler(
 
     const reservation = result.rows[0];
 
+    // Prepare reservation data for emails
+    const reservationData = {
+      id: reservation.id,
+      createdAt: reservation.created_at,
+      checkIn: reservation.check_in,
+      checkOut: reservation.check_out,
+      nights: reservation.nights,
+      mainGuest: {
+        name: reservation.main_guest_name,
+        cpf: reservation.main_guest_cpf,
+        age: reservation.main_guest_age,
+        email: reservation.main_guest_email,
+        phone: reservation.main_guest_phone,
+      },
+      additionalGuests: reservation.additional_guests,
+      observations: reservation.observations,
+      rooms: reservation.rooms,
+      extras: reservation.extras,
+      totalPrice: parseFloat(reservation.total_price),
+      discountApplied: reservation.discount_code ? {
+        code: reservation.discount_code,
+        amount: parseFloat(reservation.discount_amount),
+      } : undefined,
+      paymentMethod: reservation.payment_method,
+      cardDetails: reservation.card_details,
+      status: reservation.status,
+    };
+
+    // Send emails (non-blocking)
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'https://motor-de-reservas-hotel-solar.vercel.app';
+
+    // Send client confirmation email
+    if (reservationData.mainGuest.email) {
+      fetch(`${baseUrl}/api/email/send-client-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reservation: reservationData }),
+      }).catch(err => console.error('Error sending client email:', err));
+    }
+
+    // Send admin notification email
+    fetch(`${baseUrl}/api/email/send-reservation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reservation: reservationData }),
+    }).catch(err => console.error('Error sending admin email:', err));
+
     // Return the created reservation
     return res.status(201).json({
       success: true,
-      reservation: {
-        id: reservation.id,
-        createdAt: reservation.created_at,
-        checkIn: reservation.check_in,
-        checkOut: reservation.check_out,
-        nights: reservation.nights,
-        mainGuest: {
-          name: reservation.main_guest_name,
-          cpf: reservation.main_guest_cpf,
-          age: reservation.main_guest_age,
-          email: reservation.main_guest_email,
-          phone: reservation.main_guest_phone,
-        },
-        additionalGuests: reservation.additional_guests,
-        observations: reservation.observations,
-        rooms: reservation.rooms,
-        extras: reservation.extras,
-        totalPrice: parseFloat(reservation.total_price),
-        discountApplied: reservation.discount_code ? {
-          code: reservation.discount_code,
-          amount: parseFloat(reservation.discount_amount),
-        } : undefined,
-        paymentMethod: reservation.payment_method,
-        cardDetails: reservation.card_details,
-        status: reservation.status,
-      },
+      reservation: reservationData,
     });
   } catch (error) {
     console.error('Error creating reservation:', error);
