@@ -1224,18 +1224,66 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                        </ul>
                     </div>
 
-                    {selectedReservation.observations && (
-                       <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
-                          <p className="font-bold text-xs uppercase text-yellow-700">Observações</p>
-                          <p className="text-sm text-yellow-900">{selectedReservation.observations}</p>
-                       </div>
-                    )}
-                 </div>
-              </div>
-           </div>
-       )}
-    </div>
-  );
+                   {selectedReservation.observations && (
+                      <div className="bg-yellow-50 p-3 rounded border border-yellow-200">
+                         <p className="font-bold text-xs uppercase text-yellow-700">Observações</p>
+                         <p className="text-sm text-yellow-900">{selectedReservation.observations}</p>
+                      </div>
+                   )}
+
+                   {/* Payment Confirmation Buttons */}
+                   {selectedReservation.status === 'PENDING' && (
+                      <div className="flex gap-3 pt-4 border-t border-gray-200">
+                         <button
+                            onClick={async () => {
+                              if (confirm('Confirmar pagamento desta reserva? Um email será enviado ao cliente.')) {
+                                try {
+                                  await fetch('/api/reservations/confirm-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ reservationId: selectedReservation.id, approved: true }),
+                                  });
+                                  alert('Pagamento confirmado! Email enviado ao cliente.');
+                                  setSelectedReservation(null);
+                                  window.location.reload();
+                                } catch (error) {
+                                  alert('Erro ao confirmar pagamento.');
+                                }
+                              }
+                            }}
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition flex items-center justify-center gap-2"
+                         >
+                            <CheckCircle size={18} /> Confirmar Pagamento
+                         </button>
+                         <button
+                            onClick={async () => {
+                              if (confirm('Reprovar pagamento desta reserva? A reserva será cancelada.')) {
+                                try {
+                                  await fetch('/api/reservations/confirm-payment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ reservationId: selectedReservation.id, approved: false }),
+                                  });
+                                  alert('Pagamento reprovado. Reserva cancelada.');
+                                  setSelectedReservation(null);
+                                  window.location.reload();
+                                } catch (error) {
+                                  alert('Erro ao reprovar pagamento.');
+                                }
+                              }
+                            }}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded transition flex items-center justify-center gap-2"
+                         >
+                            <X size={18} /> Reprovar Pagamento
+                         </button>
+                      </div>
+                   )}
+                </div>
+             </div>
+          </div>
+      )}
+   </div>
+ );
 
   return (
     <div className="flex min-h-screen bg-[#F9F8F6] relative">

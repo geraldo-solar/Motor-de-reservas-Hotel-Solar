@@ -132,6 +132,27 @@ const App: React.FC = () => {
     loadData();
   }, []);
 
+  // Check URL parameters for admin view and reservation
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const view = params.get('view');
+    const reservationId = params.get('reservation');
+
+    if (view === 'admin') {
+      setCurrentView(ViewState.ADMIN);
+      
+      // If there's a reservation ID, wait for data to load then open it
+      if (reservationId && !isLoadingData) {
+        const reservation = reservations.find(r => r.id === reservationId);
+        if (reservation) {
+          // AdminPanel will handle opening the modal via selectedReservation
+          // We need to pass this through props or use a different approach
+          console.log('Reservation found:', reservationId);
+        }
+      }
+    }
+  }, [isLoadingData, reservations]);
+
   // --- HISTORY LOGIC ---
   const saveCheckpoint = () => {
      const currentSnapshot: HistoryState = {

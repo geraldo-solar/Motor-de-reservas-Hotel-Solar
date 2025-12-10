@@ -639,3 +639,18 @@ export async function updateConfig(config: HotelConfig): Promise<{ success: bool
     throw error;
   }
 }
+
+// Confirm or reject payment
+export async function confirmPayment(reservationId: string, approved: boolean) {
+  const response = await fetch(`${API_BASE_URL}/reservations/confirm-payment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reservationId, approved }),
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to confirm payment');
+  }
+  
+  return response.json();
+}

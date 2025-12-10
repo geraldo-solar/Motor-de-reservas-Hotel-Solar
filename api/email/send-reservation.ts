@@ -53,8 +53,8 @@ export default async function handler(
       ? 'PIX'
       : `Cartão de Crédito\nTitular: ${reservation.cardDetails?.holderName || 'N/A'}\nNúmero: **** **** **** ${reservation.cardDetails?.number?.slice(-4) || '****'}\nValidade: ${reservation.cardDetails?.expiry || 'N/A'}`;
 
-    // Admin panel link
-    const adminPanelUrl = `${process.env.VERCEL_URL || 'https://motor-de-reservas-hotel-solar.vercel.app'}/?view=admin`;
+    // Admin panel link with reservation ID
+    const adminPanelUrl = `${process.env.VERCEL_URL || 'https://motor-de-reservas-hotel-solar.vercel.app'}/?view=admin&reservation=${reservation.id}`;
 
     // Email HTML content
     const htmlContent = `
