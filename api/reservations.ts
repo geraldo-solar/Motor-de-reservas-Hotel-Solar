@@ -151,7 +151,14 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     status: reservation.status,
   };
 
-  // Send confirmation emails
+  // Return the created reservation immediately
+  res.status(201).json({
+    success: true,
+    reservation: reservationData,
+  });
+
+  // Send confirmation emails asynchronously (non-blocking)
+  Promise.resolve().then(async () => {
   try {
     const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
     const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
@@ -221,11 +228,8 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     console.error('[CREATE RESERVATION] Email sending failed, but reservation was created:', emailError);
     console.error('[CREATE RESERVATION] Email error stack:', emailError instanceof Error ? emailError.stack : 'No stack trace');
   }
-
-  // Return the created reservation
-  return res.status(201).json({
-    success: true,
-    reservation: reservationData,
+  }).catch(err => {
+    console.error('[CREATE RESERVATION] Async email error:', err);
   });
 }
 
