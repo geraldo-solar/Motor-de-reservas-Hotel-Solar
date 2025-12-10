@@ -41,7 +41,6 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
               </a>
               <button onClick={() => onNavigate(ViewState.HOME)} className={navItemClass(ViewState.HOME)}>INÍCIO</button>
               <button onClick={() => onNavigate(ViewState.ROOMS)} className={navItemClass(ViewState.ROOMS)}>ACOMODAÇÕES</button>
-              <button onClick={() => onNavigate(ViewState.PACKAGES)} className={navItemClass(ViewState.PACKAGES)}>PACOTES</button>
             </div>
           </div>
 
