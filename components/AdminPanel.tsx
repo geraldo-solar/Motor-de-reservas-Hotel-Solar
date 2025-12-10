@@ -137,7 +137,15 @@ const GeneralMapCalendar: React.FC<{
   const month = currentDate.getMonth();
   const daysInMonth = getDaysInMonth(year, month);
 
-  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  // Filter out past dates
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const daysArray = allDays.filter(day => {
+    const dateObj = new Date(year, month, day);
+    return dateObj >= today;
+  });
 
   const handlePrev = () => setCurrentDate(new Date(year, month - 1, 1));
   const handleNext = () => setCurrentDate(new Date(year, month + 1, 1));
@@ -432,11 +440,6 @@ const GeneralMapCalendar: React.FC<{
                       const dateObj = new Date(year, month, day);
                       const isoDate = toLocalISO(dateObj);
                       
-                      // Check if date is in the past
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      const isPastDate = dateObj < today;
-                      
                       const override = room.overrides?.find(o => o.dateIso === isoDate);
                       
                       const displayPrice = override?.price !== undefined ? override.price : room.price;
@@ -461,7 +464,7 @@ const GeneralMapCalendar: React.FC<{
                       return (
                         <div 
                           key={`${room.id}-${day}`} 
-                          className={`${cellStyle} ${isClosed ? 'bg-red-900/30 border-red-800/50' : ''} ${isPastDate ? 'bg-red-900/20 opacity-60' : ''}`}
+                          className={`${cellStyle} ${isClosed ? 'bg-red-900/30 border-red-800/50' : ''}`}
                         >
                           {/* Price Input */}
                           <div className={`flex items-center gap-0.5 md:gap-1 bg-[#2F3A2F] rounded px-0.5 md:px-1 border border-[#4A5D43] ${isClosed ? 'opacity-50' : ''}`}>
