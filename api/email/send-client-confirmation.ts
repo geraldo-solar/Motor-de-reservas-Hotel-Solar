@@ -155,6 +155,23 @@ export default async function handler(
                         </p>
                       </div>
 
+                      <!-- Regulamento e Cancelamento -->
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px; padding: 20px; background-color: #F9FAFB; border-radius: 8px;">
+                        <tr>
+                          <td style="text-align: center; padding-bottom: 15px;">
+                            <p style="margin: 0; font-size: 14px; color: #6B7280;">
+                              <a href="https://motor-de-reservas-hotel-solar.vercel.app/regulamento" style="color: #16A34A; text-decoration: none; font-weight: 600;">📋 Regulamento de Hospedagem e Cancelamento</a>
+                            </p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="text-align: center; border-top: 1px solid #E5E7EB; padding-top: 15px;">
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #9CA3AF;">Precisa cancelar sua reserva?</p>
+                            <a href="https://motor-de-reservas-hotel-solar.vercel.app/cancelar-reserva?id=${reservation.id}" style="display: inline-block; padding: 8px 16px; background-color: #EF4444; color: white; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 600;">Cancelar Reserva</a>
+                          </td>
+                        </tr>
+                      </table>
+
                     </td>
                   </tr>
 

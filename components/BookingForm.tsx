@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Users, ArrowRight, CheckCircle, Tag, Lock, ShoppingBag, CreditCard, MessageSquare, QrCode, Copy, User, Mail, Phone, FileText, ChevronLeft, ShieldCheck, AlertCircle, BedDouble, Trash2, Baby } from 'lucide-react';
 import { Room, DiscountCode, ExtraService, Reservation } from '../types';
 import { createReservation, sendReservationEmail, generatePixPayment } from '../services/apiService';
+import RegulamentoHospedagem from './RegulamentoHospedagem';
 
 interface BookingFormProps {
   selectedRooms: Room[];
@@ -108,6 +109,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // Loading and PIX states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pixData, setPixData] = useState<{ payload: string; qrCode: string } | null>(null);
+  
+  // Regulamento
+  const [acceptedRegulamento, setAcceptedRegulamento] = useState(false);
+  const [showRegulamento, setShowRegulamento] = useState(false);
   
   // Refs for auto-scroll
   const nameRef = useRef<HTMLInputElement>(null);
@@ -717,13 +722,52 @@ const BookingForm: React.FC<BookingFormProps> = ({
                )}
             </div>
 
+            {/* Aceite do Regulamento */}
+            <div className="border border-[#D4AF37] rounded-lg p-4 bg-[#F9F8F6]">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedRegulamento}
+                  onChange={(e) => setAcceptedRegulamento(e.target.checked)}
+                  className="mt-1 w-5 h-5 text-[#D4AF37] border-[#4A5D43] rounded focus:ring-[#D4AF37]"
+                />
+                <span className="text-sm text-[#0F2820]">
+                  <strong>Li e aceito o </strong>
+                  <button
+                    type="button"
+                    onClick={() => setShowRegulamento(true)}
+                    className="text-[#16A34A] font-bold underline hover:text-[#15803D]"
+                  >
+                    Regulamento de Hospedagem e Cancelamento
+                  </button>
+                  <strong> do Hotel Solar.</strong>
+                  <br />
+                  <span className="text-xs text-gray-600">
+                    É obrigatório aceitar o regulamento para concluir a reserva.
+                  </span>
+                </span>
+              </label>
+            </div>
+
             <button 
               onClick={handleFinalSubmit}
-              className="w-full bg-[#0F2820] text-white py-4 rounded font-bold uppercase tracking-widest hover:bg-[#1a3c30] transition shadow-lg flex items-center justify-center gap-2 text-lg"
+              disabled={!acceptedRegulamento}
+              className="w-full bg-[#0F2820] text-white py-4 rounded font-bold uppercase tracking-widest hover:bg-[#1a3c30] transition shadow-lg flex items-center justify-center gap-2 text-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
                <CheckCircle size={24} className="text-[#D4AF37]" /> Confirmar Reserva e Pagar
             </button>
+            
+            {!acceptedRegulamento && (
+              <p className="text-center text-sm text-red-600">
+                ⚠️ Você precisa aceitar o regulamento para continuar
+              </p>
+            )}
         </div>
+        
+        {/* Modal de Regulamento */}
+        {showRegulamento && (
+          <RegulamentoHospedagem onClose={() => setShowRegulamento(false)} />
+        )}
     </div>
   );
 };

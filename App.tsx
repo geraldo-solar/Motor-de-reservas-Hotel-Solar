@@ -5,6 +5,8 @@ import ChatAssistant from './components/ChatAssistant';
 import BookingForm from './components/BookingForm';
 import ThankYouPage from './components/ThankYouPage';
 import AdminPanel, { AdminLogin } from './components/AdminPanel';
+import RegulamentoHospedagem from './components/RegulamentoHospedagem';
+import CancelReservationPage from './components/CancelReservationPage';
 import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
 import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
@@ -878,6 +880,21 @@ const App: React.FC = () => {
         onRedo={handleRedo}
       />
     );
+  }
+
+  // Check URL for special pages
+  const urlParams = new URLSearchParams(window.location.search);
+  const showRegulamento = window.location.pathname === '/regulamento';
+  const cancelReservationId = urlParams.get('id');
+  const showCancelPage = window.location.pathname === '/cancelar-reserva' && cancelReservationId;
+
+  // Render special pages
+  if (showRegulamento) {
+    return <RegulamentoHospedagem onClose={() => window.location.href = '/'} />;
+  }
+
+  if (showCancelPage) {
+    return <CancelReservationPage reservationId={cancelReservationId} onClose={() => window.location.href = '/'} />;
   }
 
   return (
