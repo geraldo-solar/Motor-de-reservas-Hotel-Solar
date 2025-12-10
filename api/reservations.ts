@@ -126,20 +126,27 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     const checkOutDate = new Date(checkOut);
     const roomsArray = JSON.parse(JSON.stringify(rooms));
 
+    console.log('[STOCK UPDATE] Starting stock update for reservation:', reservationId);
+    console.log('[STOCK UPDATE] Rooms array:', JSON.stringify(roomsArray));
+    console.log('[STOCK UPDATE] Check-in:', checkIn, 'Check-out:', checkOut);
+
     // For each room in the reservation
     for (const room of roomsArray) {
       const roomId = room.id;
+      console.log('[STOCK UPDATE] Processing room:', roomId);
       
       // Get room's total quantity from database
       const roomData = await sql`
         SELECT total_quantity FROM rooms WHERE id = ${roomId}
       `;
       const totalQuantity = roomData.rows[0]?.total_quantity || 1;
+      console.log('[STOCK UPDATE] Room total quantity:', totalQuantity);
       
       // For each night between check-in and check-out
       const currentDate = new Date(checkInDate);
       while (currentDate < checkOutDate) {
         const dateStr = currentDate.toISOString().split('T')[0];
+        console.log('[STOCK UPDATE] Processing date:', dateStr);
         
         // Check if there's already an override for this room/date
         const existingOverride = await sql`
@@ -150,21 +157,29 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
         if (existingOverride.rows.length > 0) {
           // Update existing override - decrement available quantity
           const currentQty = existingOverride.rows[0].available_quantity;
+          console.log('[STOCK UPDATE] Found existing override with qty:', currentQty);
           if (currentQty !== null && currentQty > 0) {
+            const newQty = currentQty - 1;
+            console.log('[STOCK UPDATE] Updating to new qty:', newQty);
             await sql`
               UPDATE room_date_overrides 
-              SET available_quantity = ${currentQty - 1}
+              SET available_quantity = ${newQty}
               WHERE room_id = ${roomId} AND date = ${dateStr}
             `;
+            console.log('[STOCK UPDATE] Update successful');
+          } else {
+            console.log('[STOCK UPDATE] Quantity is null or 0, skipping update');
           }
         } else {
           // Create new override with decremented quantity
           // Use totalQuantity from room and decrement by 1
           const newQty = Math.max(0, totalQuantity - 1);
+          console.log('[STOCK UPDATE] No existing override, creating new with qty:', newQty);
           await sql`
             INSERT INTO room_date_overrides (room_id, date, available_quantity)
             VALUES (${roomId}, ${dateStr}, ${newQty})
           `;
+          console.log('[STOCK UPDATE] Insert successful');
         }
         
         // Move to next day
