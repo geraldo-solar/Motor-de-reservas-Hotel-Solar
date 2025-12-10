@@ -20,6 +20,7 @@ export interface CreateReservationPayload {
   }>;
   observations: string;
   rooms: Array<{
+    id: string;
     name: string;
     priceSnapshot: number;
   }>;
