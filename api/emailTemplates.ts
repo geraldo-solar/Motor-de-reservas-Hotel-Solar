@@ -6,10 +6,10 @@ export function generateClientConfirmationEmail(
   checkOutDate: string,
   reservationNumber: string
 ): string {
-  const roomsList = reservation.rooms.map((room: any) => 
+  const roomsList = reservation.accommodations.map((room: any) => 
     `<tr>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${room.name}</td>
-      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">R$ ${room.priceSnapshot.toFixed(2)}</td>
+      <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">R$ ${room.pricePerNight.toFixed(2)}</td>
     </tr>`
   ).join('');
 
@@ -178,8 +178,8 @@ export function generateAdminNotificationEmail(
   checkOutDate: string,
   reservationNumber: string
 ): string {
-  const roomsList = reservation.rooms.map((room: any) => 
-    `<li>${room.name} - R$ ${room.priceSnapshot.toFixed(2)}</li>`
+  const roomsList = reservation.accommodations.map((room: any) => 
+    `<li>${room.name} - R$ ${room.pricePerNight.toFixed(2)}</li>`
   ).join('');
 
   const extrasList = reservation.extras && reservation.extras.length > 0
