@@ -1,9 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
 import { v4 as uuidv4 } from 'uuid';
-import { generateClientConfirmationEmail, generateAdminNotificationEmail } from './emailTemplates';
-
-const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 
 export default async function handler(
   req: VercelRequest,
@@ -151,82 +148,14 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     status: reservation.status,
   };
 
-  // Send confirmation emails asynchronously (non-blocking)
-  /* DISABLED FOR DEBUG
-  Promise.resolve().then(async () => {
-  try {
-    const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
-    const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
-    const reservationNumber = reservationData.id.toUpperCase().substring(0, 8);
-    
-    console.log('[CREATE RESERVATION] About to send emails for reservation:', reservationData.id);
-    
-    // Send client confirmation email
-    if (reservationData.mainGuest.email) {
-      console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
-      try {
-        const clientEmailHtml = generateClientConfirmationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-          method: 'POST',
-          headers: {
-            'accept': 'application/json',
-            'api-key': BREVO_API_KEY,
-            'content-type': 'application/json'
-          },
-          body: JSON.stringify({
-            sender: { name: 'Hotel Solar', email: 'geraldo@hotelsolar.tur.br' },
-            to: [{ email: reservationData.mainGuest.email, name: reservationData.mainGuest.name }],
-            subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
-            htmlContent: clientEmailHtml
-          })
-        });
-        if (response.ok) {
-          console.log('[CREATE RESERVATION] Client email sent successfully via Brevo');
-        } else {
-          const errorData = await response.json();
-          console.error('[CREATE RESERVATION] Brevo API error:', errorData);
-        }
-      } catch (err) {
-        console.error('[CREATE RESERVATION] Error sending client email:', err);
-      }
-    }
-
-    // Send admin notification email
-    console.log('[CREATE RESERVATION] Sending admin email');
-    try {
-      const adminEmailHtml = generateAdminNotificationEmail(reservationData, checkInDate, checkOutDate, reservationNumber);
-      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'api-key': BREVO_API_KEY,
-          'content-type': 'application/json'
-        },
-          body: JSON.stringify({
-            sender: { name: 'Hotel Solar', email: 'geraldo@hotelsolar.tur.br' },
-            to: [{ email: 'geraldo@hotelsolar.tur.br', name: 'Geraldo - Hotel Solar' }],
-          subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
-          htmlContent: adminEmailHtml
-        })
-      });
-      if (response.ok) {
-        console.log('[CREATE RESERVATION] Admin email sent successfully via Brevo');
-      } else {
-        const errorData = await response.json();
-        console.error('[CREATE RESERVATION] Brevo API error:', errorData);
-      }
-    } catch (err) {
-      console.error('[CREATE RESERVATION] Error sending admin email:', err);
-    }
-  } catch (emailError) {
-    // Don't let email errors break the reservation creation
-    console.error('[CREATE RESERVATION] Email sending failed, but reservation was created:', emailError);
-    console.error('[CREATE RESERVATION] Email error stack:', emailError instanceof Error ? emailError.stack : 'No stack trace');
-  }
+  // Send confirmation emails asynchronously via separate API (fire-and-forget)
+  fetch(`${process.env.VERCEL_URL || 'https://motor-de-reservas-hotel-solar.vercel.app'}/api/send-reservation-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reservation: reservationData })
   }).catch(err => {
-    console.error('[CREATE RESERVATION] Async email error:', err);
+    console.error('[CREATE RESERVATION] Failed to trigger email API:', err);
   });
-  */
 
   // Return the created reservation
   return res.status(201).json({
