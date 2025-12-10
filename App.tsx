@@ -336,7 +336,11 @@ const App: React.FC = () => {
   // Helper to get package on a specific date
   const getPackageOnDate = (date: Date) => {
     const iso = date.toISOString().split('T')[0];
-    return activePackages.find(p => iso >= p.startIsoDate && iso <= p.endIsoDate);
+    return activePackages.find(p => {
+      const startDate = p.startIsoDate.split('T')[0];
+      const endDate = p.endIsoDate.split('T')[0];
+      return iso >= startDate && iso <= endDate;
+    });
   };
 
   // Helper to get room override for specific date
