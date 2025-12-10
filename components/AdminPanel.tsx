@@ -34,6 +34,12 @@ const toLocalISO = (date: Date) => {
   return `${y}-${m}-${d}`;
 };
 
+// --- HELPER: Format date string (YYYY-MM-DD) to DD/MM/YYYY without timezone conversion ---
+const formatDateLocal = (dateString: string) => {
+  const [year, month, day] = dateString.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 export const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -1137,8 +1143,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             <div className="text-xs text-gray-500">{res.mainGuest.email}</div>
                         </td>
                         <td className="p-3">
-                            <div>In: {new Date(res.checkIn).toLocaleDateString()}</div>
-                            <div>Out: {new Date(res.checkOut).toLocaleDateString()}</div>
+                            <div>In: {formatDateLocal(res.checkIn)}</div>
+                            <div>Out: {formatDateLocal(res.checkOut)}</div>
                             <div className="text-xs font-bold text-gray-600">{res.rooms.length} Quarto(s)</div>
                         </td>
                         <td className="p-3 font-bold text-[#0F2820]">
