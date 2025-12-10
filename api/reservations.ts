@@ -151,7 +151,9 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     status: reservation.status,
   };
 
-  // Send emails in background (non-blocking) - don't let email errors break reservation creation
+  // TEMPORARILY DISABLED: Send emails in background (non-blocking) - don't let email errors break reservation creation
+  console.log('[CREATE RESERVATION] Email sending is temporarily disabled for debugging');
+  /*
   try {
     const checkInDate = new Date(reservationData.checkIn).toLocaleDateString('pt-BR');
     const checkOutDate = new Date(reservationData.checkOut).toLocaleDateString('pt-BR');
@@ -220,6 +222,7 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     // Don't let email errors break the reservation creation
     console.error('[CREATE RESERVATION] Email sending failed, but reservation was created:', emailError);
   }
+  */
 
   // Return the created reservation
   return res.status(201).json({
