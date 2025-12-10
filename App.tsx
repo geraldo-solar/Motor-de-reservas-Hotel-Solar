@@ -909,34 +909,6 @@ const App: React.FC = () => {
       {/* Floating Cart Bar */}
       {currentView !== ViewState.THANK_YOU && renderFloatingBar()}
       
-      {/* DEBUG: Test button to force THANK_YOU view */}
-      {currentView === ViewState.HOME && (
-        <button
-          onClick={() => {
-            console.log('DEBUG: Forcing THANK_YOU view');
-            setCompletedReservationId('test-123-456');
-            setCompletedGuestEmail('teste@example.com');
-            setCompletedPaymentMethod('pix');
-            setCurrentView(ViewState.THANK_YOU);
-          }}
-          style={{
-            position: 'fixed',
-            top: '100px',
-            right: '20px',
-            zIndex: 9999,
-            backgroundColor: 'red',
-            color: 'white',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          TEST THANK YOU
-        </button>
-      )}
-      
       {/* Home View */}
       {currentView === ViewState.HOME && (
         <>
@@ -1044,23 +1016,23 @@ const App: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="bg-[#0F2820] text-white pt-20 pb-10 border-t border-[#D4AF37]">
+      <footer className="bg-[#0F2820] text-white pt-8 pb-6 border-t border-[#D4AF37]">
          <div className="max-w-7xl mx-auto px-4 text-center">
-            <div className="mb-8 flex justify-center">
+            <div className="mb-4 flex justify-center">
                <img 
                  src="/hotel-solar-logo.png" 
                  alt="Hotel Solar" 
-                 className="h-24 w-auto object-contain"
+                 className="h-16 w-auto object-contain"
                />
             </div>
             
-            <div className="space-y-2 text-sm text-gray-400 font-light mb-12">
+            <div className="space-y-1 text-sm text-gray-400 font-light mb-6">
                <p>Av. Atlântica • CEP 68721-000 • Salinópolis - PA</p>
                <p>Tel: (91) 98100-0800</p>
                <p>E-mail: reserva@hotelsolar.tur.br</p>
             </div>
 
-            <div className="text-xs text-[#4A5D43] pt-8 border-t border-[#4A5D43]/30">
+            <div className="text-xs text-[#4A5D43] pt-4 border-t border-[#4A5D43]/30">
                <p>&copy; {new Date().getFullYear()} Hotel Solar. Todos os direitos reservados.</p>
                <button onClick={() => setCurrentView(ViewState.ADMIN)} className="mt-4 hover:text-[#D4AF37] transition opacity-50 hover:opacity-100">Área Administrativa</button>
             </div>
