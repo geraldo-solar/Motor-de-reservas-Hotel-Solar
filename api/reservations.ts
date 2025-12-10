@@ -130,6 +130,12 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     for (const room of roomsArray) {
       const roomId = room.id;
       
+      // Get room's total quantity from database
+      const roomData = await sql`
+        SELECT total_quantity FROM rooms WHERE id = ${roomId}
+      `;
+      const totalQuantity = roomData.rows[0]?.total_quantity || 1;
+      
       // For each night between check-in and check-out
       const currentDate = new Date(checkInDate);
       while (currentDate < checkOutDate) {
@@ -153,10 +159,11 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
           }
         } else {
           // Create new override with decremented quantity
-          // Assume default quantity is 1, so after reservation it becomes 0
+          // Use totalQuantity from room and decrement by 1
+          const newQty = Math.max(0, totalQuantity - 1);
           await sql`
             INSERT INTO room_date_overrides (room_id, date, available_quantity)
-            VALUES (${roomId}, ${dateStr}, 0)
+            VALUES (${roomId}, ${dateStr}, ${newQty})
           `;
         }
         
