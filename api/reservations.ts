@@ -479,12 +479,13 @@ async function cancelReservation(req: VercelRequest, res: VercelResponse) {
     `;
 
     try {
-      await resend.emails.send({
-        from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-        to: guestEmail,
-        subject: `Cancelamento Confirmado - Reserva #${reservationNumber} - Hotel Solar`,
-        html: guestEmailHtml,
-      });
+      // TODO: Implement email sending for cancellation
+      // await resend.emails.send({
+      //   from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
+      //   to: guestEmail,
+      //   subject: `Cancelamento Confirmado - Reserva #${reservationNumber} - Hotel Solar`,
+      //   html: guestEmailHtml,
+      // });
     } catch (emailError) {
       console.error('Error sending cancellation email:', emailError);
     }
