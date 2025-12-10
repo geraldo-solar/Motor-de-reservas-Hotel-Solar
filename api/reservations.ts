@@ -151,26 +151,50 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
     status: reservation.status,
   };
 
-  // Send emails (non-blocking)
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : 'https://motor-de-reservas-hotel-solar.vercel.app';
-
-  // Send client confirmation email
+  // Send emails using internal API calls with detailed logging
+  const baseUrl = 'https://motor-de-reservas-hotel-solar.vercel.app';
+  
+  console.log('[CREATE RESERVATION] About to send emails for reservation:', reservationData.id);
+  
+  // Send client confirmation email (with await to ensure it completes)
   if (reservationData.mainGuest.email) {
-    fetch(`${baseUrl}/api/email?action=send-client-confirmation`, {
+    console.log('[CREATE RESERVATION] Sending client email to:', reservationData.mainGuest.email);
+    try {
+      const clientEmailResponse = await fetch(`${baseUrl}/api/email?action=send-client-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reservation: reservationData }),
+      });
+      
+      if (clientEmailResponse.ok) {
+        console.log('[CREATE RESERVATION] Client email sent successfully');
+      } else {
+        const errorData = await clientEmailResponse.json();
+        console.error('[CREATE RESERVATION] Client email failed:', errorData);
+      }
+    } catch (err) {
+      console.error('[CREATE RESERVATION] Error sending client email:', err);
+    }
+  }
+
+  // Send admin notification email (with await to ensure it completes)
+  console.log('[CREATE RESERVATION] Sending admin email');
+  try {
+    const adminEmailResponse = await fetch(`${baseUrl}/api/email?action=send-reservation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reservation: reservationData }),
-    }).catch(err => console.error('Error sending client email:', err));
+    });
+    
+    if (adminEmailResponse.ok) {
+      console.log('[CREATE RESERVATION] Admin email sent successfully');
+    } else {
+      const errorData = await adminEmailResponse.json();
+      console.error('[CREATE RESERVATION] Admin email failed:', errorData);
+    }
+  } catch (err) {
+    console.error('[CREATE RESERVATION] Error sending admin email:', err);
   }
-
-  // Send admin notification email
-  fetch(`${baseUrl}/api/email?action=send-reservation`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reservation: reservationData }),
-  }).catch(err => console.error('Error sending admin email:', err));
 
   // Return the created reservation
   return res.status(201).json({
