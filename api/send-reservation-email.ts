@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { generateClientConfirmationEmail, generateAdminNotificationEmail } from './emailTemplates';
+import { generateClientConfirmationEmail, generateAdminNotificationEmail } from './emailTemplatesSimple';
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
 
