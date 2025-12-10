@@ -1,6 +1,8 @@
 import React from 'react';
 import { CheckCircle, Mail, ArrowLeft } from 'lucide-react';
 
+// Updated: 2025-12-10 - Added header and updated text
+
 interface ThankYouPageProps {
   reservationId: string;
   guestEmail: string;
