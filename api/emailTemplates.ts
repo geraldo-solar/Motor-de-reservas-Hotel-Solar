@@ -6,15 +6,19 @@ export function generateClientConfirmationEmail(
   checkOutDate: string,
   reservationNumber: string
 ): string {
-  const roomsList = reservation.rooms.map((room: any) => 
+  // Parse rooms and extras if they are JSON strings
+  const rooms = typeof reservation.rooms === 'string' ? JSON.parse(reservation.rooms) : reservation.rooms;
+  const extras = typeof reservation.extras === 'string' ? JSON.parse(reservation.extras) : reservation.extras;
+  
+  const roomsList = rooms.map((room: any) => 
     `<tr>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${room.name}</td>
       <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">R$ ${room.priceSnapshot.toFixed(2)}</td>
     </tr>`
   ).join('');
 
-  const extrasRows = reservation.extras && reservation.extras.length > 0
-    ? reservation.extras.map((extra: any) => 
+  const extrasRows = extras && extras.length > 0
+    ? extras.map((extra: any) => 
         `<tr>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${extra.name} (${extra.quantity}x)</td>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">R$ ${(extra.priceSnapshot * extra.quantity).toFixed(2)}</td>
@@ -178,12 +182,16 @@ export function generateAdminNotificationEmail(
   checkOutDate: string,
   reservationNumber: string
 ): string {
-  const roomsList = reservation.rooms.map((room: any) => 
+  // Parse rooms and extras if they are JSON strings
+  const rooms = typeof reservation.rooms === 'string' ? JSON.parse(reservation.rooms) : reservation.rooms;
+  const extras = typeof reservation.extras === 'string' ? JSON.parse(reservation.extras) : reservation.extras;
+  
+  const roomsList = rooms.map((room: any) => 
     `<li>${room.name} - R$ ${room.priceSnapshot.toFixed(2)}</li>`
   ).join('');
 
-  const extrasList = reservation.extras && reservation.extras.length > 0
-    ? reservation.extras.map((extra: any) => 
+  const extrasList = extras && extras.length > 0
+    ? extras.map((extra: any) => 
         `<li>${extra.name} (${extra.quantity}x) - R$ ${(extra.priceSnapshot * extra.quantity).toFixed(2)}</li>`
       ).join('')
     : '<li>Nenhum serviço extra</li>';
