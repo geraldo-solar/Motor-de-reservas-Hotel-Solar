@@ -208,15 +208,17 @@ const App: React.FC = () => {
      
      // Sync with Postgres
      try {
-       // Detect changes and sync with database
-       const oldRoomIds = new Set(rooms.map(r => r.id));
-       const newRoomIds = new Set(newRooms.map(r => r.id));
+      // Detect changes and sync with database
+      const oldRoomIds: Set<string> = new Set(rooms.map(r => r.id));
+      const newRoomIds: Set<string> = new Set(newRooms.map(r => r.id));
        
-       // Find deleted rooms
-       const deletedIds = [...oldRoomIds].filter(id => !newRoomIds.has(id));
-       for (const id of deletedIds) {
-         await deleteRoom(id).catch(err => console.error('Failed to delete room:', err));
-       }
+      // Find deleted rooms
+      const deletedIds = Array.from(oldRoomIds).filter(id => !newRoomIds.has(id));
+      for (const id of deletedIds) {
+        if (typeof id === 'string') {
+          await deleteRoom(id).catch(err => console.error('Failed to delete room:', err));
+        }
+      }
        
        // Find new or updated rooms
        for (const room of newRooms) {
@@ -241,15 +243,17 @@ const App: React.FC = () => {
      setPackages(newPackages);
      
      // Sync with Postgres
-     try {
-       const oldPackageIds = new Set(packages.map(p => p.id));
-       const newPackageIds = new Set(newPackages.map(p => p.id));
+    try {
+      const oldPackageIds: Set<string> = new Set(packages.map(p => p.id));
+      const newPackageIds: Set<string> = new Set(newPackages.map(p => p.id));
        
-       // Find deleted packages
-       const deletedIds = [...oldPackageIds].filter(id => !newPackageIds.has(id));
-       for (const id of deletedIds) {
-         await deletePackage(id).catch(err => console.error('Failed to delete package:', err));
-       }
+      // Find deleted packages
+      const deletedIds = Array.from(oldPackageIds).filter(id => !newPackageIds.has(id));
+      for (const id of deletedIds) {
+        if (typeof id === 'string') {
+          await deletePackage(id).catch(err => console.error('Failed to delete package:', err));
+        }
+      }
        
        // Find new or updated packages
        for (const pkg of newPackages) {
@@ -272,15 +276,17 @@ const App: React.FC = () => {
      setDiscounts(newDiscounts);
      
      // Sync with Postgres
-     try {
-       const oldDiscountCodes = new Set(discounts.map(d => d.code));
-       const newDiscountCodes = new Set(newDiscounts.map(d => d.code));
+    try {
+      const oldDiscountCodes: Set<string> = new Set(discounts.map(d => d.code));
+      const newDiscountCodes: Set<string> = new Set(newDiscounts.map(d => d.code));
        
-       // Find deleted discounts
-       const deletedCodes = [...oldDiscountCodes].filter(code => !newDiscountCodes.has(code));
-       for (const code of deletedCodes) {
-         await deleteDiscount(code).catch(err => console.error('Failed to delete discount:', err));
-       }
+      // Find deleted discounts
+      const deletedCodes = Array.from(oldDiscountCodes).filter(code => !newDiscountCodes.has(code));
+      for (const code of deletedCodes) {
+        if (typeof code === 'string') {
+          await deleteDiscount(code).catch(err => console.error('Failed to delete discount:', err));
+        }
+      }
        
        // Find new or updated discounts
        for (const discount of newDiscounts) {
@@ -303,15 +309,17 @@ const App: React.FC = () => {
      setExtras(newExtras);
      
      // Sync with Postgres
-     try {
-       const oldExtraIds = new Set(extras.map(e => e.id));
-       const newExtraIds = new Set(newExtras.map(e => e.id));
+    try {
+      const oldExtraIds: Set<string> = new Set(extras.map(e => e.id));
+      const newExtraIds: Set<string> = new Set(newExtras.map(e => e.id));
        
-       // Find deleted extras
-       const deletedIds = [...oldExtraIds].filter(id => !newExtraIds.has(id));
-       for (const id of deletedIds) {
-         await deleteExtra(id).catch(err => console.error('Failed to delete extra:', err));
-       }
+      // Find deleted extras
+      const deletedIds = Array.from(oldExtraIds).filter(id => !newExtraIds.has(id));
+      for (const id of deletedIds) {
+        if (typeof id === 'string') {
+          await deleteExtra(id).catch(err => console.error('Failed to delete extra:', err));
+        }
+      }
        
        // Find new or updated extras
        for (const extra of newExtras) {

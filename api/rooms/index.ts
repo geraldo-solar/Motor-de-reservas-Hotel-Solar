@@ -74,9 +74,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'DELETE') {
       // Delete room
       const { id } = req.query;
+      const roomId = Array.isArray(id) ? id[0] : id;
 
       await sql`
-        DELETE FROM rooms WHERE id = ${id}
+        DELETE FROM rooms WHERE id = ${roomId}
       `;
 
       return res.status(200).json({ success: true });

@@ -65,9 +65,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'DELETE') {
       // Delete extra service
       const { id } = req.query;
+      const extraId = Array.isArray(id) ? id[0] : id;
 
       await sql`
-        DELETE FROM extra_services WHERE id = ${id}
+        DELETE FROM extra_services WHERE id = ${extraId}
       `;
 
       return res.status(200).json({ success: true });

@@ -80,9 +80,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'DELETE') {
       // Delete package
       const { id } = req.query;
+      const packageId = Array.isArray(id) ? id[0] : id;
 
       await sql`
-        DELETE FROM packages WHERE id = ${id}
+        DELETE FROM packages WHERE id = ${packageId}
       `;
 
       return res.status(200).json({ success: true });

@@ -68,9 +68,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'DELETE') {
       // Delete discount code
       const { code } = req.query;
+      const discountCode = Array.isArray(code) ? code[0] : code;
 
       await sql`
-        DELETE FROM discount_codes WHERE code = ${code}
+        DELETE FROM discount_codes WHERE code = ${discountCode}
       `;
 
       return res.status(200).json({ success: true });
