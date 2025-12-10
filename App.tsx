@@ -898,11 +898,13 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen font-sans bg-[#F9F8F6] pb-24 relative">
-      <Navbar currentView={currentView} onNavigate={setCurrentView} />
+    <div className={`min-h-screen font-sans ${currentView === ViewState.THANK_YOU ? 'bg-transparent p-0' : 'bg-[#F9F8F6] pb-24'} relative`}>
+      {currentView !== ViewState.THANK_YOU && (
+        <Navbar currentView={currentView} onNavigate={setCurrentView} />
+      )}
       
       {/* Floating Cart Bar */}
-      {renderFloatingBar()}
+      {currentView !== ViewState.THANK_YOU && renderFloatingBar()}
       
       {/* Home View */}
       {currentView === ViewState.HOME && (
