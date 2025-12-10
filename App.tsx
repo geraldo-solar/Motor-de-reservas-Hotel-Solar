@@ -918,9 +918,9 @@ const App: React.FC = () => {
                <div className="absolute inset-0 bg-black/40 z-10"></div>
                <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#0F2820]/90 z-10"></div>
                <img 
-                 src="https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+                 src="/hero-image.jpg" 
                  className="w-full h-full object-cover animate-in fade-in duration-1000 scale-105" 
-                 alt="Resort Pool"
+                 alt="Hotel Solar Pier"
                />
             </div>
             
