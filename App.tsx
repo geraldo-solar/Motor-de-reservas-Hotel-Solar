@@ -1053,8 +1053,11 @@ const App: React.FC = () => {
                     // Get minimum price from roomPrices, or Infinity if no prices set
                     const minPrice = pkg.roomPrices.length > 0 ? Math.min(...pkg.roomPrices.map(rp => rp.price)) : Infinity;
                     // Parse dates in local timezone to avoid timezone issues
-                    const [sY, sM, sD] = pkg.startIsoDate.split('-').map(Number);
-                    const [eY, eM, eD] = pkg.endIsoDate.split('-').map(Number);
+                    // Extract date part (YYYY-MM-DD) from ISO string (YYYY-MM-DDTHH:mm:ss.sssZ)
+                    const startDateStr = pkg.startIsoDate.split('T')[0];
+                    const endDateStr = pkg.endIsoDate.split('T')[0];
+                    const [sY, sM, sD] = startDateStr.split('-').map(Number);
+                    const [eY, eM, eD] = endDateStr.split('-').map(Number);
                     const startDate = new Date(sY, sM - 1, sD);
                     const endDate = new Date(eY, eM - 1, eD);
                     const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
