@@ -635,9 +635,6 @@ const App: React.FC = () => {
                 // If both dates are set, mark the entire range including checkout
                 if (date >= checkIn && date <= checkOut) {
                   inRange = true;
-                  if (day === 12 || day === 13 || day === 14 || day === 15) {
-                    console.log(`[Calendar Day ${day}]`, { date, checkIn, checkOut, inRange, 'date >= checkIn': date >= checkIn, 'date <= checkOut': date <= checkOut });
-                  }
                 }
               } else if (checkIn && date.getTime() === checkIn.getTime()) {
                 // Only check-in is set
@@ -1198,6 +1195,9 @@ const App: React.FC = () => {
              <div className="max-w-7xl mx-auto px-4 mb-8">
                 <button
                    onClick={() => {
+                     // Reset calendar date to current month if invalid
+                     const now = new Date();
+                     setCurrentCalendarDate(new Date(now.getFullYear(), now.getMonth(), 1));
                      setCurrentView(ViewState.HOME);
                      window.scrollTo({ top: 0, behavior: 'smooth' });
                    }}
