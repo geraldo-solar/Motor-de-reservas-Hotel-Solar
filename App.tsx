@@ -837,37 +837,28 @@ const App: React.FC = () => {
                           
                           // Check availability for this room in the package dates
                           const isAvailable = checkAvailability(room);
-                          const isUnavailable = !isAvailable;
+                          
+                          // Don't render unavailable rooms
+                          if (!isAvailable) return null;
                           
                           return (
                               <button 
                                 key={rp.roomId}
-                                onClick={() => !isUnavailable && handlePackageSelect(pkg, rp.roomId, rp.price)}
-                                disabled={isUnavailable}
+                                onClick={() => handlePackageSelect(pkg, rp.roomId, rp.price)}
                                 className={`w-full flex justify-between items-center p-4 border rounded-sm transition group text-left ${
-                                  isUnavailable
-                                    ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
-                                    : selectedRooms.some(r => r.id === rp.roomId)
-                                      ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                      : 'border-gray-200 hover:border-[#D4AF37] hover:bg-[#F9F8F6]'
+                                  selectedRooms.some(r => r.id === rp.roomId)
+                                    ? 'border-[#D4AF37] bg-[#D4AF37]/10'
+                                    : 'border-gray-200 hover:border-[#D4AF37] hover:bg-[#F9F8F6]'
                                 }`}
                               >
                                   <div className="flex items-center gap-3">
                                       <img src={room.imageUrl} className="w-10 h-10 rounded-sm object-cover" alt="" />
                                       <div>
-                                          <p className={`font-bold text-sm transition ${
-                                            isUnavailable ? 'text-gray-400' : 'text-[#0F2820] group-hover:text-[#D4AF37]'
-                                          }`}>{room.name}</p>
-                                          <p className="text-xs text-gray-400">
-                                            {isUnavailable ? 'Esgotado' : 'Pacote Completo'}
-                                          </p>
+                                          <p className="font-bold text-[#0F2820] text-sm group-hover:text-[#D4AF37] transition">{room.name}</p>
+                                          <p className="text-xs text-gray-400">Pacote Completo</p>
                                       </div>
                                   </div>
-                                  <span className={`font-serif text-lg ${
-                                    isUnavailable ? 'text-gray-400' : 'text-[#0F2820]'
-                                  }`}>
-                                    {isUnavailable ? 'Esgotado' : `R$ ${rp.price.toLocaleString('pt-BR')}`}
-                                  </span>
+                                  <span className="font-serif text-lg text-[#0F2820]">R$ {rp.price.toLocaleString('pt-BR')}</span>
                               </button>
                           );
                       })}
