@@ -615,7 +615,7 @@ const App: React.FC = () => {
               // Selection Logic
               if (checkIn && date.getTime() === checkIn.getTime()) isSelected = true;
               if (checkOut && date.getTime() === checkOut.getTime()) isSelected = true;
-              if (checkIn && checkOut && date > checkIn && date < checkOut) inRange = true;
+              if (checkIn && checkOut && date >= checkIn && date <= checkOut) inRange = true;
 
               const pkg = getPackageOnDate(date);
               
