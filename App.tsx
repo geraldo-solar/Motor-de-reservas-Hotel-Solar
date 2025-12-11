@@ -649,6 +649,15 @@ const App: React.FC = () => {
               // Restrictions styling
               const noCheckIn = restrictedCheckInDates.has(iso);
               const noCheckOut = restrictedCheckOutDates.has(iso);
+              
+              // Check if all rooms are sold out for this date
+              const allRoomsSoldOut = !isPast && rooms.filter(r => r.active).every(room => {
+                const override = room.overrides?.find(o => o.dateIso === iso);
+                const displayPrice = override?.price !== undefined ? override.price : room.price;
+                const displayQty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+                const isClosed = override?.isClosed || (displayPrice === 0) || (displayQty === 0);
+                return isClosed;
+              });
 
               // Styling
               let bgClass = "bg-white hover:border-[#D4AF37]";
@@ -658,6 +667,10 @@ const App: React.FC = () => {
               if (isPast) {
                  bgClass = "bg-gray-100 opacity-50 cursor-not-allowed";
                  textClass = "text-gray-400";
+              } else if (allRoomsSoldOut) {
+                 bgClass = "bg-red-50/50 cursor-not-allowed";
+                 textClass = "text-gray-400";
+                 borderClass = "border-red-300";
               } else if (isSelected) {
                  bgClass = "bg-[#2F3A2F]"; // Moss Green
                  textClass = "text-[#E5D3B3] font-bold"; // Sand
@@ -674,17 +687,19 @@ const App: React.FC = () => {
               return (
                  <div 
                     key={day}
-                    onClick={() => !isPast && handleDateClick(day)}
+                    onClick={() => !isPast && !allRoomsSoldOut && handleDateClick(day)}
                     className={`
-                       h-14 md:h-28 border rounded-sm p-1 md:p-2 cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden
+                       h-14 md:h-28 border rounded-sm p-1 md:p-2 transition-all flex flex-col justify-between relative overflow-hidden
+                       ${allRoomsSoldOut ? 'cursor-not-allowed' : 'cursor-pointer'}
                        ${bgClass} ${textClass} ${borderClass}
                     `}
                  >
                     <div className="flex justify-between items-start">
                        <span className={`text-sm md:text-lg leading-none ${isSelected || inRange ? 'text-[#E5D3B3]' : ''}`}>{day}</span>
                        <div className="flex gap-0.5">
-                          {noCheckIn && !isPast && <span title="Sem check-in" className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-orange-400"></span>}
-                          {noCheckOut && !isPast && <span title="Sem check-out" className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-red-400"></span>}
+                          {allRoomsSoldOut && <span title="Esgotado" className="text-[8px] md:text-[10px] font-bold text-red-500 bg-red-100 px-1 rounded">ESGOTADO</span>}
+                          {!allRoomsSoldOut && noCheckIn && !isPast && <span title="Sem check-in" className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-orange-400"></span>}
+                          {!allRoomsSoldOut && noCheckOut && !isPast && <span title="Sem check-out" className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-red-400"></span>}
                        </div>
                     </div>
                     
@@ -704,6 +719,7 @@ const App: React.FC = () => {
             <div className="flex items-center gap-1"><div className="w-3 h-3 bg-[#F3E5AB]/30 border border-[#D4AF37]/50"></div> Pacote Especial</div>
             <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400"></span> Check-in Restrito</div>
             <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400"></span> Check-out Restrito</div>
+            <div className="flex items-center gap-1"><div className="w-3 h-3 bg-red-50/50 border border-red-300"></div> Esgotado</div>
         </div>
       </div>
     );
