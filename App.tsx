@@ -66,24 +66,32 @@ const App: React.FC = () => {
     const checkInParam = params.get('checkin');
     const checkOutParam = params.get('checkout');
     
+    console.log('[URL Params Debug]', { dateParam, checkInParam, checkOutParam });
+    
     if (dateParam) {
       // Single date parameter - set as check-in
       const date = new Date(dateParam);
       if (!isNaN(date.getTime())) {
+        console.log('[Setting Check-in from date param]', date);
         setCheckIn(date);
         setCurrentCalendarDate(date);
       }
     } else if (checkInParam) {
       // Check-in and optional check-out parameters
       const checkInDate = new Date(checkInParam);
+      console.log('[Check-in Date parsed]', checkInDate, 'Valid:', !isNaN(checkInDate.getTime()));
+      
       if (!isNaN(checkInDate.getTime())) {
         setCheckIn(checkInDate);
         setCurrentCalendarDate(checkInDate);
         
         if (checkOutParam) {
           const checkOutDate = new Date(checkOutParam);
+          console.log('[Check-out Date parsed]', checkOutDate, 'Valid:', !isNaN(checkOutDate.getTime()));
+          
           if (!isNaN(checkOutDate.getTime())) {
             setCheckOut(checkOutDate);
+            console.log('[Dates set]', { checkIn: checkInDate, checkOut: checkOutDate });
           }
         }
       }
@@ -617,6 +625,9 @@ const App: React.FC = () => {
                 // If both dates are set, mark the entire range including checkout
                 if (date >= checkIn && date <= checkOut) {
                   inRange = true;
+                  if (day === 12 || day === 13 || day === 14 || day === 15) {
+                    console.log(`[Calendar Day ${day}]`, { date, checkIn, checkOut, inRange, 'date >= checkIn': date >= checkIn, 'date <= checkOut': date <= checkOut });
+                  }
                 }
               } else if (checkIn && date.getTime() === checkIn.getTime()) {
                 // Only check-in is set
