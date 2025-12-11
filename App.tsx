@@ -888,6 +888,7 @@ const App: React.FC = () => {
                       })}
                   </div>
               </div>
+           </div>
           </div>
           
           {/* Separador visual entre pacotes */}
