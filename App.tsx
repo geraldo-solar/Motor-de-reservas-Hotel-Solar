@@ -1195,15 +1195,18 @@ const App: React.FC = () => {
       {/* Packages View */}
       {currentView === ViewState.PACKAGES && (
          <div className="py-20 bg-[#F9F8F6]">
-            <div className="max-w-7xl mx-auto px-4 mb-8">
-               <button
-                  onClick={() => setCurrentView(ViewState.HOME)}
-                  className="flex items-center gap-2 text-[#0F2820] hover:text-[#D4AF37] transition-colors font-semibold"
-               >
-                  <ChevronLeft size={20} />
-                  Voltar para Início
-               </button>
-            </div>
+             <div className="max-w-7xl mx-auto px-4 mb-8">
+                <button
+                   onClick={() => {
+                     setCurrentView(ViewState.HOME);
+                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                   }}
+                   className="flex items-center gap-2 text-[#0F2820] hover:text-[#D4AF37] transition-colors font-semibold"
+                >
+                   <ChevronLeft size={20} />
+                   Voltar para Início
+                </button>
+             </div>
             <div className="text-center mb-16">
                <h2 className="text-4xl font-serif text-[#0F2820]">Pacotes Especiais</h2>
             </div>
