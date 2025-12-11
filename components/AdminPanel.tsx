@@ -1886,6 +1886,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         <label className={labelStyle}>% Desconto</label>
                         <input type="number" value={newDiscountPercent} onChange={e => setNewDiscountPercent(Number(e.target.value))} className={inputStyle} />
                      </div>
+                     <div className="w-40">
+                        <label className={labelStyle}>Data Início</label>
+                        <input type="date" value={newDiscountStartDate} onChange={e => setNewDiscountStartDate(e.target.value)} className={inputStyle} placeholder="Opcional" />
+                     </div>
+                     <div className="w-40">
+                        <label className={labelStyle}>Data Fim</label>
+                        <input type="date" value={newDiscountEndDate} onChange={e => setNewDiscountEndDate(e.target.value)} className={inputStyle} placeholder="Opcional" />
+                     </div>
                      <div className="w-32">
                         <label className={labelStyle}>Mín. Noites</label>
                         <input type="number" value={newDiscountMinNights} onChange={e => setNewDiscountMinNights(Number(e.target.value) || '')} className={inputStyle} placeholder="Opcional" />
@@ -1916,6 +1924,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                               <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded font-bold">-{d.percentage}%</span>
                            </div>
                            {d.minNights && <p className="text-xs text-gray-500">Mínimo {d.minNights} noites</p>}
+                           {(d.startDate || d.endDate) && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                 <CalendarIcon size={12} className="inline mr-1" />
+                                 {d.startDate && new Date(d.startDate).toLocaleDateString('pt-BR')} 
+                                 {d.startDate && d.endDate && ' - '}
+                                 {d.endDate && new Date(d.endDate).toLocaleDateString('pt-BR')}
+                              </p>
+                           )}
                         </div>
                         <div className="flex gap-2">
                            <button onClick={() => handleEditDiscount(d.code)} className="text-blue-500 hover:text-blue-700 p-2" title="Editar cupom"><Edit size={18}/></button>
