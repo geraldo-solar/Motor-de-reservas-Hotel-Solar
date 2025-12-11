@@ -751,7 +751,7 @@ const App: React.FC = () => {
                            <>
                               <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Valor Total ({nights} noites)</p>
                               {isUnavailable ? (
-                                  <span className="text-sm font-bold text-red-500 uppercase tracking-wider">Indisponível</span>
+                                  <span className="text-sm font-bold text-red-500 uppercase tracking-wider">Esgotado</span>
                               ) : (
                                   <div className="flex items-baseline gap-1">
                                     <span className="text-xs text-[#D4AF37]">R$</span>
@@ -775,7 +775,7 @@ const App: React.FC = () => {
                      </div>
                   </div>
                   
-                  <button 
+                   <button 
                     onClick={() => handleAddToBooking(room)}
                     disabled={isUnavailable}
                     className={`w-full py-3 rounded-sm font-bold uppercase text-xs tracking-[0.2em] transition shadow-lg flex items-center justify-center gap-2 
@@ -784,7 +784,7 @@ const App: React.FC = () => {
                          : 'bg-[#0F2820] text-white hover:bg-[#1a3c30] group-hover:gap-3'
                        }`}
                   >
-                    {isUnavailable ? 'Indisponível' : 'Adicionar à Reserva'} 
+                    {isUnavailable ? 'Esgotado' : 'Adicionar à Reserva'}
                     {!isUnavailable && <ArrowRight className="h-4 w-4 text-[#D4AF37]" />}
                   </button>
                </div>
@@ -834,24 +834,40 @@ const App: React.FC = () => {
                       {pkg.roomPrices.map(rp => {
                           const room = rooms.find(r => r.id === rp.roomId);
                           if (!room) return null;
+                          
+                          // Check availability for this room in the package dates
+                          const isAvailable = checkAvailability(room);
+                          const isUnavailable = !isAvailable;
+                          
                           return (
                               <button 
                                 key={rp.roomId}
-                                onClick={() => handlePackageSelect(pkg, rp.roomId, rp.price)}
+                                onClick={() => !isUnavailable && handlePackageSelect(pkg, rp.roomId, rp.price)}
+                                disabled={isUnavailable}
                                 className={`w-full flex justify-between items-center p-4 border rounded-sm transition group text-left ${
-                                  selectedRooms.some(r => r.id === rp.roomId)
-                                    ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                    : 'border-gray-200 hover:border-[#D4AF37] hover:bg-[#F9F8F6]'
+                                  isUnavailable
+                                    ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
+                                    : selectedRooms.some(r => r.id === rp.roomId)
+                                      ? 'border-[#D4AF37] bg-[#D4AF37]/10'
+                                      : 'border-gray-200 hover:border-[#D4AF37] hover:bg-[#F9F8F6]'
                                 }`}
                               >
                                   <div className="flex items-center gap-3">
                                       <img src={room.imageUrl} className="w-10 h-10 rounded-sm object-cover" alt="" />
                                       <div>
-                                          <p className="font-bold text-[#0F2820] text-sm group-hover:text-[#D4AF37] transition">{room.name}</p>
-                                          <p className="text-xs text-gray-400">Pacote Completo</p>
+                                          <p className={`font-bold text-sm transition ${
+                                            isUnavailable ? 'text-gray-400' : 'text-[#0F2820] group-hover:text-[#D4AF37]'
+                                          }`}>{room.name}</p>
+                                          <p className="text-xs text-gray-400">
+                                            {isUnavailable ? 'Esgotado' : 'Pacote Completo'}
+                                          </p>
                                       </div>
                                   </div>
-                                  <span className="font-serif text-lg text-[#0F2820]">R$ {rp.price.toLocaleString('pt-BR')}</span>
+                                  <span className={`font-serif text-lg ${
+                                    isUnavailable ? 'text-gray-400' : 'text-[#0F2820]'
+                                  }`}>
+                                    {isUnavailable ? 'Esgotado' : `R$ ${rp.price.toLocaleString('pt-BR')}`}
+                                  </span>
                               </button>
                           );
                       })}
