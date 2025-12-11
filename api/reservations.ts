@@ -121,6 +121,8 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   const reservation = result.rows[0];
 
   // Update room availability (decrement stock for each reserved night)
+  let stockUpdateSuccess = false;
+  let stockUpdateError = null;
   try {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
@@ -186,8 +188,11 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
         currentDate.setDate(currentDate.getDate() + 1);
       }
     }
+    stockUpdateSuccess = true;
+    console.log('[STOCK UPDATE] All updates completed successfully');
   } catch (error) {
     console.error('Error updating room availability:', error);
+    stockUpdateError = error instanceof Error ? error.message : 'Unknown error';
     // Don't fail the reservation if stock update fails
   }
 
@@ -232,6 +237,10 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   return res.status(201).json({
     success: true,
     reservation: reservationData,
+    stockUpdate: {
+      success: stockUpdateSuccess,
+      error: stockUpdateError
+    }
   });
 }
 
