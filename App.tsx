@@ -1231,14 +1231,27 @@ const App: React.FC = () => {
                             </div>
                             <button
                               onClick={() => {
-                                // Set dates automatically
-                                const pkgStartDate = new Date(pkg.startIsoDate.split('-').map(Number).map((n, i) => i === 1 ? n - 1 : n) as [number, number, number]);
-                                const pkgEndDate = new Date(pkg.endIsoDate.split('-').map(Number).map((n, i) => i === 1 ? n - 1 : n) as [number, number, number]);
-                                setCheckIn(pkgStartDate);
-                                setCheckOut(pkgEndDate);
-                                setCurrentCalendarDate(pkgStartDate);
-                                // Navigate to packages view
-                                setCurrentView(ViewState.PACKAGES);
+                                try {
+                                  // Set dates automatically using safe parsing
+                                  const startParts = pkg.startIsoDate.split('T')[0].split('-');
+                                  const endParts = pkg.endIsoDate.split('T')[0].split('-');
+                                  const pkgStartDate = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]));
+                                  const pkgEndDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]));
+                                  
+                                  if (!isNaN(pkgStartDate.getTime()) && !isNaN(pkgEndDate.getTime())) {
+                                    setCheckIn(pkgStartDate);
+                                    setCheckOut(pkgEndDate);
+                                    setCurrentCalendarDate(pkgStartDate);
+                                    // Navigate to packages view
+                                    setCurrentView(ViewState.PACKAGES);
+                                  } else {
+                                    console.error('Invalid package dates');
+                                    alert('Erro ao carregar datas do pacote');
+                                  }
+                                } catch (error) {
+                                  console.error('Error setting package dates:', error);
+                                  alert('Erro ao selecionar pacote');
+                                }
                               }}
                               className="w-full bg-[#2F3A2F] hover:bg-[#1f281f] text-[#E5D3B3] py-3 rounded font-bold uppercase text-sm tracking-wider transition-all flex items-center justify-center gap-2"
                             >
