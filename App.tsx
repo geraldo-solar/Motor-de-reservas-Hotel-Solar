@@ -612,10 +612,16 @@ const App: React.FC = () => {
               let isSelected = false;
               let inRange = false;
               
-              // Selection Logic
-              if (checkIn && date.getTime() === checkIn.getTime()) isSelected = true;
-              if (checkOut && date.getTime() === checkOut.getTime()) isSelected = true;
-              if (checkIn && checkOut && date >= checkIn && date <= checkOut) inRange = true;
+              // Selection Logic - Simplified to ensure checkout is always marked
+              if (checkIn && checkOut) {
+                // If both dates are set, mark the entire range including checkout
+                if (date >= checkIn && date <= checkOut) {
+                  inRange = true;
+                }
+              } else if (checkIn && date.getTime() === checkIn.getTime()) {
+                // Only check-in is set
+                isSelected = true;
+              }
 
               const pkg = getPackageOnDate(date);
               
