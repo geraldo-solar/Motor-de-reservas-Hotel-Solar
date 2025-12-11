@@ -78,16 +78,20 @@ const App: React.FC = () => {
       }
     } else if (checkInParam) {
       // Check-in and optional check-out parameters
-      const checkInDate = new Date(checkInParam);
-      console.log('[Check-in Date parsed]', checkInDate, 'Valid:', !isNaN(checkInDate.getTime()));
+      // Parse date in local timezone to avoid timezone issues
+      const [cY, cM, cD] = checkInParam.split('-').map(Number);
+      const checkInDate = new Date(cY, cM - 1, cD);
+      console.log('[Check-in Date parsed]', checkInDate, 'From:', checkInParam, 'Valid:', !isNaN(checkInDate.getTime()));
       
       if (!isNaN(checkInDate.getTime())) {
         setCheckIn(checkInDate);
         setCurrentCalendarDate(checkInDate);
         
         if (checkOutParam) {
-          const checkOutDate = new Date(checkOutParam);
-          console.log('[Check-out Date parsed]', checkOutDate, 'Valid:', !isNaN(checkOutDate.getTime()));
+          // Parse checkout date in local timezone
+          const [oY, oM, oD] = checkOutParam.split('-').map(Number);
+          const checkOutDate = new Date(oY, oM - 1, oD);
+          console.log('[Check-out Date parsed]', checkOutDate, 'From:', checkOutParam, 'Valid:', !isNaN(checkOutDate.getTime()));
           
           if (!isNaN(checkOutDate.getTime())) {
             setCheckOut(checkOutDate);
