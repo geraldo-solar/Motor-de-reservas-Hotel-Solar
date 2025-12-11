@@ -812,9 +812,19 @@ const App: React.FC = () => {
   );
 
   const renderPackages = () => (
-    <div className="max-w-7xl mx-auto px-4 grid gap-12">
+    <div className="max-w-7xl mx-auto px-4 grid gap-16">
       {activePackages.map((pkg, index) => (
-        <div key={pkg.id} className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+        <div key={pkg.id} className={`bg-white rounded-lg shadow-2xl border-2 border-[#D4AF37]/20 p-8 md:p-12 transition-all hover:shadow-3xl hover:border-[#D4AF37]/40`}>
+          {/* Cabeçalho do Pacote */}
+          <div className="mb-8 pb-6 border-b-2 border-[#D4AF37]/20">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-1 h-8 bg-[#D4AF37]"></div>
+              <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em]">Pacote Especial {index + 1}</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-serif text-[#0F2820] font-bold">{pkg.name}</h2>
+          </div>
+          
+          <div className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
            <div className="w-full md:w-1/2 relative group">
               <div className="absolute inset-0 bg-[#0F2820] translate-x-4 translate-y-4 rounded-sm transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
               <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-80 object-cover rounded-sm relative z-10 shadow-xl" />
@@ -830,9 +840,7 @@ const App: React.FC = () => {
            
            <div className="w-full md:w-1/2 space-y-6">
               <div>
-                 <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em] mb-2 block">Experiência Exclusiva</span>
-                 <h2 className="text-4xl font-serif text-[#0F2820] mb-4">{pkg.name}</h2>
-                 <p className="text-gray-600 leading-relaxed font-light">{pkg.description}</p>
+                 <p className="text-gray-600 leading-relaxed font-light text-lg">{pkg.description}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 border-y border-[#D4AF37]/30 py-6">
@@ -880,7 +888,16 @@ const App: React.FC = () => {
                       })}
                   </div>
               </div>
-           </div>
+          </div>
+          
+          {/* Separador visual entre pacotes */}
+          {index < activePackages.length - 1 && (
+            <div className="mt-12 pt-8 border-t-2 border-[#D4AF37]/10">
+              <div className="flex items-center justify-center">
+                <div className="w-16 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
