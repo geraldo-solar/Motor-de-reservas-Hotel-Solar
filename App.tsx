@@ -651,8 +651,6 @@ const App: React.FC = () => {
       percentage: discount.percentage,
       amount: discountAmount 
     });
-    
-    alert(`Cupom ${discount.code} aplicado! Desconto de ${discount.percentage}%`);
   };
 
   // --- RENDERERS ---
@@ -818,9 +816,24 @@ const App: React.FC = () => {
                               {isUnavailable ? (
                                   <span className="text-sm font-bold text-red-500 uppercase tracking-wider">Esgotado</span>
                               ) : (
-                                  <div className="flex items-baseline gap-1">
-                                    <span className="text-xs text-[#D4AF37]">R$</span>
-                                    <span className="text-2xl font-serif text-[#0F2820]">{total.toLocaleString('pt-BR')}</span>
+                                  <div className="flex flex-col">
+                                    {appliedDiscount ? (
+                                      <>
+                                        <div className="flex items-baseline gap-1 mb-1">
+                                          <span className="text-xs text-red-500 line-through">R$</span>
+                                          <span className="text-lg font-serif text-red-500 line-through">{total.toLocaleString('pt-BR')}</span>
+                                        </div>
+                                        <div className="flex items-baseline gap-1">
+                                          <span className="text-xs text-[#D4AF37]">R$</span>
+                                          <span className="text-2xl font-serif text-[#0F2820]">{(total * (1 - appliedDiscount.percentage / 100)).toLocaleString('pt-BR')}</span>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <div className="flex items-baseline gap-1">
+                                        <span className="text-xs text-[#D4AF37]">R$</span>
+                                        <span className="text-2xl font-serif text-[#0F2820]">{total.toLocaleString('pt-BR')}</span>
+                                      </div>
+                                    )}
                                   </div>
                               )}
                            </>
