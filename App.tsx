@@ -968,6 +968,35 @@ const App: React.FC = () => {
           {/* Calendar Section */}
           <section className="relative z-30 -mt-24 px-4 pb-12">
             {renderCalendar()}
+            
+            {/* Share Link Button */}
+            {checkIn && checkOut && (
+              <div className="max-w-4xl mx-auto mt-6 flex justify-center">
+                <button
+                  onClick={() => {
+                    const checkInIso = checkIn.toISOString().split('T')[0];
+                    const checkOutIso = checkOut.toISOString().split('T')[0];
+                    const shareUrl = `${window.location.origin}/?checkin=${checkInIso}&checkout=${checkOutIso}`;
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                      alert(`Link copiado para compartilhar!\n\n${shareUrl}\n\nEnvie este link para o cliente continuar a reserva com as datas já selecionadas.`);
+                    }).catch(err => {
+                      console.error('Erro ao copiar:', err);
+                      prompt('Copie este link:', shareUrl);
+                    });
+                  }}
+                  className="bg-[#D4AF37] hover:bg-[#C4A037] text-[#0F2820] px-6 py-3 rounded-sm font-bold transition-all flex items-center gap-2 shadow-lg"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                  Compartilhar Link desta Reserva
+                </button>
+              </div>
+            )}
           </section>
 
           {/* Rooms Section */}
