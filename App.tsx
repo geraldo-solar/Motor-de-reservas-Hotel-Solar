@@ -48,6 +48,10 @@ const App: React.FC = () => {
   const [checkIn, setCheckIn] = useState<Date | null>(null);
   const [checkOut, setCheckOut] = useState<Date | null>(null);
 
+  // Discount Code State
+  const [discountCode, setDiscountCode] = useState<string>('');
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percentage: number; amount: number } | null>(null);
+
   // Thank You Page State
   const [completedReservationId, setCompletedReservationId] = useState<string>('');
   const [completedGuestEmail, setCompletedGuestEmail] = useState<string>('');
@@ -430,7 +434,7 @@ const App: React.FC = () => {
   };
 
   // Calculate Total Price considering daily overrides
-  const calculateTotalRoomPrice = (room: Room) => {
+  const calculateTotalRoomPrice = (room: Room, applyDiscount: boolean = true) => {
      if (!checkIn || !checkOut) return room.price;
      
      let total = 0;
@@ -449,6 +453,11 @@ const App: React.FC = () => {
          
          total += dailyPrice;
          tempDate.setDate(tempDate.getDate() + 1);
+     }
+     
+     // Apply discount if applicable
+     if (applyDiscount && appliedDiscount) {
+       total = total - (total * appliedDiscount.percentage / 100);
      }
      
      return Math.round(total);
@@ -588,6 +597,58 @@ const App: React.FC = () => {
       if (selectedPackagePrice && selectedRooms.length === 1) return selectedPackagePrice;
 
       return selectedRooms.reduce((acc, room) => acc + calculateTotalRoomPrice(room), 0);
+  };
+
+  // Handle Discount Code Application
+  const handleApplyDiscount = () => {
+    const code = discountCode.toUpperCase().trim();
+    
+    if (!code) {
+      alert('Por favor, digite um código de desconto.');
+      return;
+    }
+    
+    const discount = discounts.find(d => d.code === code && d.active);
+
+    if (!discount) {
+      alert('Cupom inválido ou expirado.');
+      setAppliedDiscount(null);
+      return;
+    }
+
+    // Validate Date Range if dates are set
+    if (checkIn && checkOut && discount.startDate && discount.endDate) {
+      const startDate = new Date(discount.startDate);
+      const endDate = new Date(discount.endDate);
+      
+      if (discount.fullPeriodRequired) {
+        // Entire stay must be within discount period
+        if (checkIn < startDate || checkOut > endDate) {
+          alert(`Este cupom é válido apenas para estadias entre ${startDate.toLocaleDateString('pt-BR')} e ${endDate.toLocaleDateString('pt-BR')}.`);
+          setAppliedDiscount(null);
+          return;
+        }
+      } else {
+        // At least check-in must be within period
+        if (checkIn < startDate || checkIn > endDate) {
+          alert(`Este cupom é válido apenas para check-ins entre ${startDate.toLocaleDateString('pt-BR')} e ${endDate.toLocaleDateString('pt-BR')}.`);
+          setAppliedDiscount(null);
+          return;
+        }
+      }
+    }
+
+    // Calculate discount amount
+    const accommodationTotal = selectedRooms.reduce((acc, room) => acc + calculateTotalRoomPrice(room, false), 0);
+    const discountAmount = (accommodationTotal * discount.percentage) / 100;
+    
+    setAppliedDiscount({ 
+      code: discount.code, 
+      percentage: discount.percentage,
+      amount: discountAmount 
+    });
+    
+    alert(`Cupom ${discount.code} aplicado! Desconto de ${discount.percentage}%`);
   };
 
   // --- RENDERERS ---
@@ -1192,11 +1253,54 @@ const App: React.FC = () => {
 
           {/* Rooms Section */}
           <section className="py-20 max-w-7xl mx-auto">
-             <div className="text-center mb-16">
+             <div className="text-center mb-8">
                 <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em]">Exclusividade</span>
                 <h2 className="text-4xl font-serif text-[#0F2820] mt-3">Nossas Acomodações</h2>
                 <div className="w-24 h-1 bg-[#D4AF37] mx-auto mt-6"></div>
              </div>
+             
+             {/* Discount Code Section */}
+             <div className="max-w-md mx-auto mb-12 px-4">
+               <div className="bg-gradient-to-br from-[#F9F8F6] to-white border-2 border-[#D4AF37]/30 rounded-lg p-6 shadow-lg">
+                 <div className="flex items-center gap-2 mb-4">
+                   <Tag size={20} className="text-[#D4AF37]" />
+                   <h3 className="font-bold text-[#0F2820] uppercase tracking-wide">Cupom de Desconto</h3>
+                 </div>
+                 <p className="text-sm text-gray-600 mb-4">Possui um código promocional? Aplique agora e veja os preços com desconto!</p>
+                 <div className="flex gap-2">
+                   <input 
+                     type="text" 
+                     value={discountCode}
+                     onChange={e => setDiscountCode(e.target.value.toUpperCase())}
+                     placeholder="Digite o código"
+                     className="flex-1 p-3 border-2 border-[#4A5D43]/30 rounded-lg uppercase bg-white focus:border-[#D4AF37] focus:outline-none transition"
+                   />
+                   <button 
+                     onClick={handleApplyDiscount}
+                     className="px-6 py-3 bg-[#2F3A2F] hover:bg-[#1f281f] text-[#E5D3B3] rounded-lg font-bold uppercase text-sm tracking-wider transition-all flex items-center gap-2 whitespace-nowrap"
+                   >
+                     Aplicar
+                   </button>
+                 </div>
+                 {appliedDiscount && (
+                   <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+                     <div className="flex items-center gap-2">
+                       <Check size={18} className="text-green-600" />
+                       <span className="text-sm font-medium text-green-800">
+                         Cupom <strong>{appliedDiscount.code}</strong> aplicado!
+                       </span>
+                     </div>
+                     <button 
+                       onClick={() => setAppliedDiscount(null)}
+                       className="text-red-600 hover:text-red-800 text-sm font-medium"
+                     >
+                       Remover
+                     </button>
+                   </div>
+                 )}
+               </div>
+             </div>
+             
              {renderRooms()}
           </section>
         </>
