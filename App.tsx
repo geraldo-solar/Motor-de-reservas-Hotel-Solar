@@ -775,7 +775,8 @@ const App: React.FC = () => {
   const renderRooms = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4" ref={roomsSectionRef}>
       {activeRooms.map(room => {
-        const total = calculateTotalRoomPrice(room);
+        const totalWithoutDiscount = calculateTotalRoomPrice(room, false);
+        const totalWithDiscount = calculateTotalRoomPrice(room, true);
         const nights = selectedNights;
         
         // Availability Logic: Check Price AND Inventory
@@ -821,17 +822,17 @@ const App: React.FC = () => {
                                       <>
                                         <div className="flex items-baseline gap-1 mb-1">
                                           <span className="text-xs text-red-500 line-through">R$</span>
-                                          <span className="text-lg font-serif text-red-500 line-through">{total.toLocaleString('pt-BR')}</span>
+                                          <span className="text-lg font-serif text-red-500 line-through">{totalWithoutDiscount.toLocaleString('pt-BR')}</span>
                                         </div>
                                         <div className="flex items-baseline gap-1">
                                           <span className="text-xs text-[#D4AF37]">R$</span>
-                                          <span className="text-2xl font-serif text-[#0F2820]">{(total * (1 - appliedDiscount.percentage / 100)).toLocaleString('pt-BR')}</span>
+                                          <span className="text-2xl font-serif text-[#0F2820]">{totalWithDiscount.toLocaleString('pt-BR')}</span>
                                         </div>
                                       </>
                                     ) : (
                                       <div className="flex items-baseline gap-1">
                                         <span className="text-xs text-[#D4AF37]">R$</span>
-                                        <span className="text-2xl font-serif text-[#0F2820]">{total.toLocaleString('pt-BR')}</span>
+                                        <span className="text-2xl font-serif text-[#0F2820]">{totalWithoutDiscount.toLocaleString('pt-BR')}</span>
                                       </div>
                                     )}
                                   </div>
