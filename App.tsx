@@ -796,9 +796,10 @@ const App: React.FC = () => {
   );
 
   const renderPackages = () => (
-    <div className="max-w-7xl mx-auto px-4 grid gap-12">
+    <div className="max-w-7xl mx-auto px-4 grid gap-20">
       {activePackages.map((pkg, index) => (
-        <div key={pkg.id} className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+        <React.Fragment key={pkg.id}>
+        <div className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
            <div className="w-full md:w-1/2 relative group">
               <div className="absolute inset-0 bg-[#0F2820] translate-x-4 translate-y-4 rounded-sm transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
               <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-80 object-cover rounded-sm relative z-10 shadow-xl" />
@@ -897,6 +898,18 @@ const App: React.FC = () => {
               </div>
            </div>
         </div>
+        {index < activePackages.length - 1 && (
+          <div className="my-12 flex items-center justify-center">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
+            <div className="mx-6 flex items-center gap-2">
+              <div className="w-2 h-2 bg-[#D4AF37] rounded-full"></div>
+              <div className="w-3 h-3 bg-[#D4AF37] rounded-full"></div>
+              <div className="w-2 h-2 bg-[#D4AF37] rounded-full"></div>
+            </div>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent"></div>
+          </div>
+        )}
+        </React.Fragment>
       ))}
     </div>
   );
