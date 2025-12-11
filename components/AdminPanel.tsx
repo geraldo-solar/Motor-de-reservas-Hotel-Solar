@@ -403,6 +403,7 @@ const GeneralMapCalendar: React.FC<{
             <span className="flex items-center gap-1"><div className="w-2 h-2 bg-orange-500 rounded-sm"></div> No In</span>
             <span className="flex items-center gap-1"><div className="w-2 h-2 bg-red-500 rounded-sm"></div> No Out</span>
             <span className="flex items-center gap-1"><div className="w-2 h-2 bg-red-900 border border-red-500 rounded-sm"></div> Fechado</span>
+            <span className="flex items-center gap-1"><div className="w-2 h-2 bg-red-900/30 border border-red-800/50 rounded-sm"></div> Esgotado (Qtd. 0 ou Preço 0)</span>
         </div>
 
         {/* Scrollable Grid */}
