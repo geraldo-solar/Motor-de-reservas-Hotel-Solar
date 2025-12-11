@@ -608,7 +608,11 @@ const App: React.FC = () => {
       return;
     }
     
+    console.log('Buscando cupom:', code);
+    console.log('Cupons disponíveis:', discounts);
+    
     const discount = discounts.find(d => d.code === code && d.active);
+    console.log('Cupom encontrado:', discount);
 
     if (!discount) {
       alert('Cupom inválido ou expirado.');
