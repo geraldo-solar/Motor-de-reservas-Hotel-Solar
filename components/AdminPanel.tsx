@@ -417,10 +417,29 @@ const GeneralMapCalendar: React.FC<{
                   const date = new Date(year, month, day);
                   // Highlight Friday (5) and Saturday (6)
                   const isWeekend = date.getDay() === 5 || date.getDay() === 6;
+                  const dateIso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                  
+                  const handleShareDate = () => {
+                    const shareUrl = `${window.location.origin}/?date=${dateIso}`;
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                      alert(`Link copiado! ${shareUrl}`);
+                    }).catch(err => {
+                      console.error('Erro ao copiar:', err);
+                      alert('Erro ao copiar link');
+                    });
+                  };
+                  
                   return (
-                    <div key={day} className={`${headerCellStyle} ${isWeekend ? 'bg-[#3d4b3d] text-[#D4AF37]' : ''}`}>
+                    <div key={day} className={`${headerCellStyle} ${isWeekend ? 'bg-[#3d4b3d] text-[#D4AF37]' : ''} relative group`}>
                         <span className="text-sm md:text-base">{day}</span>
                         <span className="text-[8px] md:text-[9px] opacity-60 block uppercase">{['D','S','T','Q','Q','S','S'][date.getDay()]}</span>
+                        <button
+                          onClick={handleShareDate}
+                          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 bg-[#D4AF37] text-[#0F2820] p-1 rounded-bl text-[8px] transition-opacity"
+                          title="Compartilhar data"
+                        >
+                          📋
+                        </button>
                     </div>
                   );
                 })}

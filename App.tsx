@@ -59,6 +59,37 @@ const App: React.FC = () => {
   // Loading state
   const [isLoadingData, setIsLoadingData] = useState(true);
 
+  // Check URL parameters for pre-selected date
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const dateParam = params.get('date');
+    const checkInParam = params.get('checkin');
+    const checkOutParam = params.get('checkout');
+    
+    if (dateParam) {
+      // Single date parameter - set as check-in
+      const date = new Date(dateParam);
+      if (!isNaN(date.getTime())) {
+        setCheckIn(date);
+        setCurrentCalendarDate(date);
+      }
+    } else if (checkInParam) {
+      // Check-in and optional check-out parameters
+      const checkInDate = new Date(checkInParam);
+      if (!isNaN(checkInDate.getTime())) {
+        setCheckIn(checkInDate);
+        setCurrentCalendarDate(checkInDate);
+        
+        if (checkOutParam) {
+          const checkOutDate = new Date(checkOutParam);
+          if (!isNaN(checkOutDate.getTime())) {
+            setCheckOut(checkOutDate);
+          }
+        }
+      }
+    }
+  }, []);
+
   // Load data from database on mount
   useEffect(() => {
     const loadData = async () => {
