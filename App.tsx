@@ -9,7 +9,7 @@ import RegulamentoHospedagem from './components/RegulamentoHospedagem';
 import CancelReservationPage from './components/CancelReservationPage';
 import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
-import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
+import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2, Tag } from 'lucide-react';
 import { fetchRooms, fetchPackages, fetchExtras, fetchDiscounts, fetchConfig, fetchReservations, createRoom, updateRoom, deleteRoom, createPackage, updatePackage, deletePackage, createExtra, updateExtra, deleteExtra, createDiscount, updateDiscount, deleteDiscount, updateConfig as updateConfigAPI } from './services/apiService';
 
 // Interface for History Snapshot
