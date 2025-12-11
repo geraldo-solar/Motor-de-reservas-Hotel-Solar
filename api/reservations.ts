@@ -137,11 +137,25 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
       const roomId = room.id;
       console.log('[STOCK UPDATE] Processing room:', roomId);
       
-      // Get room's total quantity from database
+      // Get room's current overrides from database
       const roomData = await sql`
-        SELECT total_quantity FROM rooms WHERE id = ${roomId}
+        SELECT overrides, total_quantity FROM rooms WHERE id = ${roomId}
       `;
-      const totalQuantity = roomData.rows[0]?.total_quantity || 1;
+      
+      if (roomData.rows.length === 0) {
+        console.log('[STOCK UPDATE] Room not found:', roomId);
+        continue;
+      }
+      
+      const totalQuantity = roomData.rows[0].total_quantity || 1;
+      let overrides = roomData.rows[0].overrides || [];
+      
+      // Parse overrides if it's a string
+      if (typeof overrides === 'string') {
+        overrides = JSON.parse(overrides);
+      }
+      
+      console.log('[STOCK UPDATE] Current overrides:', JSON.stringify(overrides));
       console.log('[STOCK UPDATE] Room total quantity:', totalQuantity);
       
       // For each night between check-in and check-out
@@ -150,43 +164,37 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
         const dateStr = currentDate.toISOString().split('T')[0];
         console.log('[STOCK UPDATE] Processing date:', dateStr);
         
-        // Check if there's already an override for this room/date
-        const existingOverride = await sql`
-          SELECT * FROM room_date_overrides 
-          WHERE room_id = ${roomId} AND date = ${dateStr}
-        `;
-
-        if (existingOverride.rows.length > 0) {
+        // Find existing override for this date
+        const existingIndex = overrides.findIndex((o: any) => o.dateIso === dateStr);
+        
+        if (existingIndex >= 0) {
           // Update existing override - decrement available quantity
-          const currentQty = existingOverride.rows[0].available_quantity;
-          console.log('[STOCK UPDATE] Found existing override with qty:', currentQty);
-          if (currentQty !== null && currentQty > 0) {
-            const newQty = currentQty - 1;
-            console.log('[STOCK UPDATE] Updating to new qty:', newQty);
-            await sql`
-              UPDATE room_date_overrides 
-              SET available_quantity = ${newQty}
-              WHERE room_id = ${roomId} AND date = ${dateStr}
-            `;
-            console.log('[STOCK UPDATE] Update successful');
-          } else {
-            console.log('[STOCK UPDATE] Quantity is null or 0, skipping update');
-          }
+          const currentQty = overrides[existingIndex].availableQuantity ?? totalQuantity;
+          const newQty = Math.max(0, currentQty - 1);
+          console.log('[STOCK UPDATE] Found existing override with qty:', currentQty, '-> new qty:', newQty);
+          overrides[existingIndex].availableQuantity = newQty;
         } else {
           // Create new override with decremented quantity
-          // Use totalQuantity from room and decrement by 1
           const newQty = Math.max(0, totalQuantity - 1);
           console.log('[STOCK UPDATE] No existing override, creating new with qty:', newQty);
-          await sql`
-            INSERT INTO room_date_overrides (room_id, date, available_quantity)
-            VALUES (${roomId}, ${dateStr}, ${newQty})
-          `;
-          console.log('[STOCK UPDATE] Insert successful');
+          overrides.push({
+            dateIso: dateStr,
+            availableQuantity: newQty
+          });
         }
         
         // Move to next day
         currentDate.setDate(currentDate.getDate() + 1);
       }
+      
+      // Update room with new overrides
+      console.log('[STOCK UPDATE] Updating room overrides:', JSON.stringify(overrides));
+      await sql`
+        UPDATE rooms 
+        SET overrides = ${JSON.stringify(overrides)}
+        WHERE id = ${roomId}
+      `;
+      console.log('[STOCK UPDATE] Room updated successfully');
     }
     stockUpdateSuccess = true;
     console.log('[STOCK UPDATE] All updates completed successfully');
