@@ -1698,7 +1698,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                <div className="flex justify-between items-start">
                                    <div>
                                        <h3 className="font-serif font-bold text-xl text-[#0F2820]">{pkg.name}</h3>
-                                       <p className="text-sm text-gray-500">{new Date(pkg.startIsoDate).toLocaleDateString()} até {new Date(pkg.endIsoDate).toLocaleDateString()}</p>
+                                       <p className="text-sm text-gray-500">{new Date(pkg.startIsoDate + 'T12:00:00').toLocaleDateString()} até {new Date(pkg.endIsoDate + 'T12:00:00').toLocaleDateString()}</p>
                                    </div>
                                    <div className="flex items-center gap-2">
                                        <label className="flex items-center gap-2 cursor-pointer mr-4">
