@@ -1083,9 +1083,25 @@ const App: React.FC = () => {
                   {packages.filter(p => p.active).map(pkg => {
                     // Get minimum price from roomPrices, or Infinity if no prices set
                     const minPrice = pkg.roomPrices.length > 0 ? Math.min(...pkg.roomPrices.map(rp => rp.price)) : Infinity;
-                    const startDate = new Date(pkg.startIsoDate);
-                    const endDate = new Date(pkg.endIsoDate);
-                    const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                    
+                    // Parse dates safely in local timezone
+                    let startDate, endDate, nights;
+                    try {
+                      const startParts = pkg.startIsoDate.split('T')[0].split('-');
+                      const endParts = pkg.endIsoDate.split('T')[0].split('-');
+                      startDate = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]));
+                      endDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]));
+                      nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                      
+                      // Validate dates
+                      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                        console.error('Invalid package dates:', pkg);
+                        return null;
+                      }
+                    } catch (error) {
+                      console.error('Error parsing package dates:', pkg, error);
+                      return null;
+                    }
 
                     return (
                       <div key={pkg.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
