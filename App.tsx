@@ -1260,39 +1260,48 @@ const App: React.FC = () => {
              </div>
              
              {/* Discount Code Section */}
-             <div className="max-w-md mx-auto mb-12 px-4">
-               <div className="bg-gradient-to-br from-[#F9F8F6] to-white border-2 border-[#D4AF37]/30 rounded-lg p-6 shadow-lg">
-                 <div className="flex items-center gap-2 mb-4">
-                   <Tag size={20} className="text-[#D4AF37]" />
-                   <h3 className="font-bold text-[#0F2820] uppercase tracking-wide">Cupom de Desconto</h3>
+             <div className="max-w-4xl mx-auto mb-12 px-4">
+               <div className="bg-gradient-to-br from-[#F9F8F6] to-white border-2 border-[#D4AF37]/30 rounded-lg p-4 shadow-lg">
+                 <div className="flex flex-col md:flex-row md:items-center gap-4">
+                   {/* Left side: Title and description */}
+                   <div className="flex items-center gap-3 md:min-w-[280px]">
+                     <Tag size={24} className="text-[#D4AF37] flex-shrink-0" />
+                     <div>
+                       <h3 className="font-bold text-[#0F2820] uppercase tracking-wide text-sm">Cupom de Desconto</h3>
+                       <p className="text-xs text-gray-500">Aplique e veja os preços com desconto</p>
+                     </div>
+                   </div>
+                   
+                   {/* Right side: Input and button */}
+                   <div className="flex-1 flex gap-2">
+                     <input 
+                       type="text" 
+                       value={discountCode}
+                       onChange={e => setDiscountCode(e.target.value.toUpperCase())}
+                       placeholder="Digite o código"
+                       className="flex-1 px-4 py-2.5 border-2 border-[#4A5D43]/30 rounded-lg uppercase bg-white focus:border-[#D4AF37] focus:outline-none transition text-sm"
+                     />
+                     <button 
+                       onClick={handleApplyDiscount}
+                       className="px-6 py-2.5 bg-[#2F3A2F] hover:bg-[#1f281f] text-[#E5D3B3] rounded-lg font-bold uppercase text-sm tracking-wider transition-all whitespace-nowrap"
+                     >
+                       Aplicar
+                     </button>
+                   </div>
                  </div>
-                 <p className="text-sm text-gray-600 mb-4">Possui um código promocional? Aplique agora e veja os preços com desconto!</p>
-                 <div className="flex gap-2">
-                   <input 
-                     type="text" 
-                     value={discountCode}
-                     onChange={e => setDiscountCode(e.target.value.toUpperCase())}
-                     placeholder="Digite o código"
-                     className="flex-1 p-3 border-2 border-[#4A5D43]/30 rounded-lg uppercase bg-white focus:border-[#D4AF37] focus:outline-none transition"
-                   />
-                   <button 
-                     onClick={handleApplyDiscount}
-                     className="px-6 py-3 bg-[#2F3A2F] hover:bg-[#1f281f] text-[#E5D3B3] rounded-lg font-bold uppercase text-sm tracking-wider transition-all flex items-center gap-2 whitespace-nowrap"
-                   >
-                     Aplicar
-                   </button>
-                 </div>
+                 
+                 {/* Applied discount message */}
                  {appliedDiscount && (
-                   <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+                   <div className="mt-3 p-2.5 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
                      <div className="flex items-center gap-2">
-                       <Check size={18} className="text-green-600" />
-                       <span className="text-sm font-medium text-green-800">
-                         Cupom <strong>{appliedDiscount.code}</strong> aplicado!
+                       <Check size={16} className="text-green-600" />
+                       <span className="text-xs font-medium text-green-800">
+                         Cupom <strong>{appliedDiscount.code}</strong> aplicado! Desconto de <strong>{appliedDiscount.percentage}%</strong>
                        </span>
                      </div>
                      <button 
                        onClick={() => setAppliedDiscount(null)}
-                       className="text-red-600 hover:text-red-800 text-sm font-medium"
+                       className="text-red-600 hover:text-red-800 text-xs font-medium"
                      >
                        Remover
                      </button>
