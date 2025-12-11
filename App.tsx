@@ -1020,6 +1020,100 @@ const App: React.FC = () => {
             )}
           </section>
 
+          {/* Packages Section */}
+          {packages.filter(p => p.active).length > 0 && (
+            <section className="py-16 bg-gradient-to-b from-[#F9F8F6] to-white">
+              <div className="max-w-7xl mx-auto px-4">
+                <div className="text-center mb-12">
+                  <span className="text-[#D4AF37] text-xs font-bold uppercase tracking-[0.2em]">Experiências Exclusivas</span>
+                  <h2 className="text-4xl font-serif text-[#0F2820] mt-3">Pacotes Especiais</h2>
+                  <div className="w-24 h-1 bg-[#D4AF37] mx-auto mt-6"></div>
+                  <p className="text-gray-600 mt-4 max-w-2xl mx-auto">Escolha um dos nossos pacotes temáticos e aproveite uma experiência completa</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {packages.filter(p => p.active).map(pkg => {
+                    const minPrice = Math.min(...pkg.roomPrices.map(rp => rp.price));
+                    const startDate = new Date(pkg.startIsoDate);
+                    const endDate = new Date(pkg.endIsoDate);
+                    const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+                    return (
+                      <div key={pkg.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                        {/* Package Image */}
+                        <div className="relative h-56 overflow-hidden">
+                          <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-full object-cover" />
+                          <div className="absolute top-4 right-4 bg-[#D4AF37] text-[#0F2820] px-3 py-1 rounded-full text-xs font-bold">
+                            {nights} noites
+                          </div>
+                        </div>
+
+                        {/* Package Content */}
+                        <div className="p-6">
+                          <h3 className="text-2xl font-serif text-[#0F2820] mb-2">{pkg.name}</h3>
+                          <p className="text-gray-600 text-sm mb-4">{pkg.description}</p>
+
+                          {/* Dates */}
+                          <div className="flex items-center gap-2 text-sm text-gray-700 mb-4 bg-[#F9F8F6] p-3 rounded">
+                            <CalendarIcon size={16} className="text-[#D4AF37]" />
+                            <span className="font-semibold">
+                              {startDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })} - {endDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </span>
+                          </div>
+
+                          {/* Includes */}
+                          <div className="mb-4">
+                            <p className="text-xs font-bold text-gray-500 uppercase mb-2">Inclui:</p>
+                            <ul className="space-y-1">
+                              {pkg.includes.slice(0, 3).map((item, idx) => (
+                                <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
+                                  <Check size={16} className="text-[#4A5D43] mt-0.5 flex-shrink-0" />
+                                  <span>{item}</span>
+                                </li>
+                              ))}
+                              {pkg.includes.length > 3 && (
+                                <li className="text-xs text-gray-500 italic">+ {pkg.includes.length - 3} mais itens</li>
+                              )}
+                            </ul>
+                          </div>
+
+                          {/* Price and CTA */}
+                          <div className="border-t border-gray-200 pt-4 mt-4">
+                            <div className="flex items-end justify-between mb-3">
+                              <div>
+                                <p className="text-xs text-gray-500 uppercase">A partir de</p>
+                                <p className="text-3xl font-bold text-[#0F2820]">R$ {minPrice.toLocaleString('pt-BR')}</p>
+                                <p className="text-xs text-gray-500">total para {nights} noites</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => {
+                                // Set dates automatically
+                                const pkgStartDate = new Date(pkg.startIsoDate.split('-').map(Number).map((n, i) => i === 1 ? n - 1 : n) as [number, number, number]);
+                                const pkgEndDate = new Date(pkg.endIsoDate.split('-').map(Number).map((n, i) => i === 1 ? n - 1 : n) as [number, number, number]);
+                                setCheckIn(pkgStartDate);
+                                setCheckOut(pkgEndDate);
+                                setCurrentCalendarDate(pkgStartDate);
+                                // Scroll to rooms
+                                setTimeout(() => {
+                                  roomsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+                                }, 300);
+                              }}
+                              className="w-full bg-[#2F3A2F] hover:bg-[#1f281f] text-[#E5D3B3] py-3 rounded font-bold uppercase text-sm tracking-wider transition-all flex items-center justify-center gap-2"
+                            >
+                              Selecionar Pacote
+                              <ArrowRight size={18} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* Rooms Section */}
           <section className="py-20 max-w-7xl mx-auto">
              <div className="text-center mb-16">
