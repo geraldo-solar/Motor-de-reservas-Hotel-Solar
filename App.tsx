@@ -1033,7 +1033,8 @@ const App: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {packages.filter(p => p.active).map(pkg => {
-                    const minPrice = Math.min(...pkg.roomPrices.map(rp => rp.price));
+                    // Get minimum price from roomPrices, or Infinity if no prices set
+                    const minPrice = pkg.roomPrices.length > 0 ? Math.min(...pkg.roomPrices.map(rp => rp.price)) : Infinity;
                     const startDate = new Date(pkg.startIsoDate);
                     const endDate = new Date(pkg.endIsoDate);
                     const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -1094,10 +1095,8 @@ const App: React.FC = () => {
                                 setCheckIn(pkgStartDate);
                                 setCheckOut(pkgEndDate);
                                 setCurrentCalendarDate(pkgStartDate);
-                                // Scroll to rooms
-                                setTimeout(() => {
-                                  roomsSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-                                }, 300);
+                                // Navigate to packages view
+                                setCurrentView(ViewState.PACKAGES);
                               }}
                               className="w-full bg-[#2F3A2F] hover:bg-[#1f281f] text-[#E5D3B3] py-3 rounded font-bold uppercase text-sm tracking-wider transition-all flex items-center justify-center gap-2"
                             >
