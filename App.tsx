@@ -673,13 +673,13 @@ const App: React.FC = () => {
 
               return (
                  <div 
-                    key={day}
-                    onClick={() => !isPast && handleDateClick(day)}
-                    className={`
-                       h-14 md:h-28 border rounded-sm p-1 md:p-2 cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden
-                       ${bgClass} ${textClass} ${borderClass}
-                    `}
-                 >
+                   key={day}
+                   onClick={() => !isPast && handleDateClick(day)}
+                   className={`
+                      h-12 md:h-20 border rounded-sm p-1 md:p-2 cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden
+                      ${bgClass} ${textClass} ${borderClass}
+                   `}
+                >
                     <div className="flex justify-between items-start">
                        <span className={`text-sm md:text-lg leading-none ${isSelected || inRange ? 'text-[#E5D3B3]' : ''}`}>{day}</span>
                        <div className="flex gap-0.5">
