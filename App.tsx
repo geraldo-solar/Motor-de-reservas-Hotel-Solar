@@ -387,8 +387,18 @@ const App: React.FC = () => {
   };
 
   // --- RESERVATION HANDLERS ---
-  const handleAddReservation = (reservation: Reservation) => {
+  const handleAddReservation = async (reservation: Reservation) => {
       setReservations(prev => [reservation, ...prev]);
+      
+      // Reload rooms data from database to get updated availability
+      console.log('[RESERVATION] Reloading rooms data after reservation creation');
+      try {
+        const updatedRooms = await fetchRooms();
+        setRooms(updatedRooms);
+        console.log('[RESERVATION] Rooms data reloaded successfully');
+      } catch (error) {
+        console.error('[RESERVATION] Failed to reload rooms data:', error);
+      }
   };
 
   const handleUpdateReservationStatus = (id: string, status: ReservationStatus) => {

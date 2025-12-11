@@ -126,11 +126,12 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   try {
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
-    const roomsArray = JSON.parse(JSON.stringify(rooms));
+    const roomsArray = Array.isArray(rooms) ? rooms : JSON.parse(JSON.stringify(rooms));
 
     console.log('[STOCK UPDATE] Starting stock update for reservation:', reservationId);
     console.log('[STOCK UPDATE] Rooms array:', JSON.stringify(roomsArray));
     console.log('[STOCK UPDATE] Check-in:', checkIn, 'Check-out:', checkOut);
+    console.log('[STOCK UPDATE] Number of rooms to update:', roomsArray.length);
 
     // For each room in the reservation
     for (const room of roomsArray) {
@@ -189,12 +190,18 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
       
       // Update room with new overrides
       console.log('[STOCK UPDATE] Updating room overrides:', JSON.stringify(overrides));
-      await sql`
+      const updateResult = await sql`
         UPDATE rooms 
-        SET overrides = ${JSON.stringify(overrides)}
+        SET overrides = ${JSON.stringify(overrides)}, updated_at = CURRENT_TIMESTAMP
         WHERE id = ${roomId}
       `;
-      console.log('[STOCK UPDATE] Room updated successfully');
+      console.log('[STOCK UPDATE] Room updated successfully, rows affected:', updateResult.rowCount);
+      
+      // Verify the update
+      const verifyResult = await sql`
+        SELECT overrides FROM rooms WHERE id = ${roomId}
+      `;
+      console.log('[STOCK UPDATE] Verified overrides after update:', JSON.stringify(verifyResult.rows[0]?.overrides));
     }
     stockUpdateSuccess = true;
     console.log('[STOCK UPDATE] All updates completed successfully');
