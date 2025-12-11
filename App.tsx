@@ -836,8 +836,30 @@ const App: React.FC = () => {
                           if (!room) return null;
                           
                           // Check availability for this room in the package dates
-                          const isAvailable = checkAvailability(room);
+                          const pkgStartDate = new Date(pkg.startIsoDate);
+                          const pkgEndDate = new Date(pkg.endIsoDate);
+                          
+                          // Check each day in the package period
+                          let isAvailable = true;
+                          let tempDate = new Date(pkgStartDate);
+                          while (tempDate < pkgEndDate) {
+                            const override = getRoomOverride(room, tempDate);
+                            const qty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+                            const price = override?.price !== undefined ? override.price : room.price;
+                            const closed = override?.isClosed;
+                            
+                            if (closed || price === 0 || qty === 0) {
+                              isAvailable = false;
+                              break;
+                            }
+                            
+                            tempDate.setDate(tempDate.getDate() + 1);
+                          }
+                          
                           const isUnavailable = !isAvailable;
+                          
+                          // Don't render unavailable rooms
+                          if (isUnavailable) return null;
                           
                           return (
                               <button 
