@@ -372,9 +372,13 @@ const App: React.FC = () => {
        for (const pkg of newPackages) {
          if (!pkg.active) continue; // Skip inactive packages
          
-         // Parse package dates
-         const startDate = new Date(pkg.startIsoDate);
-         const endDate = new Date(pkg.endIsoDate);
+         // Parse package dates (local timezone to avoid date shift)
+         const [startYear, startMonth, startDay] = pkg.startIsoDate.split('-').map(Number);
+         const [endYear, endMonth, endDay] = pkg.endIsoDate.split('-').map(Number);
+         const startDate = new Date(startYear, startMonth - 1, startDay);
+         const endDate = new Date(endYear, endMonth - 1, endDay);
+         
+         console.log(`[PACKAGE SYNC] Processing package "${pkg.name}" from ${pkg.startIsoDate} to ${pkg.endIsoDate}`);
          
          // For each room price in the package
          for (const roomPrice of pkg.roomPrices) {
@@ -384,10 +388,15 @@ const App: React.FC = () => {
            const room = updatedRooms[roomIndex];
            let overrides = room.overrides || [];
            
+           console.log(`[PACKAGE SYNC] Syncing room "${room.name}" with price ${roomPrice.price}`);
+           
            // Create overrides for each date in the package period
            const currentDate = new Date(startDate);
            while (currentDate < endDate) {
-             const dateStr = currentDate.toISOString().split('T')[0];
+             const year = currentDate.getFullYear();
+             const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+             const day = String(currentDate.getDate()).padStart(2, '0');
+             const dateStr = `${year}-${month}-${day}`;
              
              // Find or create override for this date
              const existingIndex = overrides.findIndex(o => o.dateIso === dateStr);
