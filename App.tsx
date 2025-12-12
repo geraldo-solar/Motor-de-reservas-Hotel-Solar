@@ -291,6 +291,65 @@ const App: React.FC = () => {
      saveCheckpoint();
      setPackages(newPackages);
      
+     // Sync package prices with room overrides automatically
+     try {
+       console.log('[PACKAGE SYNC] Syncing package prices with room overrides');
+       const updatedRooms = [...rooms];
+       
+       for (const pkg of newPackages) {
+         if (!pkg.active) continue; // Skip inactive packages
+         
+         // Parse package dates
+         const startDate = new Date(pkg.startIsoDate);
+         const endDate = new Date(pkg.endIsoDate);
+         
+         // For each room price in the package
+         for (const roomPrice of pkg.roomPrices) {
+           const roomIndex = updatedRooms.findIndex(r => r.id === roomPrice.roomId);
+           if (roomIndex === -1) continue;
+           
+           const room = updatedRooms[roomIndex];
+           let overrides = room.overrides || [];
+           
+           // Create overrides for each date in the package period
+           const currentDate = new Date(startDate);
+           while (currentDate < endDate) {
+             const dateStr = currentDate.toISOString().split('T')[0];
+             
+             // Find or create override for this date
+             const existingIndex = overrides.findIndex(o => o.dateIso === dateStr);
+             
+             if (existingIndex >= 0) {
+               // Update existing override
+               overrides[existingIndex].price = roomPrice.price;
+             } else {
+               // Create new override
+               overrides.push({
+                 dateIso: dateStr,
+                 price: roomPrice.price,
+                 availableQuantity: room.totalQuantity
+               });
+             }
+             
+             currentDate.setDate(currentDate.getDate() + 1);
+           }
+           
+           updatedRooms[roomIndex] = { ...room, overrides };
+         }
+       }
+       
+       // Update rooms with new overrides
+       setRooms(updatedRooms);
+       console.log('[PACKAGE SYNC] Room overrides updated successfully');
+       
+       // Sync updated rooms to database
+       for (const room of updatedRooms) {
+         await updateRoom(room).catch(err => console.error('Failed to update room:', err));
+       }
+     } catch (error) {
+       console.error('[PACKAGE SYNC] Error syncing package prices:', error);
+     }
+     
      // Sync with Postgres
     try {
       const oldPackageIds: Set<string> = new Set(packages.map(p => p.id));
