@@ -189,9 +189,14 @@ export const processAdminCommand = async (
       }
     });
 
-    const responseText = result.text;
+    let responseText = result.text;
     if (!responseText) throw new Error("Sem resposta da IA");
 
+    // Remove markdown code blocks if present
+    responseText = responseText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    
+    console.log('[ADMIN AI] Response text:', responseText);
+    
     const parsedData = JSON.parse(responseText) as AdminResponse;
     return parsedData;
 
