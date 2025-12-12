@@ -192,12 +192,28 @@ export const processAdminCommand = async (
     let responseText = result.text;
     if (!responseText) throw new Error("Sem resposta da IA");
 
-    // Remove markdown code blocks if present
-    responseText = responseText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    console.log('[ADMIN AI] Raw response:', responseText.substring(0, 200));
     
-    console.log('[ADMIN AI] Response text:', responseText);
+    // Extract JSON from markdown code blocks or plain text
+    let jsonText = responseText;
     
-    const parsedData = JSON.parse(responseText) as AdminResponse;
+    // Try to extract from markdown code block
+    const codeBlockMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (codeBlockMatch) {
+      jsonText = codeBlockMatch[1].trim();
+      console.log('[ADMIN AI] Extracted from code block');
+    } else {
+      // Try to find JSON object in the text
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonText = jsonMatch[0];
+        console.log('[ADMIN AI] Extracted JSON object');
+      }
+    }
+    
+    console.log('[ADMIN AI] Parsing JSON:', jsonText.substring(0, 200));
+    
+    const parsedData = JSON.parse(jsonText) as AdminResponse;
     return parsedData;
 
   } catch (error) {
