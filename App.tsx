@@ -894,10 +894,14 @@ const App: React.FC = () => {
               <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-80 object-cover rounded-sm relative z-10 shadow-xl" />
               <div className="absolute top-4 left-4 z-20 bg-white/90 backdrop-blur px-4 py-2">
                  <span className="block text-2xl font-serif text-[#0F2820] text-center font-bold">
-                    {pkg.startIsoDate.split('-')[2]}
+                    {parseInt(pkg.startIsoDate.split('-')[2])}
                  </span>
                  <span className="block text-xs uppercase tracking-widest text-center text-gray-500">
-                    {new Date(pkg.startIsoDate + 'T12:00:00').toLocaleString('pt-BR', { month: 'short' }).toUpperCase()}
+                    {(() => {
+                      const [year, month, day] = pkg.startIsoDate.split('-').map(Number);
+                      const date = new Date(year, month - 1, day);
+                      return date.toLocaleString('pt-BR', { month: 'short' }).toUpperCase();
+                    })()}
                  </span>
               </div>
            </div>
