@@ -14,7 +14,8 @@ export interface Room {
   description: string;
   price: number; // Default Base Price
   capacity: number;
-  imageUrl: string;
+  imageUrl: string; // Kept for backward compatibility (primary image)
+  imageUrls?: string[]; // NEW: Array of up to 4 images
   features: string[];
   totalQuantity: number; // Default Base Inventory
   active: boolean;

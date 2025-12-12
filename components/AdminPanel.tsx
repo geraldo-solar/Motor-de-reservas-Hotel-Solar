@@ -750,13 +750,15 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleCreateRoom = () => {
     if (!newRoom.name) return;
+    const imageUrls = (newRoom as any).imageUrls || [newRoom.imageUrl || ''];
     const room: Room = {
       id: newRoom.name.toLowerCase().replace(/\s+/g, '-'),
       name: newRoom.name || 'Nova Acomodação',
       description: newRoom.description || '',
       price: newRoom.price || 0,
       capacity: newRoom.capacity || 2,
-      imageUrl: newRoom.imageUrl || '',
+      imageUrl: imageUrls[0] || '',
+      imageUrls: imageUrls.filter((img: string) => img),
       features: newRoomFeatures.split(',').map(f => f.trim()).filter(f => f),
       totalQuantity: newRoom.totalQuantity || 1,
       active: true,
@@ -784,8 +786,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               capacity: room.capacity,
               totalQuantity: room.totalQuantity,
               active: room.active,
-              imageUrl: room.imageUrl
-          });
+              imageUrl: room.imageUrl,
+              imageUrls: room.imageUrls || [room.imageUrl]
+          } as any);
           setNewRoomFeatures(room.features.join(', '));
           setEditingRoomId(id);
           setIsAddingRoom(true);
@@ -794,6 +797,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleUpdateRoom = () => {
       if (!newRoom.name || !editingRoomId) return;
+      const imageUrls = (newRoom as any).imageUrls || [newRoom.imageUrl || ''];
       const updatedRooms = rooms.map(r => 
           r.id === editingRoomId 
               ? { 
@@ -803,7 +807,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   price: newRoom.price || 0, 
                   capacity: newRoom.capacity || 2,
                   totalQuantity: newRoom.totalQuantity || 1,
-                  imageUrl: newRoom.imageUrl || '',
+                  imageUrl: imageUrls[0] || '',
+                  imageUrls: imageUrls.filter((img: string) => img),
                   features: newRoomFeatures.split(',').map(f => f.trim()).filter(f => f)
                 }
               : r
@@ -1499,48 +1504,60 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                         <label className={labelStyle}>Descrição</label>
                         <textarea value={newRoom.description} onChange={e => setNewRoom({...newRoom, description: e.target.value})} className={inputStyle} rows={3} />
                      </div>
-                    <div className="md:col-span-2">
-                       <label className={labelStyle}>Imagem da Acomodação</label>
-                       <div className="space-y-2">
-                          <div className="flex gap-2">
-                             <input 
-                                type="url"
-                                value={newRoom.imageUrl || ''} 
-                                onChange={e => setNewRoom({...newRoom, imageUrl: e.target.value})} 
-                                className={inputStyle} 
-                                placeholder="Cole a URL da imagem ou faça upload abaixo"
-                             />
-                          </div>
-                          <div className="flex items-center gap-2">
-                             <label className="flex-1 cursor-pointer">
-                                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-sm text-gray-700">
-                                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                   Fazer Upload de Imagem
-                                </div>
-                                <input 
+                   <div className="md:col-span-2">
+                      <label className={labelStyle}>Imagens da Acomodação (até 4 fotos)</label>
+                      <div className="space-y-3">
+                         {[0, 1, 2, 3].map(index => {
+                           const currentImages = (newRoom as any).imageUrls || [newRoom.imageUrl || ''];
+                           const imageUrl = currentImages[index] || '';
+                           return (
+                             <div key={index} className="flex items-center gap-2">
+                               <span className="text-xs font-bold text-gray-500 w-12">Foto {index + 1}:</span>
+                               <input 
+                                 type="url"
+                                 value={imageUrl} 
+                                 onChange={e => {
+                                   const newImages = [...currentImages];
+                                   newImages[index] = e.target.value;
+                                   setNewRoom({...newRoom, imageUrls: newImages.filter(img => img), imageUrl: newImages[0] || ''} as any);
+                                 }} 
+                                 className={inputStyle + ' flex-1'} 
+                                 placeholder="Cole a URL da imagem ou faça upload"
+                               />
+                               <label className="cursor-pointer">
+                                 <div className="flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-xs text-gray-700">
+                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                   Upload
+                                 </div>
+                                 <input 
                                    type="file" 
                                    accept="image/*" 
                                    className="hidden"
                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      if (file) {
-                                         const reader = new FileReader();
-                                         reader.onloadend = () => {
-                                            setNewRoom({...newRoom, imageUrl: reader.result as string});
-                                         };
-                                         reader.readAsDataURL(file);
-                                      }
+                                     const file = e.target.files?.[0];
+                                     if (file) {
+                                       const reader = new FileReader();
+                                       reader.onloadend = () => {
+                                         const newImages = [...currentImages];
+                                         newImages[index] = reader.result as string;
+                                         setNewRoom({...newRoom, imageUrls: newImages.filter(img => img), imageUrl: newImages[0] || ''} as any);
+                                       };
+                                       reader.readAsDataURL(file);
+                                     }
                                    }}
-                                />
-                             </label>
-                             {newRoom.imageUrl && (
-                                <div className="w-20 h-20 border border-gray-300 rounded overflow-hidden shrink-0">
-                                   <img src={newRoom.imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                                </div>
-                             )}
-                          </div>
-                       </div>
-                    </div>
+                                 />
+                               </label>
+                               {imageUrl && (
+                                 <div className="w-16 h-16 border border-gray-300 rounded overflow-hidden shrink-0">
+                                   <img src={imageUrl} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                                 </div>
+                               )}
+                             </div>
+                           );
+                         })}
+                         <p className="text-xs text-gray-500 mt-2">💡 A primeira foto será a imagem principal da acomodação</p>
+                      </div>
+                   </div>
                      <div className="md:col-span-2">
                         <label className={labelStyle}>Comodidades (Separadas por vírgula)</label>
                         <input value={newRoomFeatures} onChange={e => setNewRoomFeatures(e.target.value)} className={inputStyle} placeholder="Wifi, Ar Condicionado, etc..." />

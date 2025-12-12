@@ -20,6 +20,79 @@ interface HistoryState {
   extras: ExtraService[];
 }
 
+// Room Image Carousel Component
+const RoomImageCarousel: React.FC<{ room: Room }> = ({ room }) => {
+  const images = room.imageUrls && room.imageUrls.length > 0 ? room.imageUrls : [room.imageUrl];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+  
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+  
+  return (
+    <div className="relative h-64 overflow-hidden">
+      <img 
+        src={images[currentImageIndex]} 
+        alt={room.name} 
+        className="w-full h-full object-cover transition duration-700 group-hover:scale-110" 
+      />
+      
+      {/* Badges */}
+      <div className="absolute top-4 right-4 bg-[#D4AF37] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-md z-10">
+        Recomendado
+      </div>
+      <div className="absolute bottom-4 left-4 bg-[#0F2820]/90 backdrop-blur-sm text-white px-3 py-1.5 text-xs flex items-center gap-1 rounded-sm shadow-sm border border-[#D4AF37]/30 z-10">
+        <Users size={12} className="text-[#D4AF37]"/> Acomoda até {room.capacity} pessoas
+      </div>
+      
+      {/* Navigation Arrows - Only show if there are multiple images */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={prevImage}
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition z-20"
+            aria-label="Imagem anterior"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button
+            onClick={nextImage}
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition z-20"
+            aria-label="Próxima imagem"
+          >
+            <ChevronRight size={20} />
+          </button>
+          
+          {/* Image Indicators */}
+          <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex(index);
+                }}
+                className={`w-2 h-2 rounded-full transition ${
+                  index === currentImageIndex 
+                    ? 'bg-[#D4AF37] w-6' 
+                    : 'bg-white/50 hover:bg-white/80'
+                }`}
+                aria-label={`Ir para imagem ${index + 1}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   // Application State (Lifted Up)
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
@@ -861,16 +934,7 @@ const App: React.FC = () => {
 
         return (
           <div key={room.id} className="group bg-white rounded-sm overflow-hidden shadow-lg border border-transparent hover:border-[#D4AF37] transition-all duration-300 flex flex-col">
-            <div className="relative h-64 overflow-hidden">
-               <img src={room.imageUrl} alt={room.name} className="w-full h-full object-cover transition duration-700 group-hover:scale-110" />
-               <div className="absolute top-4 right-4 bg-[#D4AF37] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-md">
-                  Recomendado
-               </div>
-               {/* Capacity Badge */}
-               <div className="absolute bottom-4 left-4 bg-[#0F2820]/90 backdrop-blur-sm text-white px-3 py-1.5 text-xs flex items-center gap-1 rounded-sm shadow-sm border border-[#D4AF37]/30">
-                  <Users size={12} className="text-[#D4AF37]"/> Acomoda até {room.capacity} pessoas
-               </div>
-            </div>
+            <RoomImageCarousel room={room} />
             
             <div className="p-6 flex-1 flex flex-col">
                <h3 className="text-xl font-serif text-[#0F2820] mb-2">{room.name}</h3>
