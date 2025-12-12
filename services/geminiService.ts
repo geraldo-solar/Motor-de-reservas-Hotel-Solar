@@ -128,59 +128,54 @@ export const processAdminCommand = async (
   try {
     const model = 'gemini-2.5-flash';
     
+    // Minimize context - only send essential data to reduce tokens
+    const simplifiedRooms = context.rooms.map(r => ({
+      id: r.id,
+      name: r.name,
+      price: r.price,
+      totalQuantity: r.totalQuantity,
+      // Only include overrides if they exist and are not empty
+      ...(r.overrides && r.overrides.length > 0 ? { overrides: r.overrides.slice(0, 10) } : {})
+    }));
+    
+    const simplifiedPackages = context.packages.map(p => ({
+      id: p.id,
+      name: p.name,
+      dates: `${p.startIsoDate} to ${p.endIsoDate}`
+    }));
+    
+    const simplifiedDiscounts = context.discounts.map(d => ({
+      code: d.code,
+      pct: d.percentage
+    }));
+    
+    const simplifiedExtras = context.extras.map(e => ({
+      name: e.name,
+      price: e.price
+    }));
+    
     const prompt = `
       Você é o Assistente Administrativo IA do Hotel Solar.
       Seu trabalho é modificar o banco de dados do hotel com base em comandos de texto natural.
       
-      ESTADO ATUAL DO BANCO DE DADOS (JSON):
-      Rooms: ${JSON.stringify(context.rooms)}
-      Packages: ${JSON.stringify(context.packages)}
-      Discounts: ${JSON.stringify(context.discounts)}
-      Extras (Produtos): ${JSON.stringify(context.extras)}
+      ESTADO ATUAL (Resumido):
+      Rooms: ${JSON.stringify(simplifiedRooms)}
+      Packages: ${JSON.stringify(simplifiedPackages)}
+      Discounts: ${JSON.stringify(simplifiedDiscounts)}
+      Extras: ${JSON.stringify(simplifiedExtras)}
 
-      COMANDO DO ADMINISTRADOR: "${command}"
+      COMANDO: "${command}"
 
-      INSTRUÇÕES CRÍTICAS PARA ATUALIZAÇÃO DE PREÇOS E DISPONIBILIDADE:
+      REGRAS:
+      1. Para alterar preço base: modifique "price" do Room
+      2. Para datas específicas: use "overrides" com formato:
+         {"dateIso":"YYYY-MM-DD","price":500,"availableQuantity":5,"noCheckIn":false,"noCheckOut":false,"isClosed":false}
+      3. Mantenha overrides existentes de outras datas
+      4. Retorne JSON com chaves modificadas + "message"
+      5. Lista COMPLETA dos itens alterados
       
-      1. ALTERAÇÃO DE PREÇO BASE (Geral):
-         Se o comando for "Aumente a diária base", altere a propriedade "price" do objeto Room.
-
-      2. ALTERAÇÃO DE PREÇO/DISPONIBILIDADE EM DATAS ESPECÍFICAS (Mapa Geral):
-         Se o comando mencionar DATAS (ex: "Feche a venda do dia 25/12" ou "Mude o preço de 20 a 30 de dez"), você deve preencher o array "overrides" dentro do objeto Room.
-         
-         ESTRUTURA DE "OVERRIDES" (Exceções):
-         overrides: [
-           {
-             "dateIso": "YYYY-MM-DD", (Data específica no formato ISO)
-             "price": 500, (Novo preço para este dia)
-             "availableQuantity": 5, (Estoque para este dia)
-             "noCheckIn": true/false, (Se true, bloqueia check-in neste dia)
-             "noCheckOut": true/false, (Se true, bloqueia check-out neste dia)
-             "isClosed": true/false (Se true, fecha a venda neste dia)
-           }
-         ]
-         
-         IMPORTANTE: 
-         - Ao adicionar um override, mantenha os overrides existentes se forem de outras datas.
-         - Se o comando mencionar "bloquear check-in" ou "restringir entrada", defina "noCheckIn": true.
-         - Se o comando mencionar "bloquear check-out" ou "restringir saída", defina "noCheckOut": true.
-         - Use o formato de data ISO (YYYY-MM-DD) para dateIso. Exemplo: 25 de dezembro de 2025 = "2025-12-25".
-
-      INSTRUÇÕES GERAIS:
-      1. Analise o comando e modifique os dados.
-      2. Retorne APENAS um JSON válido.
-      3. O JSON deve conter as chaves "rooms", "packages", "discounts" ou "extras" APENAS se houver alteração.
-      4. O valor dessas chaves deve ser a lista COMPLETA e ATUALIZADA.
-      5. Inclua uma chave "message" descrevendo brevemente o que foi feito.
-
-      SCHEMA DE RETORNO ESPERADO (JSON Puro):
-      {
-        "rooms": [ ... ],
-        "packages": [ ... ],
-        "discounts": [ ... ],
-        "extras": [ ... ],
-        "message": "Resumo da ação"
-      }
+      RETORNO:
+      {"rooms":[...],"packages":[...],"discounts":[...],"extras":[...],"message":"texto"}
     `;
 
     const result = await getAI().models.generateContent({
