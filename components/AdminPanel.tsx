@@ -904,6 +904,46 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', roomPrices: [] });
   };
 
+  // Auto-fill room prices from map when dates are set
+  const autoFillRoomPricesFromMap = (startDate: string, endDate: string) => {
+      if (!startDate || !endDate) return;
+      
+      console.log('[AUTO-FILL] Filling room prices from map for dates:', startDate, 'to', endDate);
+      
+      const roomPrices: { roomId: string; price: number }[] = [];
+      
+      // Calculate average price for each room during the package period
+      for (const room of rooms) {
+          const start = new Date(startDate);
+          const end = new Date(endDate);
+          let totalPrice = 0;
+          let nights = 0;
+          
+          const currentDate = new Date(start);
+          while (currentDate < end) {
+              const dateStr = currentDate.toISOString().split('T')[0];
+              
+              // Find override for this date
+              const override = room.overrides?.find(o => o.dateIso === dateStr);
+              const dailyPrice = override?.price !== undefined ? override.price : room.price;
+              
+              totalPrice += dailyPrice;
+              nights++;
+              
+              currentDate.setDate(currentDate.getDate() + 1);
+          }
+          
+          // Total price for the entire package period
+          roomPrices.push({
+              roomId: room.id,
+              price: Math.round(totalPrice)
+          });
+      }
+      
+      console.log('[AUTO-FILL] Room prices filled:', roomPrices);
+      setNewPackage(prev => ({ ...prev, roomPrices }));
+  };
+
   // ---- Handlers for Extras ----
   const handleCreateExtra = () => {
       if (!newExtra.name) return;
@@ -1614,11 +1654,25 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                        </div>
                        <div>
                           <label className={labelStyle}>Data Início</label>
-                          <input type="date" value={newPackage.startIsoDate} onChange={e => setNewPackage({...newPackage, startIsoDate: e.target.value})} className={inputStyle} />
+                          <input type="date" value={newPackage.startIsoDate} onChange={e => {
+                            const newStartDate = e.target.value;
+                            setNewPackage({...newPackage, startIsoDate: newStartDate});
+                            // Auto-fill prices when both dates are set
+                            if (newStartDate && newPackage.endIsoDate) {
+                              autoFillRoomPricesFromMap(newStartDate, newPackage.endIsoDate);
+                            }
+                          }} className={inputStyle} />
                        </div>
                        <div>
                           <label className={labelStyle}>Data Fim</label>
-                          <input type="date" value={newPackage.endIsoDate} onChange={e => setNewPackage({...newPackage, endIsoDate: e.target.value})} className={inputStyle} />
+                          <input type="date" value={newPackage.endIsoDate} onChange={e => {
+                            const newEndDate = e.target.value;
+                            setNewPackage({...newPackage, endIsoDate: newEndDate});
+                            // Auto-fill prices when both dates are set
+                            if (newPackage.startIsoDate && newEndDate) {
+                              autoFillRoomPricesFromMap(newPackage.startIsoDate, newEndDate);
+                            }
+                          }} className={inputStyle} />
                        </div>
                       <div className="md:col-span-2">
                          <label className={labelStyle}>Itens Inclusos (Separados por vírgula)</label>
@@ -1671,6 +1725,41 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             </div>
                          </div>
                       </div>
+                      
+                      {/* Room Prices Section */}
+                      {newPackage.startIsoDate && newPackage.endIsoDate && newPackage.roomPrices && newPackage.roomPrices.length > 0 && (
+                        <div className="md:col-span-2 mt-4">
+                          <label className={labelStyle}>Preços por Acomodação (Valor Total do Pacote)</label>
+                          <div className="bg-[#F9F8F6] p-4 rounded border border-gray-200">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                              {rooms.map(room => {
+                                const rp = newPackage.roomPrices?.find(p => p.roomId === room.id);
+                                return (
+                                  <div key={room.id} className="flex items-center justify-between bg-white p-2 rounded border border-gray-200">
+                                    <span className="text-xs font-bold truncate pr-2">{room.name}</span>
+                                    <div className="flex items-center w-28">
+                                      <span className="text-xs text-gray-400 mr-1">R$</span>
+                                      <input 
+                                        type="number"
+                                        value={rp ? rp.price : 0}
+                                        onChange={(e) => {
+                                          const val = Number(e.target.value);
+                                          const newPrices = (newPackage.roomPrices || []).filter(p => p.roomId !== room.id);
+                                          if (val > 0) newPrices.push({ roomId: room.id, price: val });
+                                          setNewPackage({...newPackage, roomPrices: newPrices});
+                                        }}
+                                        className="w-full text-xs font-bold outline-none text-right border-b border-gray-300 focus:border-[#D4AF37]"
+                                        placeholder="0"
+                                      />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2">💡 Preços preenchidos automaticamente do mapa geral. Você pode editá-los aqui.</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="flex gap-2 mt-4 justify-end">
                        {editingPackageId ? (
