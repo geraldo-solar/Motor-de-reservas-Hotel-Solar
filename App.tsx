@@ -466,7 +466,14 @@ const App: React.FC = () => {
 
   // Filter only active items for public view
   const activeRooms = rooms.filter(r => r.active);
-  const activePackages = packages.filter(p => p.active);
+  const activePackages = packages
+    .filter(p => p.active)
+    .sort((a, b) => {
+      // Sort by start date (chronological order)
+      const dateA = new Date(a.startIsoDate);
+      const dateB = new Date(b.startIsoDate);
+      return dateA.getTime() - dateB.getTime();
+    });
 
   // Collect Restricted Dates
   const restrictedCheckInDates = new Set<string>();
