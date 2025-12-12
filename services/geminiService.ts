@@ -185,8 +185,11 @@ export const processAdminCommand = async (
 
     const result = await getAI().models.generateContent({
       model: model,
-      contents: prompt,
-      config: {
+      contents: [{
+        role: 'user',
+        parts: [{ text: prompt }]
+      }],
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
@@ -199,6 +202,8 @@ export const processAdminCommand = async (
 
   } catch (error) {
     console.error("Erro no Admin AI:", error);
-    return { message: "Erro ao processar comando de IA. Tente novamente." };
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error("Error details:", errorMessage);
+    return { message: `Erro ao processar comando de IA: ${errorMessage}. Tente novamente.` };
   }
 };
