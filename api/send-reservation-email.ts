@@ -160,6 +160,25 @@ export default async function handler(
                 </div>
               </div>
               ${paymentInstructions}
+              
+              <!-- Botão Gerenciar Reserva -->
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="https://motor-de-reservas-hotel-solar.vercel.app/gerenciar-reserva?id=${reservation.id}" style="display: inline-block; background-color: #16A34A; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                  📋 Gerenciar Minha Reserva
+                </a>
+              </div>
+              
+              <!-- Links Adicionais -->
+              <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+                <p style="color: #6b7280; font-size: 14px; margin: 0 0 12px 0;">
+                  📋 <a href="https://hotelsolar.tur.br/regulamento" style="color: #16A34A; text-decoration: none; font-weight: bold;">Regulamento de Hospedagem</a>
+                </p>
+                <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                  Precisa cancelar sua reserva? 
+                  <a href="https://motor-de-reservas-hotel-solar.vercel.app/cancelar-reserva?id=${reservation.id}" style="color: #EF4444; text-decoration: none; font-weight: bold;">Cancelar Reserva</a>
+                </p>
+              </div>
+              
               <p style="color: #6b7280; font-size: 14px; margin-top: 30px; text-align: center;">
                 Hotel Solar - Belém, PA<br>
                 Email: geraldo@hotelsolar.tur.br
