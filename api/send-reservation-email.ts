@@ -11,15 +11,17 @@ export default async function handler(
   }
 
   try {
-    console.log('[SEND EMAIL] API called');
+    console.log('[SEND EMAIL] ========== API CALLED ==========');
+    console.log('[SEND EMAIL] Request body:', JSON.stringify(req.body, null, 2));
     const { reservation } = req.body;
 
     if (!reservation || !reservation.id) {
-      console.error('[SEND EMAIL] Missing reservation data');
+      console.error('[SEND EMAIL] ❌ Missing reservation data');
       return res.status(400).json({ error: 'Missing reservation data' });
     }
     
-    console.log('[SEND EMAIL] Processing reservation:', reservation.id);
+    console.log('[SEND EMAIL] ✅ Processing reservation:', reservation.id);
+    console.log('[SEND EMAIL] Guest email:', reservation?.mainGuest?.email);
     console.log('[SEND EMAIL] BREVO_API_KEY configured:', !!BREVO_API_KEY);
 
     // Extract data safely
