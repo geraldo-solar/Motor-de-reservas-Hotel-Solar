@@ -1152,6 +1152,7 @@ const App: React.FC = () => {
               });
               setSelectedRooms(newSelectedRooms);
               setRoomQuantities({}); // Reset quantities
+              setCurrentView(ViewState.BOOKING); // Ir direto para o formulário
             }}
             className="bg-[#D4AF37] hover:bg-[#C49D2F] text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition shadow-lg flex items-center gap-3"
           >
@@ -1344,6 +1345,7 @@ const App: React.FC = () => {
                               setSelectedRooms(newSelectedRooms);
                               setSelectedPackagePrice(totalPrice);
                               setPackageRoomQuantities({}); // Reset
+                              setCurrentView(ViewState.BOOKING); // Ir direto para o formulário
                               console.log('[PACKAGE SELECT] Success!');
                             } else {
                               alert('Por favor, selecione pelo menos um quarto.');
