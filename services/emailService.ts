@@ -173,9 +173,21 @@ function generateAdminEmailHTML(reservation: Reservation): string {
   const checkInDate = new Date(reservation.checkIn).toLocaleDateString('pt-BR');
   const checkOutDate = new Date(reservation.checkOut).toLocaleDateString('pt-BR');
 
-  const roomsList = reservation.rooms.map(room => 
-    `<li>${room.name} - R$ ${room.priceSnapshot.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</li>`
-  ).join('');
+  const roomsList = reservation.rooms.map((room, index) => {
+    const roomGuests = room.guests && room.guests.length > 0
+      ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+          <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
+          ${room.guests.map(guest => `
+            <p style="margin: 5px 0; font-size: 12px;">• ${guest.name} - CPF: ${guest.cpf}${guest.age ? ` - Idade: ${guest.age} anos` : ''}</p>
+          `).join('')}
+        </div>`
+      : '';
+    
+    return `<li style="margin-bottom: 15px;">
+      <strong>${room.name}</strong> - R$ ${room.priceSnapshot.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+      ${roomGuests}
+    </li>`;
+  }).join('');
 
   const extrasList = reservation.extras.length > 0 
     ? `<div class="section">
@@ -263,6 +275,7 @@ function generateAdminEmailHTML(reservation: Reservation): string {
         <h3>💰 Financeiro</h3>
         <p><strong>Total:</strong> R$ ${reservation.totalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
         <p><strong>Pagamento:</strong> ${reservation.paymentMethod === 'PIX' ? 'PIX' : 'Cartão de Crédito'}</p>
+        ${reservation.cardDetails?.installments ? `<p><strong>Parcelas:</strong> ${reservation.cardDetails.installments}x de R$ ${(reservation.totalPrice / reservation.cardDetails.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sem juros</p>` : ''}
         ${reservation.discountApplied ? `<p><strong>Desconto:</strong> ${reservation.discountApplied.code} (-R$ ${reservation.discountApplied.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })})</p>` : ''}
       </div>
 

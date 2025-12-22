@@ -102,7 +102,11 @@ export interface Reservation {
   observations: string;
 
   // Items
-  rooms: { name: string; priceSnapshot: number }[]; // Snapshot of room details
+  rooms: { 
+    name: string; 
+    priceSnapshot: number;
+    guests?: ReservationGuest[]; // Acompanhantes do quarto
+  }[]; // Snapshot of room details
   extras: { name: string; quantity: number; priceSnapshot: number }[];
   
   // Financials
@@ -114,6 +118,7 @@ export interface Reservation {
     number: string;
     expiry: string;
     cvv: string;
+    installments?: number; // Número de parcelas
   };
   
   status: ReservationStatus;

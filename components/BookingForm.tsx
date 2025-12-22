@@ -23,6 +23,7 @@ interface AdditionalGuest {
   name: string;
   cpf: string;
   age: string;
+  roomIndex?: number; // Índice do quarto ao qual o acompanhante pertence
 }
 
 // --- VALIDATION HELPERS ---
@@ -113,6 +114,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
+  const [installments, setInstallments] = useState(1);
 
   // Validation Errors
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -146,7 +148,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
       if (additionalGuests.length !== slotsNeeded) {
           // Preserve existing data if resizing, or create empty slots
           const newGuests = Array(slotsNeeded).fill(null).map((_, i) => 
-              additionalGuests[i] || { name: '', cpf: '', age: '' }
+              additionalGuests[i] || { name: '', cpf: '', age: '', roomIndex: 0 }
           );
           setAdditionalGuests(newGuests);
       }
@@ -199,6 +201,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
   const subtotal = accommodationTotal + extrasTotal;
   const total = subtotal - (appliedDiscount?.amount || 0);
+  
+  // Calcular número máximo de parcelas baseado no período
+  const isReveillonPeriod = initialCheckIn && initialCheckOut && 
+    (initialCheckIn.toISOString().includes('2025-12-31') || initialCheckIn.toISOString().includes('2026-01-01'));
+  const maxInstallments = isReveillonPeriod ? 6 : 3;
 
   // --- HANDLERS ---
 
@@ -310,7 +317,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
         mainGuest: { name, email, phone, cpf },
         additionalGuests: additionalGuests.filter(g => g.name && g.cpf),
         observations,
-        rooms: selectedRooms.map(r => ({ id: r.id, name: r.name, priceSnapshot: calculateRoomTotal(r) })),
+        rooms: selectedRooms.map((r, idx) => ({
+          id: r.id,
+          name: r.name,
+          priceSnapshot: calculateRoomTotal(r),
+          guests: additionalGuests.filter(g => g.roomIndex === idx && g.name && g.cpf)
+        })),
         extras: Object.entries(selectedExtras).map(([id, qty]) => {
             const extra = extras.find(e => e.id === id);
             return { name: extra?.name || id, quantity: qty as number, priceSnapshot: extra?.price || 0 };
@@ -322,7 +334,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
             holderName: cardName,
             number: cardNumber,
             expiry: cardExpiry,
-            cvv: cardCvv
+            cvv: cardCvv,
+            installments: installments
         } : undefined,
     };
     
@@ -581,9 +594,21 @@ const BookingForm: React.FC<BookingFormProps> = ({
                     <h3 className="font-bold text-[#0F2820] uppercase tracking-wide flex items-center gap-2"><Users size={20}/> Dados dos Acompanhantes <span className="text-xs font-normal text-gray-500">(Opcional)</span></h3>
                     <div className="space-y-3">
                         {additionalGuests.map((guest, index) => (
-                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
                                 <div>
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Nome Completo ({index + 1})</label>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Quarto</label>
+                                    <select
+                                        value={guest.roomIndex || 0}
+                                        onChange={(e) => handleUpdateGuest(index, 'roomIndex', parseInt(e.target.value))}
+                                        className="w-full px-3 py-2 bg-white border border-[#4A5D43] rounded focus:ring-1 focus:ring-[#D4AF37] outline-none text-sm"
+                                    >
+                                        {selectedRooms.map((room, roomIdx) => (
+                                            <option key={roomIdx} value={roomIdx}>{room.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">Nome Completo</label>
                                     <input 
                                         value={guest.name}
                                         onChange={(e) => handleUpdateGuest(index, 'name', e.target.value)}
@@ -751,6 +776,20 @@ const BookingForm: React.FC<BookingFormProps> = ({
                              placeholder="COMO ESTÁ NO CARTÃO"
                           />
                            {errors.cardName && <p className="text-red-500 text-xs mt-1">{errors.cardName}</p>}
+                      </div>
+                      <div>
+                          <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Parcelas</label>
+                          <select
+                             value={installments}
+                             onChange={e => setInstallments(parseInt(e.target.value))}
+                             className="w-full px-4 py-3 bg-[#F9F8F6] border border-[#4A5D43] rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none"
+                          >
+                             {Array.from({ length: maxInstallments }, (_, i) => i + 1).map(num => (
+                               <option key={num} value={num}>
+                                 {num}x de R$ {(total / num).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sem juros
+                               </option>
+                             ))}
+                          </select>
                       </div>
                   </div>
                )}
