@@ -11,11 +11,16 @@ export default async function handler(
   }
 
   try {
+    console.log('[SEND EMAIL] API called');
     const { reservation } = req.body;
 
     if (!reservation || !reservation.id) {
+      console.error('[SEND EMAIL] Missing reservation data');
       return res.status(400).json({ error: 'Missing reservation data' });
     }
+    
+    console.log('[SEND EMAIL] Processing reservation:', reservation.id);
+    console.log('[SEND EMAIL] BREVO_API_KEY configured:', !!BREVO_API_KEY);
 
     // Extract data safely
     const guestName = reservation?.mainGuest?.name || 'Cliente';
@@ -179,6 +184,7 @@ export default async function handler(
 
     // Send client email
     if (guestEmail) {
+      console.log('[SEND EMAIL] Attempting to send client email to:', guestEmail);
       try {
         const response = await fetch('https://api.brevo.com/v3/smtp/email', {
           method: 'POST',
@@ -195,13 +201,15 @@ export default async function handler(
           })
         });
 
+        console.log('[SEND EMAIL] Brevo API response status (client):', response.status);
+        
         if (response.ok) {
           results.clientEmail.sent = true;
-          console.log('[SEND EMAIL] Client email sent successfully');
+          console.log('[SEND EMAIL] ✅ Client email sent successfully to:', guestEmail);
         } else {
           const errorData = await response.json();
           results.clientEmail.error = JSON.stringify(errorData);
-          console.error('[SEND EMAIL] Brevo API error (client):', errorData);
+          console.error('[SEND EMAIL] ❌ Brevo API error (client):', errorData);
         }
       } catch (err) {
         results.clientEmail.error = err instanceof Error ? err.message : 'Unknown error';
@@ -210,6 +218,7 @@ export default async function handler(
     }
 
     // Send admin email
+    console.log('[SEND EMAIL] Attempting to send admin email to: reserva@hotelsolar.tur.br');
     try {
       const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -226,13 +235,15 @@ export default async function handler(
         })
       });
 
+      console.log('[SEND EMAIL] Brevo API response status (admin):', response.status);
+      
       if (response.ok) {
         results.adminEmail.sent = true;
-        console.log('[SEND EMAIL] Admin email sent successfully');
+        console.log('[SEND EMAIL] ✅ Admin email sent successfully to: reserva@hotelsolar.tur.br');
       } else {
         const errorData = await response.json();
         results.adminEmail.error = JSON.stringify(errorData);
-        console.error('[SEND EMAIL] Brevo API error (admin):', errorData);
+        console.error('[SEND EMAIL] ❌ Brevo API error (admin):', errorData);
       }
     } catch (err) {
       results.adminEmail.error = err instanceof Error ? err.message : 'Unknown error';
