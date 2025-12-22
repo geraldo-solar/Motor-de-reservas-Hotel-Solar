@@ -178,15 +178,31 @@ function generateAdminEmailHTML(reservation: Reservation): string {
   ).join('');
 
   const extrasList = reservation.extras.length > 0 
-    ? `<h3>Extras</h3><ul>${reservation.extras.map(extra => 
-        `<li>${extra.name} (${extra.quantity}x) - R$ ${(extra.priceSnapshot * extra.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</li>`
-      ).join('')}</ul>`
+    ? `<div class="section">
+        <h3>🎁 Produtos Extras</h3>
+        ${reservation.extras.map(extra => `
+          <div style="margin-bottom: 10px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+            <p><strong>${extra.name}</strong></p>
+            <p>Quantidade: ${extra.quantity}x</p>
+            <p>Preço unitário: R$ ${extra.priceSnapshot.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+            <p><strong>Subtotal: R$ ${(extra.priceSnapshot * extra.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></p>
+          </div>
+        `).join('')}
+      </div>`
     : '';
 
   const guestsList = reservation.additionalGuests.length > 0
-    ? `<h3>Hóspedes Adicionais</h3><ul>${reservation.additionalGuests.map(guest => 
-        `<li>${guest.name} - CPF: ${guest.cpf}${guest.age ? ` - Idade: ${guest.age}` : ''}</li>`
-      ).join('')}</ul>`
+    ? `<div class="section">
+        <h3>👥 Hóspedes Adicionais</h3>
+        ${reservation.additionalGuests.map((guest, index) => `
+          <div style="margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 5px;">
+            <p><strong>Hóspede ${index + 1}:</strong></p>
+            <p><strong>Nome:</strong> ${guest.name}</p>
+            <p><strong>CPF:</strong> ${guest.cpf}</p>
+            ${guest.age ? `<p><strong>Idade:</strong> ${guest.age} anos</p>` : ''}
+          </div>
+        `).join('')}
+      </div>`
     : '';
 
   return `
