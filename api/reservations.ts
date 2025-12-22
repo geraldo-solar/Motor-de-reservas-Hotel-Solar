@@ -251,22 +251,22 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   console.log('[CREATE RESERVATION] Guest email:', reservationData.mainGuest.email);
   console.log('[CREATE RESERVATION] Reservation ID:', reservationData.id);
   
-  fetch(emailApiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reservation: reservationData })
-  })
-  .then(response => {
-    console.log('[CREATE RESERVATION] ✅ Email API response status:', response.status);
-    return response.json();
-  })
-  .then(data => {
-    console.log('[CREATE RESERVATION] ✅ Email API response data:', JSON.stringify(data));
-  })
-  .catch(err => {
+  try {
+    const emailResponse = await fetch(emailApiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reservation: reservationData })
+    });
+    
+    console.log('[CREATE RESERVATION] ✅ Email API response status:', emailResponse.status);
+    const emailData = await emailResponse.json();
+    console.log('[CREATE RESERVATION] ✅ Email API response data:', JSON.stringify(emailData));
+  } catch (err: any) {
     console.error('[CREATE RESERVATION] ❌ Failed to trigger email API:', err);
-    console.error('[CREATE RESERVATION] ❌ Error details:', err.message);
-  });
+    console.error('[CREATE RESERVATION] ❌ Error name:', err.name);
+    console.error('[CREATE RESERVATION] ❌ Error message:', err.message);
+    console.error('[CREATE RESERVATION] ❌ Error stack:', err.stack);
+  }
 
   // Return the created reservation
   return res.status(201).json({
