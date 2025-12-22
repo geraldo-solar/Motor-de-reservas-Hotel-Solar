@@ -1188,9 +1188,20 @@ const App: React.FC = () => {
                                         type="number"
                                         min="0"
                                         max={maxAvailable}
-                                        value={packageRoomQuantities[rp.roomId] || 0}
+                                        defaultValue={0}
+                                        value={packageRoomQuantities[rp.roomId] !== undefined ? packageRoomQuantities[rp.roomId] : ''}
                                         onChange={(e) => {
-                                          const value = Math.max(0, Math.min(maxAvailable, parseInt(e.target.value) || 0));
+                                          const inputValue = e.target.value;
+                                          if (inputValue === '') {
+                                            setPackageRoomQuantities(prev => ({
+                                              ...prev,
+                                              [rp.roomId]: 0
+                                            }));
+                                            return;
+                                          }
+                                          const numValue = parseInt(inputValue);
+                                          if (isNaN(numValue)) return;
+                                          const value = Math.max(0, Math.min(maxAvailable, numValue));
                                           setPackageRoomQuantities(prev => ({
                                             ...prev,
                                             [rp.roomId]: value
