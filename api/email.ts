@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 export default async function handler(
   req: VercelRequest,
@@ -210,18 +210,38 @@ async function sendClientConfirmation(req: VercelRequest, res: VercelResponse) {
     </html>
   `;
 
-  const emailResult = await resend.emails.send({
-    from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-    to: reservation.mainGuest.email,
-    subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
-    html: htmlContent,
-  });
+  try {
+    const response = await fetch(BREVO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: 'Hotel Solar', email: 'reserva@hotelsolar.tur.br' },
+        to: [{ email: reservation.mainGuest.email, name: reservation.mainGuest.name }],
+        subject: `Confirmação de Reserva #${reservationNumber} - Hotel Solar`,
+        htmlContent: htmlContent,
+      }),
+    });
 
-  return res.status(200).json({
-    success: true,
-    emailId: emailResult.data?.id,
-    message: 'Email de confirmação enviado ao cliente',
-  });
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('[EMAIL] Brevo API error:', error);
+      return res.status(500).json({ success: false, error: 'Failed to send email', details: error });
+    }
+
+    const result = await response.json();
+    return res.status(200).json({
+      success: true,
+      emailId: result.messageId,
+      message: 'Email de confirmação enviado ao cliente',
+    });
+  } catch (error) {
+    console.error('[EMAIL] Error sending email:', error);
+    return res.status(500).json({ success: false, error: 'Failed to send email' });
+  }
 }
 
 async function sendPaymentConfirmation(req: VercelRequest, res: VercelResponse) {
@@ -352,18 +372,38 @@ async function sendPaymentConfirmation(req: VercelRequest, res: VercelResponse) 
     </html>
   `;
 
-  const emailResult = await resend.emails.send({
-    from: 'Hotel Solar <reserva@hotelsolar.tur.br>',
-    to: reservation.mainGuest.email,
-    subject: `✅ Pagamento Confirmado - Reserva #${reservationNumber} - Hotel Solar`,
-    html: htmlContent,
-  });
+  try {
+    const response = await fetch(BREVO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: 'Hotel Solar', email: 'reserva@hotelsolar.tur.br' },
+        to: [{ email: reservation.mainGuest.email, name: reservation.mainGuest.name }],
+        subject: `✅ Pagamento Confirmado - Reserva #${reservationNumber} - Hotel Solar`,
+        htmlContent: htmlContent,
+      }),
+    });
 
-  return res.status(200).json({
-    success: true,
-    emailId: emailResult.data?.id,
-    message: 'Email de confirmação de pagamento enviado',
-  });
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('[EMAIL] Brevo API error:', error);
+      return res.status(500).json({ success: false, error: 'Failed to send email', details: error });
+    }
+
+    const result = await response.json();
+    return res.status(200).json({
+      success: true,
+      emailId: result.messageId,
+      message: 'Email de confirmação de pagamento enviado',
+    });
+  } catch (error) {
+    console.error('[EMAIL] Error sending email:', error);
+    return res.status(500).json({ success: false, error: 'Failed to send email' });
+  }
 }
 
 async function sendReservationToAdmin(req: VercelRequest, res: VercelResponse) {
@@ -539,16 +579,36 @@ async function sendReservationToAdmin(req: VercelRequest, res: VercelResponse) {
     </html>
   `;
 
-  const emailResult = await resend.emails.send({
-    from: 'Sistema de Reservas <reserva@hotelsolar.tur.br>',
-    to: 'reserva@hotelsolar.tur.br',
-    subject: `🔔 Nova Reserva #${reservationNumber} - ${reservation.mainGuest.name}`,
-    html: htmlContent,
-  });
+  try {
+    const response = await fetch(BREVO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: 'Sistema de Reservas', email: 'reserva@hotelsolar.tur.br' },
+        to: [{ email: 'reserva@hotelsolar.tur.br', name: 'Reservas Hotel Solar' }],
+        subject: `🔔 Nova Reserva #${reservationNumber} - ${reservation.mainGuest.name}`,
+        htmlContent: htmlContent,
+      }),
+    });
 
-  return res.status(200).json({
-    success: true,
-    emailId: emailResult.data?.id,
-    message: 'Email enviado para administração',
-  });
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('[EMAIL] Brevo API error:', error);
+      return res.status(500).json({ success: false, error: 'Failed to send email', details: error });
+    }
+
+    const result = await response.json();
+    return res.status(200).json({
+      success: true,
+      emailId: result.messageId,
+      message: 'Email enviado para administração',
+    });
+  } catch (error) {
+    console.error('[EMAIL] Error sending email:', error);
+    return res.status(500).json({ success: false, error: 'Failed to send email' });
+  }
 }
