@@ -220,7 +220,7 @@ export default async function handler(
         },
         body: JSON.stringify({
           sender: { name: 'Hotel Solar', email: 'geraldo@hotelsolar.tur.br' },
-          to: [{ email: 'geraldo@hotelsolar.tur.br', name: 'Geraldo - Hotel Solar' }],
+          to: [{ email: 'reserva@hotelsolar.tur.br', name: 'Reservas - Hotel Solar' }],
           subject: `🔔 Nova Reserva #${reservationNumber} - Hotel Solar`,
           htmlContent: adminEmailHtml
         })
