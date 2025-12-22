@@ -375,21 +375,21 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return (
       <div className="bg-white rounded-lg shadow-2xl overflow-hidden border border-[#D4AF37] animate-in fade-in slide-in-from-bottom-4">
         <div className="bg-[#0F2820] text-white p-6 border-b border-[#D4AF37] flex items-center gap-4">
-           <button onClick={() => {
-             alert('Botão voltar clicado!');
-             console.log('[BOOKING FORM] Back button clicked');
-             console.log('[BOOKING FORM] onClose exists?', !!onClose);
-             if (onClose) {
-               console.log('[BOOKING FORM] Calling onClose');
+           {onClose && (
+           <button 
+             onClick={(e) => {
+               e.preventDefault();
+               e.stopPropagation();
+               console.log('[BOOKING FORM] Back button clicked');
                onClose();
-               alert('onClose chamado!');
-             } else {
-               console.error('[BOOKING FORM] onClose is not defined!');
-               alert('ERRO: onClose não definido!');
-             }
-           }} className="hover:bg-white/20 p-2 rounded-full transition" title="Voltar para seleção de datas">
+             }} 
+             className="hover:bg-white/20 p-2 rounded-full transition" 
+             title="Voltar para seleção de datas"
+             type="button"
+           >
              <ChevronLeft/>
            </button>
+           )}
            <div>
              <h2 className="text-2xl font-serif">Sua Reserva: Passo 1 de 2</h2>
              <p className="text-[#D4AF37] text-sm tracking-widest uppercase">Revisão e Personalização</p>
