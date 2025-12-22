@@ -355,19 +355,20 @@ async function confirmPayment(req: VercelRequest, res: VercelResponse) {
     status: updatedReservation.status,
   };
 
-  // Send confirmation email to client (non-blocking)
-  if (approved && reservationData.mainGuest.email) {
+  // Send email to client (non-blocking)
+  if (reservationData.mainGuest.email) {
     // Always use production URL to avoid calling preview deployments
     const baseUrl = 'https://motor-de-reservas-hotel-solar.vercel.app';
+    const emailAction = approved ? 'send-payment-confirmation' : 'send-payment-denied';
 
-    fetch(`${baseUrl}/api/email?action=send-payment-confirmation`, {
+    fetch(`${baseUrl}/api/email?action=${emailAction}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         reservation: reservationData,
-        approved: true 
+        approved 
       }),
-    }).catch(err => console.error('Error sending confirmation email:', err));
+    }).catch(err => console.error(`Error sending ${approved ? 'confirmation' : 'denial'} email:`, err));
   }
 
   return res.status(200).json({
