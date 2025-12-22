@@ -99,6 +99,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>(ViewState.HOME);
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([]); // Array for multi-select
   const [selectedPackagePrice, setSelectedPackagePrice] = useState<number | null>(null);
+  const [roomQuantities, setRoomQuantities] = useState<{[roomId: string]: number}>({});
   
   // Data State (Editable by Admin)
   const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
@@ -1068,23 +1069,90 @@ const App: React.FC = () => {
                      </div>
                   </div>
                   
-                   <button 
-                    onClick={() => handleAddToBooking(room)}
-                    disabled={isUnavailable}
-                    className={`w-full py-3 rounded-sm font-bold uppercase text-xs tracking-[0.2em] transition shadow-lg flex items-center justify-center gap-2 
-                       ${isUnavailable 
-                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                         : 'bg-[#0F2820] text-white hover:bg-[#1a3c30] group-hover:gap-3'
-                       }`}
-                  >
-                    {isUnavailable ? 'Esgotado' : 'Adicionar à Reserva'}
-                    {!isUnavailable && <ArrowRight className="h-4 w-4 text-[#D4AF37]" />}
-                  </button>
+                  {isUnavailable ? (
+                    <div className="w-full py-3 rounded-sm font-bold uppercase text-xs tracking-[0.2em] bg-gray-200 text-gray-400 text-center">
+                      Esgotado
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Quantidade</label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              const current = roomQuantities[room.id] || 0;
+                              if (current > 0) {
+                                setRoomQuantities({...roomQuantities, [room.id]: current - 1});
+                              }
+                            }}
+                            className="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-sm font-bold text-lg transition"
+                            type="button"
+                          >
+                            −
+                          </button>
+                          <input
+                            type="number"
+                            min="0"
+                            max={room.totalQuantity || 10}
+                            value={roomQuantities[room.id] || 0}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0;
+                              const max = room.totalQuantity || 10;
+                              setRoomQuantities({...roomQuantities, [room.id]: Math.min(Math.max(0, val), max)});
+                            }}
+                            className="w-16 h-10 text-center border border-gray-300 rounded-sm font-bold text-lg"
+                          />
+                          <button
+                            onClick={() => {
+                              const current = roomQuantities[room.id] || 0;
+                              const max = room.totalQuantity || 10;
+                              if (current < max) {
+                                setRoomQuantities({...roomQuantities, [room.id]: current + 1});
+                              }
+                            }}
+                            className="w-10 h-10 bg-[#0F2820] hover:bg-[#1a3c30] text-white rounded-sm font-bold text-lg transition"
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">Disponível: {room.totalQuantity || 10}</p>
+                      </div>
+                    </div>
+                  )}
                </div>
             </div>
           </div>
         );
       })}
+      
+      {/* Botão Continuar */}
+      {Object.values(roomQuantities).some(q => q > 0) && (
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={() => {
+              // Adicionar quartos selecionados ao carrinho
+              const newSelectedRooms: Room[] = [];
+              Object.entries(roomQuantities).forEach(([roomId, quantity]) => {
+                if (quantity > 0) {
+                  const room = rooms.find(r => r.id === roomId);
+                  if (room) {
+                    for (let i = 0; i < quantity; i++) {
+                      newSelectedRooms.push(room);
+                    }
+                  }
+                }
+              });
+              setSelectedRooms(newSelectedRooms);
+              setRoomQuantities({}); // Reset quantities
+            }}
+            className="bg-[#D4AF37] hover:bg-[#C49D2F] text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition shadow-lg flex items-center gap-3"
+          >
+            Continuar para Reserva
+            <ArrowRight className="h-5 w-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 
@@ -1159,39 +1227,128 @@ const App: React.FC = () => {
                           // Don't render unavailable rooms
                           if (isUnavailable) return null;
                           
+                          // Calcular maxAvailable
+                          let maxAvailable = room.totalQuantity || 10;
+                          let tempDate2 = new Date(pkgStartDate);
+                          while (tempDate2 < pkgEndDate) {
+                            const override = getRoomOverride(room, tempDate2);
+                            const qty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+                            if (qty < maxAvailable) maxAvailable = qty;
+                            tempDate2.setDate(tempDate2.getDate() + 1);
+                          }
+                          
                           return (
-                              <button 
+                              <div 
                                 key={rp.roomId}
-                                onClick={() => !isUnavailable && handlePackageSelect(pkg, rp.roomId, rp.price)}
-                                disabled={isUnavailable}
-                                className={`w-full flex justify-between items-center p-4 border rounded-sm transition group text-left ${
+                                className={`w-full flex justify-between items-center p-4 border rounded-sm transition ${
                                   isUnavailable
-                                    ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
-                                    : selectedRooms.some(r => r.id === rp.roomId)
-                                      ? 'border-[#D4AF37] bg-[#D4AF37]/10'
-                                      : 'border-gray-200 hover:border-[#D4AF37] hover:bg-[#F9F8F6]'
+                                    ? 'border-gray-200 bg-gray-50 opacity-60'
+                                    : 'border-gray-200 hover:border-[#D4AF37] hover:bg-[#F9F8F6]'
                                 }`}
                               >
-                                  <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-3 flex-1">
                                       <img src={room.imageUrl} className="w-10 h-10 rounded-sm object-cover" alt="" />
-                                      <div>
-                                          <p className={`font-bold text-sm transition ${
-                                            isUnavailable ? 'text-gray-400' : 'text-[#0F2820] group-hover:text-[#D4AF37]'
+                                      <div className="flex-1">
+                                          <p className={`font-bold text-sm ${
+                                            isUnavailable ? 'text-gray-400' : 'text-[#0F2820]'
                                           }`}>{room.name}</p>
                                           <p className="text-xs text-gray-400">
-                                            {isUnavailable ? 'Esgotado' : 'Pacote Completo'}
+                                            {isUnavailable ? 'Esgotado' : `R$ ${rp.price.toLocaleString('pt-BR')} • Disponível: ${maxAvailable}`}
                                           </p>
                                       </div>
                                   </div>
-                                  <span className={`font-serif text-lg ${
-                                    isUnavailable ? 'text-gray-400' : 'text-[#0F2820]'
-                                  }`}>
-                                    {isUnavailable ? 'Esgotado' : `R$ ${rp.price.toLocaleString('pt-BR')}`}
-                                  </span>
-                              </button>
+                                  {!isUnavailable && (
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={() => {
+                                          const current = packageRoomQuantities[rp.roomId] || 0;
+                                          if (current > 0) {
+                                            setPackageRoomQuantities({...packageRoomQuantities, [rp.roomId]: current - 1});
+                                          }
+                                        }}
+                                        className="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-sm font-bold transition"
+                                        type="button"
+                                      >
+                                        −
+                                      </button>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max={maxAvailable}
+                                        value={packageRoomQuantities[rp.roomId] || 0}
+                                        onChange={(e) => {
+                                          const val = parseInt(e.target.value) || 0;
+                                          setPackageRoomQuantities({...packageRoomQuantities, [rp.roomId]: Math.min(Math.max(0, val), maxAvailable)});
+                                        }}
+                                        className="w-14 h-8 text-center border border-gray-300 rounded-sm font-bold"
+                                      />
+                                      <button
+                                        onClick={() => {
+                                          const current = packageRoomQuantities[rp.roomId] || 0;
+                                          if (current < maxAvailable) {
+                                            setPackageRoomQuantities({...packageRoomQuantities, [rp.roomId]: current + 1});
+                                          }
+                                        }}
+                                        className="w-8 h-8 bg-[#0F2820] hover:bg-[#1a3c30] text-white rounded-sm font-bold transition"
+                                        type="button"
+                                      >
+                                        +
+                                      </button>
+                                    </div>
+                                  )}
+                              </div>
                           );
                       })}
                   </div>
+                  
+                  {/* Botão Continuar para Reserva */}
+                  {Object.values(packageRoomQuantities).some(q => q > 0) && (
+                    <div className="flex justify-center mt-6">
+                      <button
+                        onClick={() => {
+                          console.log('[PACKAGE SELECT] Button clicked');
+                          console.log('[PACKAGE SELECT] packageRoomQuantities:', packageRoomQuantities);
+                          
+                          try {
+                            const newSelectedRooms: Room[] = [];
+                            let totalPrice = 0;
+                            
+                            Object.entries(packageRoomQuantities).forEach(([roomId, quantity]) => {
+                              if (quantity > 0) {
+                                const room = rooms.find(r => r.id === roomId);
+                                const roomPrice = pkg.roomPrices.find(rp => rp.roomId === roomId);
+                                if (room && roomPrice) {
+                                  for (let i = 0; i < quantity; i++) {
+                                    newSelectedRooms.push(room);
+                                  }
+                                  totalPrice += roomPrice.price * quantity;
+                                }
+                              }
+                            });
+                            
+                            console.log('[PACKAGE SELECT] newSelectedRooms:', newSelectedRooms);
+                            console.log('[PACKAGE SELECT] totalPrice:', totalPrice);
+                            
+                            if (newSelectedRooms.length > 0) {
+                              setSelectedRooms(newSelectedRooms);
+                              setSelectedPackagePrice(totalPrice);
+                              setPackageRoomQuantities({}); // Reset
+                              console.log('[PACKAGE SELECT] Success!');
+                            } else {
+                              alert('Por favor, selecione pelo menos um quarto.');
+                            }
+                          } catch (error) {
+                            console.error('[PACKAGE SELECT] Error:', error);
+                            alert('Erro ao processar seleção: ' + error);
+                          }
+                        }}
+                        className="bg-[#D4AF37] hover:bg-[#C49D2F] text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition shadow-lg flex items-center gap-3"
+                      >
+                        Continuar para Reserva
+                        <ArrowRight className="h-5 w-5" />
+                      </button>
+                    </div>
+                  )}
               </div>
            </div>
         </div>
