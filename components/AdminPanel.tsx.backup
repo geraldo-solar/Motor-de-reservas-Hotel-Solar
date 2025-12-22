@@ -1161,7 +1161,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const navItemClass = (tab: AdminTab) => 
-    `flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${activeTab === tab 
+    `flex items-center gap-2 px-4 py-3 rounded-lg transition-all ${activeTab === tab 
       ? 'bg-[#D4AF37] text-[#0F2820] font-bold shadow-lg' 
       : 'text-[#E5D3B3] hover:bg-[#2F3A2F]'}`;
 
@@ -1358,121 +1358,102 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
  );
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F9F8F6]">
+    <div className="flex min-h-screen bg-[#F9F8F6] relative">
       
-      {/* Horizontal Top Navigation Bar */}
-      <header className="bg-[#0F2820] text-[#E5D3B3] shadow-lg sticky top-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
-          {/* Logo/Title */}
-          <div className="flex items-center gap-3">
-            <Lock className="text-[#D4AF37]" size={24} />
-            <div>
-              <h1 className="font-serif font-bold tracking-widest text-xl">SOLAR ADMIN</h1>
-              <p className="text-xs text-[#4A5D43]">Painel de Controle</p>
-            </div>
-          </div>
+      {/* Mobile Header (Only visible on small screens) */}
+      <div className="md:hidden fixed top-0 w-full bg-[#0F2820] text-[#E5D3B3] z-50 p-4 flex justify-between items-center shadow-lg">
+         <div className="flex items-center gap-2">
+             <Lock className="text-[#D4AF37]" size={20} />
+             <h1 className="font-serif font-bold tracking-widest text-lg">SOLAR ADMIN</h1>
+         </div>
+         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 bg-[#2F3A2F] rounded text-[#D4AF37]">
+             {isMobileMenuOpen ? <X size={24}/> : <Menu size={24}/>}
+         </button>
+      </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-2">
-            <a 
-                href="https://www.hotelsolar.tur.br/"
-                className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-[#E5D3B3] hover:bg-[#2F3A2F] border border-[#4A5D43] text-sm"
-            >
-                <ArrowLeft size={16} /> Site
-            </a>
-            <button onClick={() => setActiveTab('map')} className={navItemClass('map')}>
-              <Grid size={16} /> Mapa
-            </button>
-            <button onClick={() => setActiveTab('reservations')} className={navItemClass('reservations')}>
-              <BookCheck size={16} /> Reservas
-            </button>
-            <button onClick={() => setActiveTab('rooms')} className={navItemClass('rooms')}>
-              <BedDouble size={16} /> Acomodações
-            </button>
-            <button onClick={() => setActiveTab('packages')} className={navItemClass('packages')}>
-              <Package size={16} /> Pacotes
-            </button>
-            <button onClick={() => setActiveTab('extras')} className={navItemClass('extras')}>
-              <ShoppingBag size={16} /> Extras
-            </button>
-            <button onClick={() => setActiveTab('discounts')} className={navItemClass('discounts')}>
-              <Tag size={16} /> Cupons
-            </button>
-            <button onClick={() => setActiveTab('ai')} className={navItemClass('ai')}>
-              <BrainCircuit size={16} /> IA
-            </button>
-            <button onClick={() => setActiveTab('config')} className={navItemClass('config')}>
-              <Settings size={16} /> Config
-            </button>
-          </nav>
+      {/* Overlay for Mobile Sidebar */}
+      {isMobileMenuOpen && (
+          <div 
+             className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
+             onClick={() => setIsMobileMenuOpen(false)}
+          />
+      )}
 
-          {/* Right Side Actions */}
-          <div className="flex items-center gap-2">
-            <button onClick={onUndo} disabled={!canUndo} className="p-2 bg-[#2F3A2F] rounded hover:bg-[#3d4b3d] disabled:opacity-30" title="Desfazer">
-              <RotateCcw size={16}/>
-            </button>
-            <button onClick={onRedo} disabled={!canRedo} className="p-2 bg-[#2F3A2F] rounded hover:bg-[#3d4b3d] disabled:opacity-30" title="Refazer">
-              <RotateCw size={16}/>
-            </button>
-            <button 
-              onClick={onLogout}
-              className="hidden md:flex items-center gap-2 bg-red-900/30 text-red-400 px-3 py-2 rounded hover:bg-red-900/50 transition text-sm"
-            >
-              <LogOut size={16} /> Sair
-            </button>
-            
-            {/* Mobile Menu Toggle */}
-            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2 bg-[#2F3A2F] rounded text-[#D4AF37]">
-              {isMobileMenuOpen ? <X size={24}/> : <Menu size={24}/>}
-            </button>
+      {/* Sidebar (Responsive) */}
+      <aside 
+         className={`
+           w-64 bg-[#0F2820] text-[#E5D3B3] flex flex-col fixed h-full z-50 shadow-2xl transition-transform duration-300 ease-in-out
+           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 top-0 left-0
+         `}
+      >
+        <div className="p-6 border-b border-[#4A5D43] hidden md:block">
+          <div className="flex items-center gap-2 mb-2">
+            <Lock className="text-[#D4AF37]" size={20} />
+            <h1 className="font-serif font-bold tracking-widest text-lg">SOLAR ADMIN</h1>
           </div>
+          <p className="text-xs text-[#4A5D43]">Painel de Controle</p>
+        </div>
+        
+        {/* Mobile Sidebar Header */}
+        <div className="p-6 border-b border-[#4A5D43] md:hidden flex justify-between items-center">
+             <span className="font-bold text-[#D4AF37]">MENU</span>
+             <button onClick={() => setIsMobileMenuOpen(false)}><X/></button>
         </div>
 
-        {/* Mobile Dropdown Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden bg-[#0A1C16] border-t border-[#4A5D43] p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <a 
                 href="https://www.hotelsolar.tur.br/"
-                className="flex items-center gap-2 px-4 py-3 rounded-lg transition-all text-[#E5D3B3] hover:bg-[#2F3A2F] border border-[#4A5D43] w-full"
+                className="flex items-center gap-2 px-4 py-3 rounded-lg transition-all text-[#E5D3B3] hover:bg-[#2F3A2F] mb-4 border border-[#4A5D43]"
             >
                 <ArrowLeft size={18} /> Voltar para site
             </a>
-            <button onClick={() => handleMobileNav('map')} className={`${navItemClass('map')} w-full`}>
-              <Grid size={18} /> Mapa Geral
-            </button>
-            <button onClick={() => handleMobileNav('reservations')} className={`${navItemClass('reservations')} w-full`}>
-              <BookCheck size={18} /> Reservas
-            </button>
-            <button onClick={() => handleMobileNav('rooms')} className={`${navItemClass('rooms')} w-full`}>
-              <BedDouble size={18} /> Acomodações
-            </button>
-            <button onClick={() => handleMobileNav('packages')} className={`${navItemClass('packages')} w-full`}>
-              <Package size={18} /> Pacotes
-            </button>
-            <button onClick={() => handleMobileNav('extras')} className={`${navItemClass('extras')} w-full`}>
-              <ShoppingBag size={18} /> Produtos Extras
-            </button>
-            <button onClick={() => handleMobileNav('discounts')} className={`${navItemClass('discounts')} w-full`}>
-              <Tag size={18} /> Cupons
-            </button>
-            <button onClick={() => handleMobileNav('ai')} className={`${navItemClass('ai')} w-full`}>
-              <BrainCircuit size={18} /> Assistente IA
-            </button>
-            <button onClick={() => handleMobileNav('config')} className={`${navItemClass('config')} w-full`}>
-              <Settings size={18} /> Configurações
-            </button>
-            <button 
-              onClick={onLogout}
-              className="w-full flex items-center justify-center gap-2 bg-red-900/30 text-red-400 px-4 py-3 rounded hover:bg-red-900/50 transition"
-            >
-              <LogOut size={18} /> Sair
-            </button>
-          </div>
-        )}
-      </header>
 
-      {/* Main Content - Full Width */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+          <button onClick={() => handleMobileNav('map')} className={navItemClass('map')}>
+            <Grid size={18} /> Mapa Geral
+          </button>
+          <button onClick={() => handleMobileNav('reservations')} className={navItemClass('reservations')}>
+            <BookCheck size={18} /> Reservas
+          </button>
+          <button onClick={() => handleMobileNav('rooms')} className={navItemClass('rooms')}>
+            <BedDouble size={18} /> Acomodações
+          </button>
+          <button onClick={() => handleMobileNav('packages')} className={navItemClass('packages')}>
+            <Package size={18} /> Pacotes
+          </button>
+          <button onClick={() => handleMobileNav('extras')} className={navItemClass('extras')}>
+            <ShoppingBag size={18} /> Produtos Extras
+          </button>
+          <button onClick={() => handleMobileNav('discounts')} className={navItemClass('discounts')}>
+            <Tag size={18} /> Cupons
+          </button>
+          <button onClick={() => handleMobileNav('ai')} className={navItemClass('ai')}>
+            <BrainCircuit size={18} /> Assistente IA
+          </button>
+          <button onClick={() => handleMobileNav('config')} className={navItemClass('config')}>
+            <Settings size={18} /> Configurações
+          </button>
+        </nav>
+
+        <div className="p-4 border-t border-[#4A5D43] bg-[#0A1C16]">
+          <div className="flex justify-between mb-4">
+             <button onClick={onUndo} disabled={!canUndo} className="p-2 bg-[#2F3A2F] rounded hover:bg-[#3d4b3d] disabled:opacity-30" title="Desfazer">
+                <RotateCcw size={16}/>
+             </button>
+             <button onClick={onRedo} disabled={!canRedo} className="p-2 bg-[#2F3A2F] rounded hover:bg-[#3d4b3d] disabled:opacity-30" title="Refazer">
+                <RotateCw size={16}/>
+             </button>
+          </div>
+          <button 
+            onClick={onLogout}
+            className="w-full flex items-center justify-center gap-2 bg-red-900/30 text-red-400 py-2 rounded hover:bg-red-900/50 transition"
+          >
+            <LogOut size={16} /> Sair
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content - No margin left on mobile, margin-left 64 on desktop */}
+      <main className="flex-1 md:ml-64 p-4 md:p-8 overflow-y-auto mt-16 md:mt-0">
         
         {/* MAP VIEW */}
         {activeTab === 'map' && (
