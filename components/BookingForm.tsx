@@ -89,7 +89,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
   preSelectedPackagePrice,
   onRemoveRoom,
   onAddReservation,
-  onReservationComplete
+  onReservationComplete,
+  onBackClick
 }) => {
   const [step, setStep] = useState(1);
   const [discountCode, setDiscountCode] = useState('');
