@@ -100,6 +100,7 @@ const App: React.FC = () => {
   const [selectedRooms, setSelectedRooms] = useState<Room[]>([]); // Array for multi-select
   const [selectedPackagePrice, setSelectedPackagePrice] = useState<number | null>(null);
   const [roomQuantities, setRoomQuantities] = useState<{[roomId: string]: number}>({});
+  const [packageRoomQuantities, setPackageRoomQuantities] = useState<{[roomId: string]: number}>({});
   
   // Data State (Editable by Admin)
   const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
