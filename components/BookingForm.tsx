@@ -15,7 +15,7 @@ interface BookingFormProps {
   onRemoveRoom: (index: number) => void;
   onAddReservation: (reservation: Reservation) => void;
   onReservationComplete?: (reservationId: string, guestEmail: string, paymentMethod: 'pix' | 'credit_card') => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 interface AdditionalGuest {
@@ -375,7 +375,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
     return (
       <div className="bg-white rounded-lg shadow-2xl overflow-hidden border border-[#D4AF37] animate-in fade-in slide-in-from-bottom-4">
         <div className="bg-[#0F2820] text-white p-6 border-b border-[#D4AF37] flex items-center gap-4">
-           <button onClick={onClose} className="hover:bg-white/20 p-2 rounded-full transition" title="Voltar para seleção de datas">
+           <button onClick={() => onClose?.()} className="hover:bg-white/20 p-2 rounded-full transition" title="Voltar para seleção de datas">
              <ChevronLeft/>
            </button>
            <div>
