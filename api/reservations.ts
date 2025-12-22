@@ -241,12 +241,30 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
 
   // Send confirmation emails asynchronously via separate API (fire-and-forget)
   const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://motor-de-reservas-hotel-solar.vercel.app';
-  fetch(`${baseUrl}/api/send-reservation-email`, {
+  const emailApiUrl = `${baseUrl}/api/send-reservation-email`;
+  
+  console.log('[CREATE RESERVATION] ========== SENDING EMAIL ==========');
+  console.log('[CREATE RESERVATION] VERCEL_URL:', process.env.VERCEL_URL);
+  console.log('[CREATE RESERVATION] Base URL:', baseUrl);
+  console.log('[CREATE RESERVATION] Email API URL:', emailApiUrl);
+  console.log('[CREATE RESERVATION] Guest email:', reservationData.mainGuest.email);
+  console.log('[CREATE RESERVATION] Reservation ID:', reservationData.id);
+  
+  fetch(emailApiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ reservation: reservationData })
-  }).catch(err => {
-    console.error('[CREATE RESERVATION] Failed to trigger email API:', err);
+  })
+  .then(response => {
+    console.log('[CREATE RESERVATION] ✅ Email API response status:', response.status);
+    return response.json();
+  })
+  .then(data => {
+    console.log('[CREATE RESERVATION] ✅ Email API response data:', JSON.stringify(data));
+  })
+  .catch(err => {
+    console.error('[CREATE RESERVATION] ❌ Failed to trigger email API:', err);
+    console.error('[CREATE RESERVATION] ❌ Error details:', err.message);
   });
 
   // Return the created reservation
