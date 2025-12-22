@@ -1156,9 +1156,13 @@ const App: React.FC = () => {
     </div>
   );
 
-  const renderPackages = () => (
+  const renderPackages = () => {
+    try {
+      console.log('[renderPackages] Starting render');
+      return (
     <div className="max-w-7xl mx-auto px-4 grid gap-20">
-      {activePackages.map((pkg, index) => (
+      {activePackages.map((pkg, index) => {
+        return (
         <React.Fragment key={pkg.id}>
         <div className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
            <div className="w-full md:w-1/2 relative group">
@@ -1364,9 +1368,15 @@ const App: React.FC = () => {
           </div>
         )}
         </React.Fragment>
-      ))}
+        );
+      })}
     </div>
-  );
+      );
+    } catch (error) {
+      console.error('[renderPackages] Error:', error);
+      return <div className="text-center text-red-500 p-8">Erro ao carregar pacotes: {String(error)}</div>;
+    }
+  };
 
   // --- FLOATING BOOKING BAR (CART) ---
   const renderFloatingBar = () => {
