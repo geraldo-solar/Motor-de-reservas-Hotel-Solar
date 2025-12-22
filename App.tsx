@@ -1201,31 +1201,49 @@ const App: React.FC = () => {
                   {Object.values(packageRoomQuantities).some(qty => qty > 0) && (
                     <button
                       onClick={() => {
+                        console.log('[PACKAGE SELECT] Starting package selection');
+                        console.log('[PACKAGE SELECT] Package:', pkg.name);
+                        console.log('[PACKAGE SELECT] Quantities:', packageRoomQuantities);
+                        
                         // Build selected rooms array based on quantities
                         const newSelectedRooms: Room[] = [];
                         let totalPrice = 0;
                         
                         pkg.roomPrices.forEach(rp => {
                           const quantity = packageRoomQuantities[rp.roomId] || 0;
+                          console.log(`[PACKAGE SELECT] Room ${rp.roomId}: quantity=${quantity}, price=${rp.price}`);
                           if (quantity > 0) {
                             const room = rooms.find(r => r.id === rp.roomId);
                             if (room) {
+                              console.log(`[PACKAGE SELECT] Found room:`, room.name);
                               for (let i = 0; i < quantity; i++) {
                                 newSelectedRooms.push(room);
                               }
                               totalPrice += rp.price * quantity;
+                            } else {
+                              console.error(`[PACKAGE SELECT] Room not found: ${rp.roomId}`);
                             }
                           }
                         });
                         
+                        console.log('[PACKAGE SELECT] Total rooms:', newSelectedRooms.length);
+                        console.log('[PACKAGE SELECT] Total price:', totalPrice);
+                        
                         // Set dates and rooms
                         const [sY, sM, sD] = pkg.startIsoDate.split('-').map(Number);
                         const [eY, eM, eD] = pkg.endIsoDate.split('-').map(Number);
-                        setCheckIn(new Date(sY, sM - 1, sD));
-                        setCheckOut(new Date(eY, eM - 1, eD));
+                        const checkInDate = new Date(sY, sM - 1, sD);
+                        const checkOutDate = new Date(eY, eM - 1, eD);
+                        
+                        console.log('[PACKAGE SELECT] Check-in:', checkInDate);
+                        console.log('[PACKAGE SELECT] Check-out:', checkOutDate);
+                        
+                        setCheckIn(checkInDate);
+                        setCheckOut(checkOutDate);
                         setSelectedRooms(newSelectedRooms);
                         setSelectedPackagePrice(totalPrice);
                         
+                        console.log('[PACKAGE SELECT] Going to BOOKING view');
                         // Go to booking
                         setCurrentView(ViewState.BOOKING);
                       }}
