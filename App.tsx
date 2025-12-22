@@ -1625,7 +1625,7 @@ const App: React.FC = () => {
                 preSelectedPackagePrice={selectedPackagePrice}
                 onRemoveRoom={handleRemoveFromBooking}
                 onAddReservation={handleAddReservation}
-                onClose={() => {
+                onBackClick={() => {
                   console.log('[APP] onClose called - going back to HOME');
                   setCurrentView(ViewState.HOME);
                   setSelectedRooms([]);
