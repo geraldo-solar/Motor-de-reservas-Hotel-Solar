@@ -100,6 +100,13 @@ const App: React.FC = () => {
   const [selectedPackagePrice, setSelectedPackagePrice] = useState<number | null>(null);
   const [packageRoomQuantities, setPackageRoomQuantities] = useState<{ [roomId: string]: number }>({});
   
+  // Reset package quantities when leaving PACKAGES view
+  useEffect(() => {
+    if (currentView !== ViewState.PACKAGES) {
+      setPackageRoomQuantities({});
+    }
+  }, [currentView]);
+  
   // Data State (Editable by Admin)
   const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
   const [packages, setPackages] = useState<HolidayPackage[]>(INITIAL_PACKAGES);
@@ -1201,51 +1208,67 @@ const App: React.FC = () => {
                   {Object.values(packageRoomQuantities).some(qty => qty > 0) && (
                     <button
                       onClick={() => {
-                        console.log('[PACKAGE SELECT] Starting package selection');
-                        console.log('[PACKAGE SELECT] Package:', pkg.name);
-                        console.log('[PACKAGE SELECT] Quantities:', packageRoomQuantities);
-                        
-                        // Build selected rooms array based on quantities
-                        const newSelectedRooms: Room[] = [];
-                        let totalPrice = 0;
-                        
-                        pkg.roomPrices.forEach(rp => {
-                          const quantity = packageRoomQuantities[rp.roomId] || 0;
-                          console.log(`[PACKAGE SELECT] Room ${rp.roomId}: quantity=${quantity}, price=${rp.price}`);
-                          if (quantity > 0) {
-                            const room = rooms.find(r => r.id === rp.roomId);
-                            if (room) {
-                              console.log(`[PACKAGE SELECT] Found room:`, room.name);
-                              for (let i = 0; i < quantity; i++) {
-                                newSelectedRooms.push(room);
+                        try {
+                          console.log('[PACKAGE SELECT] Starting package selection');
+                          console.log('[PACKAGE SELECT] Package:', pkg.name);
+                          console.log('[PACKAGE SELECT] Quantities:', packageRoomQuantities);
+                          
+                          // Build selected rooms array based on quantities
+                          const newSelectedRooms: Room[] = [];
+                          let totalPrice = 0;
+                          
+                          pkg.roomPrices.forEach(rp => {
+                            const quantity = packageRoomQuantities[rp.roomId] || 0;
+                            console.log(`[PACKAGE SELECT] Room ${rp.roomId}: quantity=${quantity}, price=${rp.price}`);
+                            if (quantity > 0) {
+                              const room = rooms.find(r => r.id === rp.roomId);
+                              if (room) {
+                                console.log(`[PACKAGE SELECT] Found room:`, room.name);
+                                for (let i = 0; i < quantity; i++) {
+                                  newSelectedRooms.push(room);
+                                }
+                                totalPrice += rp.price * quantity;
+                              } else {
+                                console.error(`[PACKAGE SELECT] Room not found: ${rp.roomId}`);
                               }
-                              totalPrice += rp.price * quantity;
-                            } else {
-                              console.error(`[PACKAGE SELECT] Room not found: ${rp.roomId}`);
                             }
+                          });
+                          
+                          console.log('[PACKAGE SELECT] Total rooms:', newSelectedRooms.length);
+                          console.log('[PACKAGE SELECT] Total price:', totalPrice);
+                          
+                          // Validate
+                          if (newSelectedRooms.length === 0) {
+                            alert('Por favor, selecione pelo menos um quarto.');
+                            return;
                           }
-                        });
-                        
-                        console.log('[PACKAGE SELECT] Total rooms:', newSelectedRooms.length);
-                        console.log('[PACKAGE SELECT] Total price:', totalPrice);
-                        
-                        // Set dates and rooms
-                        const [sY, sM, sD] = pkg.startIsoDate.split('-').map(Number);
-                        const [eY, eM, eD] = pkg.endIsoDate.split('-').map(Number);
-                        const checkInDate = new Date(sY, sM - 1, sD);
-                        const checkOutDate = new Date(eY, eM - 1, eD);
-                        
-                        console.log('[PACKAGE SELECT] Check-in:', checkInDate);
-                        console.log('[PACKAGE SELECT] Check-out:', checkOutDate);
-                        
-                        setCheckIn(checkInDate);
-                        setCheckOut(checkOutDate);
-                        setSelectedRooms(newSelectedRooms);
-                        setSelectedPackagePrice(totalPrice);
-                        
-                        console.log('[PACKAGE SELECT] Going to BOOKING view');
-                        // Go to booking
-                        setCurrentView(ViewState.BOOKING);
+                          
+                          if (totalPrice === 0) {
+                            alert('Erro ao calcular o pre\u00e7o. Por favor, tente novamente.');
+                            return;
+                          }
+                          
+                          // Set dates and rooms
+                          const [sY, sM, sD] = pkg.startIsoDate.split('-').map(Number);
+                          const [eY, eM, eD] = pkg.endIsoDate.split('-').map(Number);
+                          const checkInDate = new Date(sY, sM - 1, sD);
+                          const checkOutDate = new Date(eY, eM - 1, eD);
+                          
+                          console.log('[PACKAGE SELECT] Check-in:', checkInDate);
+                          console.log('[PACKAGE SELECT] Check-out:', checkOutDate);
+                          
+                          setCheckIn(checkInDate);
+                          setCheckOut(checkOutDate);
+                          setSelectedRooms(newSelectedRooms);
+                          setSelectedPackagePrice(totalPrice);
+                          
+                          console.log('[PACKAGE SELECT] Going to BOOKING view');
+                          // Go to booking
+                          setCurrentView(ViewState.BOOKING);
+                        } catch (error) {
+                          console.error('[PACKAGE SELECT] Error:', error);
+                          alert('Ocorreu um erro. Por favor, tente novamente.');
+                        }
                       }}
                       className="w-full mt-4 bg-[#D4AF37] hover:bg-[#b8952b] text-[#0F2820] py-3 rounded font-bold uppercase text-sm tracking-wider transition-all flex items-center justify-center gap-2"
                     >
