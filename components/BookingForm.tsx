@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Users, ArrowRight, CheckCircle, Tag, Lock, ShoppingBag, CreditCard, MessageSquare, QrCode, Copy, User, Mail, Phone, FileText, ChevronLeft, ShieldCheck, AlertCircle, BedDouble, Trash2, Baby } from 'lucide-react';
 import { Room, DiscountCode, ExtraService, Reservation } from '../types';
-import { createReservation, sendReservationEmail, generatePixPayment } from '../services/apiService';
+import { createReservation, generatePixPayment } from '../services/apiService';
 import RegulamentoHospedagem from './RegulamentoHospedagem';
 
 interface BookingFormProps {
@@ -330,8 +330,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Create reservation in database
       const { reservation } = await createReservation(reservationPayload);
       
-      // Send email notification (non-blocking)
-      sendReservationEmail(reservation).catch(err => console.error('Error sending email:', err));
+      // Email notifications are now sent by the backend API automatically
+      // No need to call sendReservationEmail here (removed to avoid duplicate emails)
       
       // If PIX payment, generate PIX code
       if (paymentMethod === 'PIX') {
