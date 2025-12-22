@@ -436,8 +436,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
            {/* Extras */}
            <div className="space-y-4">
                <h3 className="font-bold text-[#0F2820] uppercase tracking-wide flex items-center gap-2"><ShoppingBag size={20}/> Incremente sua Experiência</h3>
-               {console.log('[BookingForm] Extras recebidos:', extras)}
-               {console.log('[BookingForm] Extras ativos:', extras.filter(e => e.active))}
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    {extras.filter(e => e.active).map(extra => (
                        <div key={extra.id} className="border border-gray-200 rounded-lg p-4 flex gap-4 hover:border-[#D4AF37] transition bg-white">
