@@ -240,7 +240,8 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   };
 
   // Send confirmation emails asynchronously via separate API (fire-and-forget)
-  fetch(`${process.env.VERCEL_URL || 'https://motor-de-reservas-hotel-solar.vercel.app'}/api/send-reservation-email`, {
+  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://motor-de-reservas-hotel-solar.vercel.app';
+  fetch(`${baseUrl}/api/send-reservation-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ reservation: reservationData })
