@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // List all packages
       const result = await sql`
         SELECT * FROM packages 
-        ORDER BY created_at DESC
+        ORDER BY start_iso_date ASC
       `;
       
       // Transform database rows to match frontend HolidayPackage type
