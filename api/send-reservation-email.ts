@@ -77,7 +77,7 @@ export default async function handler(
           ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
               <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
               ${room.guests.map((guest: any) => `
-                <p style="margin: 5px 0; font-size: 12px;">• ${guest.name} - CPF: ${guest.cpf}${guest.age ? ` - Idade: ${guest.age} anos` : ''}</p>
+                <p style="margin: 5px 0; font-size: 12px;">• ${guest.name}${guest.cpf ? ` - CPF: ${guest.cpf}` : ''}${guest.age ? ` - Idade: ${guest.age} anos` : ''}</p>
               `).join('')}
             </div>`
           : '';
@@ -171,11 +171,11 @@ export default async function handler(
               <!-- Links Adicionais -->
               <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
                 <p style="color: #6b7280; font-size: 14px; margin: 0 0 12px 0;">
-                  📋 <a href="https://hotelsolar.tur.br/regulamento" style="color: #16A34A; text-decoration: none; font-weight: bold;">Regulamento de Hospedagem</a>
+                  📋 <a href="https://motor-de-reservas-hotel-solar.vercel.app/gerenciar-reserva?id=${reservation.id}" style="color: #16A34A; text-decoration: none; font-weight: bold;">Regulamento de Hospedagem</a>
                 </p>
                 <p style="color: #9ca3af; font-size: 12px; margin: 0;">
                   Precisa cancelar sua reserva? 
-                  <a href="https://motor-de-reservas-hotel-solar.vercel.app/cancelar-reserva?id=${reservation.id}" style="color: #EF4444; text-decoration: none; font-weight: bold;">Cancelar Reserva</a>
+                  <a href="https://motor-de-reservas-hotel-solar.vercel.app/gerenciar-reserva?id=${reservation.id}" style="color: #EF4444; text-decoration: none; font-weight: bold;">Cancelar Reserva</a>
                 </p>
               </div>
               
