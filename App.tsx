@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ChatAssistant from './components/ChatAssistant';
 import BookingForm from './components/BookingForm';
+import ErrorBoundary from './components/ErrorBoundary';
 import ThankYouPage from './components/ThankYouPageSimple';
 import AdminPanel, { AdminLogin } from './components/AdminPanel';
 import RegulamentoHospedagem from './components/RegulamentoHospedagem';
@@ -1613,6 +1614,7 @@ const App: React.FC = () => {
 
       {/* Booking View */}
       {currentView === ViewState.BOOKING && (
+         <ErrorBoundary>
          <div className="py-12 max-w-4xl mx-auto px-4">
              <BookingForm 
                 selectedRooms={selectedRooms} 
@@ -1634,6 +1636,7 @@ const App: React.FC = () => {
                 }}
              />
          </div>
+         </ErrorBoundary>
       )}
 
       {/* Footer */}
