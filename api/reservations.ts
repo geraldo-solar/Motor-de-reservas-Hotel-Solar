@@ -32,6 +32,10 @@ export default async function handler(
         if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
         return await getReservation(req, res);
       
+      case 'update':
+        if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+        return await updateReservation(req, res);
+      
       case 'list':
         if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
         return await listReservations(req, res);
@@ -644,5 +648,60 @@ async function getReservation(req: VercelRequest, res: VercelResponse) {
   return res.status(200).json({
     success: true,
     reservation,
+  });
+}
+
+
+async function updateReservation(req: VercelRequest, res: VercelResponse) {
+  const { reservationId, checkIn, checkOut, additionalGuests } = req.body;
+
+  if (!reservationId) {
+    return res.status(400).json({ error: 'Missing reservation ID' });
+  }
+
+  // Get existing reservation
+  const existingResult = await sql`
+    SELECT * FROM reservations 
+    WHERE id = ${reservationId}
+  `;
+
+  if (existingResult.rows.length === 0) {
+    return res.status(404).json({ error: 'Reservation not found' });
+  }
+
+  const existing = existingResult.rows[0];
+
+  // Check if reservation can be updated (only PENDING or CONFIRMED)
+  if (existing.status === 'CANCELLED') {
+    return res.status(400).json({ error: 'Cannot update cancelled reservation' });
+  }
+
+  // Calculate new nights if dates changed
+  let newNights = existing.nights;
+  let newCheckIn = existing.check_in;
+  let newCheckOut = existing.check_out;
+
+  if (checkIn && checkOut) {
+    newCheckIn = checkIn;
+    newCheckOut = checkOut;
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    newNights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  // Update reservation
+  await sql`
+    UPDATE reservations 
+    SET 
+      check_in = ${newCheckIn},
+      check_out = ${newCheckOut},
+      nights = ${newNights},
+      additional_guests = ${JSON.stringify(additionalGuests || existing.additional_guests)}
+    WHERE id = ${reservationId}
+  `;
+
+  return res.status(200).json({
+    success: true,
+    message: 'Reservation updated successfully',
   });
 }
