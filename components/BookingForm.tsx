@@ -5,6 +5,7 @@ import { Room, DiscountCode, ExtraService, Reservation } from '../types';
 import { createReservation, generatePixPayment } from '../services/apiService';
 import RegulamentoHospedagem from './RegulamentoHospedagem';
 
+// Last updated: 2025-12-22 14:18 - Force rebuild
 interface BookingFormProps {
   selectedRooms: Room[];
   discountCodes: DiscountCode[];
