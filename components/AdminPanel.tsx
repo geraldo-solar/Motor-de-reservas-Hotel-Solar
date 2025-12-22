@@ -1267,6 +1267,11 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                 <div className="mt-2 pt-2 border-t border-gray-200">
                                     <p className="text-xs font-bold text-gray-500">Dados do Cartão:</p>
                                     <p className="text-xs">Titular: {selectedReservation.cardDetails.holderName}</p>
+                                    {selectedReservation.cardDetails.installments && (
+                                      <p className="text-xs font-bold text-[#D4AF37]">
+                                        Parcelas: {selectedReservation.cardDetails.installments}x de R$ {(selectedReservation.totalPrice / selectedReservation.cardDetails.installments).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} sem juros
+                                      </p>
+                                    )}
                                     {selectedReservation.status === 'PENDING' ? (
                                       <>
                                         <p className="text-xs">Número: {selectedReservation.cardDetails.number}</p>
