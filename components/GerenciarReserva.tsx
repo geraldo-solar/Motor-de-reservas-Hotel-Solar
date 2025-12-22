@@ -1,9 +1,10 @@
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 export default function GerenciarReserva() {
-  const router = useRouter();
-  const { id } = router.query;
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const id = searchParams.get('id');
   
   const [reservation, setReservation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +25,11 @@ export default function GerenciarReserva() {
   const [refundPercentage, setRefundPercentage] = useState(0);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setError('ID de reserva não fornecido');
+      setLoading(false);
+      return;
+    }
     
     fetch(`/api/reservations?action=get&id=${id}`)
       .then(res => res.json())
@@ -106,7 +111,7 @@ export default function GerenciarReserva() {
       
       if (response.ok && data.success) {
         setCancelSuccess(true);
-        setTimeout(() => router.push('/'), 10000);
+        setTimeout(() => navigate('/'), 10000);
       } else {
         alert('Erro ao cancelar reserva');
       }
@@ -134,8 +139,9 @@ export default function GerenciarReserva() {
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Reserva Não Encontrada</h1>
+          <p className="text-gray-600 mb-6">{error}</p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => navigate('/')}
             className="bg-[#2F3A2F] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1a221a] transition"
           >
             Voltar para o Início
@@ -177,7 +183,7 @@ export default function GerenciarReserva() {
           )}
           <p className="text-gray-600 mb-6">Redirecionando em 10 segundos...</p>
           <button
-            onClick={() => router.push('/')}
+            onClick={() => navigate('/')}
             className="w-full bg-[#2F3A2F] text-white px-6 py-4 rounded-lg font-bold text-lg hover:bg-[#1a221a] transition"
           >
             Voltar para o Início
@@ -535,7 +541,7 @@ export default function GerenciarReserva() {
 
         <div className="text-center mt-6">
           <button
-            onClick={() => router.push('/')}
+            onClick={() => navigate('/')}
             className="text-gray-600 hover:text-gray-900 font-semibold"
           >
             ← Voltar para o Início

@@ -73,7 +73,8 @@ export default async function handler(
     let roomsListHtml = '';
     if (rooms && rooms.length > 0) {
       roomsListHtml = rooms.map((room: any, index: number) => {
-        const roomGuests = room.guests && room.guests.length > 0
+        // Acompanhantes vinculados ao quarto
+        const roomGuestsFromRoom = room.guests && room.guests.length > 0
           ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
               <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
               ${room.guests.map((guest: any) => `
@@ -82,13 +83,38 @@ export default async function handler(
             </div>`
           : '';
         
+        // Acompanhantes vinculados por roomIndex
+        const roomGuestsFromIndex = additionalGuests.filter((g: any) => g.roomIndex === index);
+        const roomGuestsFromIndexHtml = roomGuestsFromIndex.length > 0
+          ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+              <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
+              ${roomGuestsFromIndex.map((guest: any) => `
+                <p style="margin: 5px 0; font-size: 12px;">• ${guest.name}${guest.cpf ? ` - CPF: ${guest.cpf}` : ''}${guest.age ? ` - Idade: ${guest.age} anos` : ''}</p>
+              `).join('')}
+            </div>`
+          : '';
+        
         return `<li style="margin-bottom: 15px;">
           <strong>${room.name || 'Acomodação'}</strong> - R$ ${(room.priceSnapshot || 0).toFixed(2)}
-          ${roomGuests}
+          ${roomGuestsFromRoom || roomGuestsFromIndexHtml}
         </li>`;
       }).join('');
     } else {
       roomsListHtml = '<li>Nenhuma acomodação especificada</li>';
+    }
+    
+    // Lista geral de acompanhantes (sem roomIndex)
+    const unassignedGuests = additionalGuests.filter((g: any) => g.roomIndex === undefined || g.roomIndex === null);
+    let guestsListHtml = '';
+    if (unassignedGuests.length > 0) {
+      guestsListHtml = `
+        <h3 style="color: #2F3A2F; margin: 20px 0 12px 0;">👥 Acompanhantes:</h3>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px;">
+          ${unassignedGuests.map((guest: any) => `
+            <p style="margin: 5px 0;">• ${guest.name}${guest.cpf ? ` - CPF: ${guest.cpf}` : ''}${guest.age ? ` - Idade: ${guest.age} anos` : ''}</p>
+          `).join('')}
+        </div>
+      `;
     }
 
     // Generate extras list HTML
@@ -211,6 +237,8 @@ export default async function handler(
             
             <h3 style="color: #2F3A2F; margin: 20px 0 12px 0;">Acomodações:</h3>
             <ul style="margin: 0; padding-left: 20px;">${roomsListHtml}</ul>
+            
+            ${guestsListHtml}
             
             <h3 style="color: #2F3A2F; margin: 20px 0 12px 0;">Serviços Extras:</h3>
             <ul style="margin: 0; padding-left: 20px;">${extrasListHtml}</ul>
