@@ -1139,7 +1139,7 @@ const App: React.FC = () => {
                           
                           // Check each day in the package period
                           let isAvailable = true;
-                          let maxAvailable = Infinity;
+                          let maxAvailable = room.totalQuantity || 10;
                           let tempDate = new Date(pkgStartDate);
                           while (tempDate < pkgEndDate) {
                             const override = getRoomOverride(room, tempDate);
@@ -1152,7 +1152,9 @@ const App: React.FC = () => {
                               break;
                             }
                             
-                            maxAvailable = Math.min(maxAvailable, qty);
+                            if (qty < maxAvailable) {
+                              maxAvailable = qty;
+                            }
                             tempDate.setDate(tempDate.getDate() + 1);
                           }
                           
