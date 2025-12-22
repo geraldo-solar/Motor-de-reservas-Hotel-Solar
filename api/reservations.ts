@@ -240,7 +240,8 @@ async function createReservation(req: VercelRequest, res: VercelResponse) {
   };
 
   // Send confirmation emails asynchronously via separate API (fire-and-forget)
-  const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://motor-de-reservas-hotel-solar.vercel.app';
+  // Always use production URL to avoid calling preview deployments
+  const baseUrl = 'https://motor-de-reservas-hotel-solar.vercel.app';
   const emailApiUrl = `${baseUrl}/api/send-reservation-email`;
   
   console.log('[CREATE RESERVATION] ========== SENDING EMAIL ==========');
@@ -356,9 +357,8 @@ async function confirmPayment(req: VercelRequest, res: VercelResponse) {
 
   // Send confirmation email to client (non-blocking)
   if (approved && reservationData.mainGuest.email) {
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'https://motor-de-reservas-hotel-solar.vercel.app';
+    // Always use production URL to avoid calling preview deployments
+    const baseUrl = 'https://motor-de-reservas-hotel-solar.vercel.app';
 
     fetch(`${baseUrl}/api/email?action=send-payment-confirmation`, {
       method: 'POST',
