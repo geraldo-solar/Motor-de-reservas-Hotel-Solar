@@ -28,6 +28,10 @@ export default async function handler(
         if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
         return await cancelReservation(req, res);
       
+      case 'get':
+        if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+        return await getReservation(req, res);
+      
       case 'list':
         if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
         return await listReservations(req, res);
@@ -590,5 +594,55 @@ async function listReservations(req: VercelRequest, res: VercelResponse) {
   return res.status(200).json({
     success: true,
     reservations,
+  });
+}
+
+async function getReservation(req: VercelRequest, res: VercelResponse) {
+  const { id } = req.query;
+
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ error: 'Missing reservation ID' });
+  }
+
+  const result = await sql`
+    SELECT * FROM reservations 
+    WHERE id = ${id}
+  `;
+
+  if (result.rows.length === 0) {
+    return res.status(404).json({ error: 'Reservation not found' });
+  }
+
+  const row = result.rows[0];
+  const reservation = {
+    id: row.id,
+    createdAt: row.created_at,
+    checkIn: row.check_in,
+    checkOut: row.check_out,
+    nights: row.nights,
+    mainGuest: {
+      name: row.main_guest_name,
+      cpf: row.main_guest_cpf,
+      age: row.main_guest_age,
+      email: row.main_guest_email,
+      phone: row.main_guest_phone,
+    },
+    additionalGuests: row.additional_guests,
+    observations: row.observations,
+    rooms: row.rooms,
+    extras: row.extras,
+    totalPrice: parseFloat(row.total_price),
+    discountApplied: row.discount_code ? {
+      code: row.discount_code,
+      amount: parseFloat(row.discount_amount),
+    } : undefined,
+    paymentMethod: row.payment_method,
+    cardDetails: row.card_details,
+    status: row.status,
+  };
+
+  return res.status(200).json({
+    success: true,
+    reservation,
   });
 }
