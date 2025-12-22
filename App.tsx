@@ -551,10 +551,10 @@ const App: React.FC = () => {
   const activePackages = packages
     .filter(p => p.active)
     .sort((a, b) => {
-      // Sort by start date (reverse chronological order - newest first)
+      // Sort by start date (chronological order - oldest first, left to right)
       const dateA = new Date(a.startIsoDate);
       const dateB = new Date(b.startIsoDate);
-      return dateB.getTime() - dateA.getTime();
+      return dateA.getTime() - dateB.getTime();
     });
 
   // Collect Restricted Dates
