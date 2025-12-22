@@ -1733,6 +1733,7 @@ const App: React.FC = () => {
 
       {/* Packages View */}
       {currentView === ViewState.PACKAGES && (
+         <ErrorBoundary>
          <div className="py-20 bg-[#F9F8F6]">
             <div className="max-w-7xl mx-auto px-4 mb-8">
                <button
@@ -1745,9 +1746,15 @@ const App: React.FC = () => {
             </div>
             <div className="text-center mb-16">
                <h2 className="text-4xl font-serif text-[#0F2820]">Pacotes Especiais</h2>
+               <p className="text-sm text-gray-500 mt-2">Debug: {activePackages.length} pacotes ativos</p>
             </div>
-            {renderPackages()}
+            {(() => {
+              console.log('[PACKAGES VIEW] Rendering packages, count:', activePackages.length);
+              console.log('[PACKAGES VIEW] activePackages:', activePackages);
+              return renderPackages();
+            })()}
          </div>
+         </ErrorBoundary>
       )}
 
       {/* Thank You Page */}
