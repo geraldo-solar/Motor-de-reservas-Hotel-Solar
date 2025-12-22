@@ -328,6 +328,70 @@ const App: React.FC = () => {
      saveCheckpoint();
      setRooms(newRooms);
      
+     // Sync room overrides back to packages (reverse sync)
+     try {
+       console.log('[ROOM SYNC] Syncing room overrides back to packages');
+       const updatedPackages = [...packages];
+       let packagesChanged = false;
+       
+       for (const pkg of updatedPackages) {
+         if (!pkg.active) continue;
+         
+         // Parse package dates
+         const [startYear, startMonth, startDay] = pkg.startIsoDate.split('-').map(Number);
+         const [endYear, endMonth, endDay] = pkg.endIsoDate.split('-').map(Number);
+         const startDate = new Date(startYear, startMonth - 1, startDay);
+         const endDate = new Date(endYear, endMonth - 1, endDay);
+         
+         // Check each room price in the package
+         for (let i = 0; i < pkg.roomPrices.length; i++) {
+           const roomPrice = pkg.roomPrices[i];
+           const room = newRooms.find(r => r.id === roomPrice.roomId);
+           if (!room || !room.overrides) continue;
+           
+           // Find overrides within package date range
+           const relevantOverrides = room.overrides.filter(override => {
+             const overrideDate = new Date(override.dateIso);
+             return overrideDate >= startDate && overrideDate < endDate;
+           });
+           
+           // If there are overrides in this period, use the most common price
+           if (relevantOverrides.length > 0) {
+             // Count price occurrences
+             const priceCount: { [key: number]: number } = {};
+             relevantOverrides.forEach(o => {
+               priceCount[o.price] = (priceCount[o.price] || 0) + 1;
+             });
+             
+             // Get most common price
+             const mostCommonPrice = parseInt(Object.keys(priceCount).reduce((a, b) => 
+               priceCount[parseInt(a)] > priceCount[parseInt(b)] ? a : b
+             ));
+             
+             // Update package price if different
+             if (pkg.roomPrices[i].price !== mostCommonPrice) {
+               console.log(`[ROOM SYNC] Updating package "${pkg.name}" room "${room.name}" price from ${pkg.roomPrices[i].price} to ${mostCommonPrice}`);
+               pkg.roomPrices[i].price = mostCommonPrice;
+               packagesChanged = true;
+             }
+           }
+         }
+       }
+       
+       // Update packages if any changed
+       if (packagesChanged) {
+         setPackages(updatedPackages);
+         console.log('[ROOM SYNC] Packages updated with new prices from room overrides');
+         
+         // Sync to database
+         for (const pkg of updatedPackages) {
+           await updatePackage(pkg).catch(err => console.error('Failed to update package:', err));
+         }
+       }
+     } catch (error) {
+       console.error('[ROOM SYNC] Error syncing room overrides to packages:', error);
+     }
+     
      // Sync with Postgres
      try {
       // Detect changes and sync with database
