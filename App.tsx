@@ -216,7 +216,13 @@ const App: React.FC = () => {
 
         // Set extras data or fallback to initial
         if (extrasData.status === 'fulfilled') {
-          setExtras(extrasData.value);
+          // Use INITIAL_EXTRAS if API returns empty array
+          if (extrasData.value && extrasData.value.length > 0) {
+            setExtras(extrasData.value);
+          } else {
+            console.log('API returned empty extras, using INITIAL_EXTRAS');
+            setExtras(INITIAL_EXTRAS);
+          }
         } else {
           console.error('Failed to load extras:', extrasData.reason);
           setExtras(INITIAL_EXTRAS);
