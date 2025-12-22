@@ -170,7 +170,13 @@ async function sendClientConfirmation(req: VercelRequest, res: VercelResponse) {
                       </p>
                     </div>
 
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px; padding: 20px; background-color: #F9FAFB; border-radius: 8px;">
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="https://motor-de-reservas-hotel-solar.vercel.app/gerenciar-reserva?id=${reservation.id}" style="display: inline-block; padding: 14px 32px; background-color: #16A34A; color: white; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-bottom: 12px;">
+                        📋 Gerenciar Minha Reserva
+                      </a>
+                    </div>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px; padding: 20px; background-color: #F9FAFB; border-radius: 8px;">
                       <tr>
                         <td style="text-align: center; padding-bottom: 15px;">
                           <p style="margin: 0; font-size: 14px; color: #6B7280;">
@@ -332,7 +338,13 @@ async function sendPaymentConfirmation(req: VercelRequest, res: VercelResponse) 
                       </p>
                     </div>
 
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px; padding: 20px; background-color: #F9FAFB; border-radius: 8px;">
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="https://motor-de-reservas-hotel-solar.vercel.app/gerenciar-reserva?id=${reservation.id}" style="display: inline-block; padding: 14px 32px; background-color: #16A34A; color: white; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: bold; margin-bottom: 12px;">
+                        📋 Gerenciar Minha Reserva
+                      </a>
+                    </div>
+
+                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 20px; padding: 20px; background-color: #F9FAFB; border-radius: 8px;">
                       <tr>
                         <td style="text-align: center; padding-bottom: 15px;">
                           <p style="margin: 0; font-size: 14px; color: #6B7280;">
