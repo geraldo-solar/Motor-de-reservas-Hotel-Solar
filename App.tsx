@@ -1625,6 +1625,11 @@ const App: React.FC = () => {
                 preSelectedPackagePrice={selectedPackagePrice}
                 onRemoveRoom={handleRemoveFromBooking}
                 onAddReservation={handleAddReservation}
+                onClose={() => {
+                  setCurrentView(ViewState.HOME);
+                  setSelectedRooms([]);
+                  setSelectedPackagePrice(null);
+                }}
                 onReservationComplete={(reservationId, guestEmail, paymentMethod) => {
                   console.log('DEBUG: onReservationComplete callback received', { reservationId, guestEmail, paymentMethod });
                   setCompletedReservationId(reservationId);

@@ -15,6 +15,7 @@ interface BookingFormProps {
   onRemoveRoom: (index: number) => void;
   onAddReservation: (reservation: Reservation) => void;
   onReservationComplete?: (reservationId: string, guestEmail: string, paymentMethod: 'pix' | 'credit_card') => void;
+  onClose: () => void;
 }
 
 interface AdditionalGuest {
