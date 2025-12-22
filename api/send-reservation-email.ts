@@ -53,12 +53,40 @@ export default async function handler(
       extras = [];
     }
 
-    // Generate rooms list HTML
+    // Parse card details and additional guests
+    let cardDetails = null;
+    let additionalGuests = [];
+    
+    try {
+      cardDetails = typeof reservation.cardDetails === 'string' ? JSON.parse(reservation.cardDetails) : reservation.cardDetails;
+    } catch (e) {
+      cardDetails = null;
+    }
+    
+    try {
+      additionalGuests = typeof reservation.additionalGuests === 'string' ? JSON.parse(reservation.additionalGuests) : (reservation.additionalGuests || []);
+    } catch (e) {
+      additionalGuests = [];
+    }
+
+    // Generate rooms list HTML with guests
     let roomsListHtml = '';
     if (rooms && rooms.length > 0) {
-      roomsListHtml = rooms.map((room: any) => 
-        `<li>${room.name || 'Acomodação'} - R$ ${(room.priceSnapshot || 0).toFixed(2)}</li>`
-      ).join('');
+      roomsListHtml = rooms.map((room: any, index: number) => {
+        const roomGuests = room.guests && room.guests.length > 0
+          ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+              <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
+              ${room.guests.map((guest: any) => `
+                <p style="margin: 5px 0; font-size: 12px;">• ${guest.name} - CPF: ${guest.cpf}${guest.age ? ` - Idade: ${guest.age} anos` : ''}</p>
+              `).join('')}
+            </div>`
+          : '';
+        
+        return `<li style="margin-bottom: 15px;">
+          <strong>${room.name || 'Acomodação'}</strong> - R$ ${(room.priceSnapshot || 0).toFixed(2)}
+          ${roomGuests}
+        </li>`;
+      }).join('');
     } else {
       roomsListHtml = '<li>Nenhuma acomodação especificada</li>';
     }
@@ -170,6 +198,13 @@ export default async function handler(
             
             <p style="font-size: 18px; margin: 20px 0;"><strong>Valor Total:</strong> R$ ${totalPrice.toFixed(2)}</p>
             <p style="margin: 8px 0;"><strong>Forma de Pagamento:</strong> ${paymentMethod}</p>
+            ${cardDetails?.installments ? `<p style="margin: 8px 0;"><strong>Parcelas:</strong> ${cardDetails.installments}x de R$ ${(totalPrice / cardDetails.installments).toFixed(2)} sem juros</p>` : ''}
+            ${reservation.observations ? `
+            <h3 style="color: #2F3A2F; margin: 20px 0 12px 0;">📝 Observações:</h3>
+            <div style="background-color: #f9fafb; padding: 12px; border-radius: 4px; border-left: 4px solid #D4AF37;">
+              <p style="margin: 0; white-space: pre-wrap;">${reservation.observations}</p>
+            </div>
+            ` : ''}
             
             <div style="background-color: #fef3c7; padding: 16px; margin-top: 20px; border-radius: 4px; border-left: 4px solid #f59e0b;">
               <p style="margin: 0;"><strong>⚠️ Ação Necessária:</strong> Confirme o pagamento no painel administrativo.</p>
