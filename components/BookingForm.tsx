@@ -162,8 +162,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
   };
 
   const calculateRoomTotal = (room: Room) => {
-     if (preSelectedPackagePrice && selectedRooms.length === 1) return preSelectedPackagePrice;
-     
      if (!initialCheckIn || !initialCheckOut) return 0;
      
      let total = 0;
@@ -187,7 +185,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
      return Math.round(total);
   };
 
-  const accommodationTotal = selectedRooms.reduce((acc, room) => acc + calculateRoomTotal(room), 0);
+  // Use package price if set, otherwise calculate from rooms
+  const accommodationTotal = preSelectedPackagePrice || selectedRooms.reduce((acc, room) => acc + calculateRoomTotal(room), 0);
   
   const extrasTotal = Object.entries(selectedExtras).reduce((acc, [id, qty]) => {
     const extra = extras.find(e => e.id === id);
