@@ -173,6 +173,18 @@ export const processAdminCommand = async (
       3. Mantenha overrides existentes de outras datas
       4. Retorne JSON com chaves modificadas + "message"
       5. Lista COMPLETA dos itens alterados
+      6. IMPORTANTE - Ao criar PACOTES, TODOS os campos são obrigatórios:
+         - id: string único (use kebab-case, ex: "reveillon-2025")
+         - name: nome do pacote
+         - description: descrição detalhada
+         - imageUrl: URL de imagem (use "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800" como padrão)
+         - includes: array de strings com itens inclusos (mínimo 3 itens)
+         - active: true
+         - startIsoDate: data início no formato "YYYY-MM-DD"
+         - endIsoDate: data fim no formato "YYYY-MM-DD"
+         - roomPrices: array com {roomId: string, price: number} para CADA quarto disponível
+         - noCheckoutDates: array vazio [] ou datas específicas
+         - noCheckInDates: array vazio [] ou datas específicas
       
       RETORNO:
       {"rooms":[...],"packages":[...],"discounts":[...],"extras":[...],"message":"texto"}
