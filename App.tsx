@@ -98,6 +98,22 @@ const App: React.FC = () => {
   const [selectedPackagePrice, setSelectedPackagePrice] = useState<number | null>(null);
   const [roomQuantities, setRoomQuantities] = useState<{[roomId: string]: number}>({});
   const [packageRoomQuantities, setPackageRoomQuantities] = useState<{[roomId: string]: number}>({});
+  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null); // Para scroll automático
+  
+  // Scroll automático para o pacote selecionado
+  useEffect(() => {
+    if (currentView === ViewState.PACKAGES && selectedPackageId) {
+      // Aguardar renderização completa
+      setTimeout(() => {
+        const element = document.getElementById(`package-${selectedPackageId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Limpar o ID após o scroll
+          setSelectedPackageId(null);
+        }
+      }, 300);
+    }
+  }, [currentView, selectedPackageId]);
   
   // Data State (Editable by Admin)
   const [rooms, setRooms] = useState<Room[]>(INITIAL_ROOMS);
@@ -1173,7 +1189,7 @@ const App: React.FC = () => {
       {activePackages.map((pkg, index) => {
         return (
         <React.Fragment key={pkg.id}>
-        <div className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
+        <div id={`package-${pkg.id}`} className={`flex flex-col md:flex-row gap-8 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
            <div className="w-full md:w-1/2 relative group">
               <div className="absolute inset-0 bg-[#0F2820] translate-x-4 translate-y-4 rounded-sm transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
               <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-80 object-cover rounded-sm relative z-10 shadow-xl" />
@@ -1695,6 +1711,8 @@ const App: React.FC = () => {
                                     setCheckIn(pkgStartDate);
                                     setCheckOut(pkgEndDate);
                                     setCurrentCalendarDate(pkgStartDate);
+                                    // Save package ID for scroll
+                                    setSelectedPackageId(pkg.id);
                                     // Navigate to packages view
                                     setCurrentView(ViewState.PACKAGES);
                                   } else {
