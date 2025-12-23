@@ -65,7 +65,9 @@ export default async function handler(
     
     try {
       additionalGuests = typeof reservation.additionalGuests === 'string' ? JSON.parse(reservation.additionalGuests) : (reservation.additionalGuests || []);
+      console.log('[SEND EMAIL] additionalGuests parsed:', JSON.stringify(additionalGuests, null, 2));
     } catch (e) {
+      console.error('[SEND EMAIL] Error parsing additionalGuests:', e);
       additionalGuests = [];
     }
 
@@ -85,6 +87,7 @@ export default async function handler(
         
         // Acompanhantes vinculados por roomIndex
         const roomGuestsFromIndex = additionalGuests.filter((g: any) => g.roomIndex === index);
+        console.log(`[SEND EMAIL] Room ${index} guests from roomIndex:`, roomGuestsFromIndex);
         const roomGuestsFromIndexHtml = roomGuestsFromIndex.length > 0
           ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
               <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
