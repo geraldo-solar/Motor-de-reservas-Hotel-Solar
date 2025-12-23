@@ -50,17 +50,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Missing required date fields: startIsoDate, endIsoDate' });
       }
       
+      // Extract date part if timestamp is included (YYYY-MM-DDTHH:mm:ss.sssZ -> YYYY-MM-DD)
+      const cleanStartDate = startIsoDate.split('T')[0];
+      const cleanEndDate = endIsoDate.split('T')[0];
+      
       // Validate date format (YYYY-MM-DD)
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateRegex.test(startIsoDate) || !dateRegex.test(endIsoDate)) {
-        return res.status(400).json({ error: 'Invalid date format. Expected YYYY-MM-DD' });
+      if (!dateRegex.test(cleanStartDate) || !dateRegex.test(cleanEndDate)) {
+        return res.status(400).json({ error: `Invalid date format. Expected YYYY-MM-DD, got: ${cleanStartDate}, ${cleanEndDate}` });
       }
 
       await sql`
         INSERT INTO packages (id, name, description, image_url, includes, active, start_iso_date, end_iso_date, room_prices, no_checkout_dates, no_checkin_dates)
         VALUES (${id}, ${name}, ${description || ''}, ${imageUrl || ''}, 
                 ${JSON.stringify(includes || [])}, ${active !== false},
-                ${startIsoDate}, ${endIsoDate},
+                ${cleanStartDate}, ${cleanEndDate},
                 ${JSON.stringify(roomPrices || [])},
                 ${JSON.stringify(noCheckoutDates || [])},
                 ${JSON.stringify(noCheckInDates || [])})
@@ -82,10 +86,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Missing required date fields: startIsoDate, endIsoDate' });
       }
       
+      // Extract date part if timestamp is included (YYYY-MM-DDTHH:mm:ss.sssZ -> YYYY-MM-DD)
+      const cleanStartDate = startIsoDate.split('T')[0];
+      const cleanEndDate = endIsoDate.split('T')[0];
+      
       // Validate date format (YYYY-MM-DD)
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateRegex.test(startIsoDate) || !dateRegex.test(endIsoDate)) {
-        return res.status(400).json({ error: 'Invalid date format. Expected YYYY-MM-DD' });
+      if (!dateRegex.test(cleanStartDate) || !dateRegex.test(cleanEndDate)) {
+        return res.status(400).json({ error: `Invalid date format. Expected YYYY-MM-DD, got: ${cleanStartDate}, ${cleanEndDate}` });
       }
 
       await sql`
@@ -95,8 +103,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             image_url = ${imageUrl || ''},
             includes = ${JSON.stringify(includes || [])},
             active = ${active !== false},
-            start_iso_date = ${startIsoDate},
-            end_iso_date = ${endIsoDate},
+            start_iso_date = ${cleanStartDate},
+            end_iso_date = ${cleanEndDate},
             room_prices = ${JSON.stringify(roomPrices || [])},
             no_checkout_dates = ${JSON.stringify(noCheckoutDates || [])},
             no_checkin_dates = ${JSON.stringify(noCheckInDates || [])},
