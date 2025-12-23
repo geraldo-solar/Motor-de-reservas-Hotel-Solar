@@ -738,7 +738,7 @@ const App: React.FC = () => {
       while (tempDate < endDate) {
           const override = getRoomOverride(room, tempDate);
           
-          const qty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+          const qty = override?.availableQuantity !== undefined ? override.availableQuantity : 0; // Indisponível se não houver override
           const price = override?.price !== undefined ? override.price : room.price;
           const closed = override?.isClosed;
 
@@ -1253,7 +1253,7 @@ const App: React.FC = () => {
                           let tempDate = new Date(pkgStartDate);
                           while (tempDate < pkgEndDate) {
                             const override = getRoomOverride(room, tempDate);
-                            const qty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+                            const qty = override?.availableQuantity !== undefined ? override.availableQuantity : 0; // Indisponível se não houver override
                             const price = override?.price !== undefined ? override.price : room.price;
                             const closed = override?.isClosed;
                             
@@ -1275,7 +1275,7 @@ const App: React.FC = () => {
                           let tempDate2 = new Date(pkgStartDate);
                           while (tempDate2 < pkgEndDate) {
                             const override = getRoomOverride(room, tempDate2);
-                            const qty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+                            const qty = override?.availableQuantity !== undefined ? override.availableQuantity : 0; // Indisponível se não houver override
                             if (qty < maxAvailable) maxAvailable = qty;
                             tempDate2.setDate(tempDate2.getDate() + 1);
                           }
