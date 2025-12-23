@@ -127,13 +127,54 @@ export default async function handler(
     let paymentInstructions = '';
     if (paymentMethod.toUpperCase() === 'PIX') {
       paymentInstructions = `
-        <div style="background-color: #fef3c7; padding: 16px; margin: 20px 0; border-radius: 4px; border-left: 4px solid #f59e0b;">
-          <h3 style="color: #92400e; margin: 0 0 12px 0;">📱 Instruções de Pagamento via PIX</h3>
-          <ol style="margin: 0; padding-left: 20px; color: #78350f;">
-            <li>Realize o pagamento via PIX no valor de <strong>R$ ${totalPrice.toFixed(2)}</strong></li>
-            <li>Envie o comprovante para: <strong>reserva@hotelsolar.tur.br</strong></li>
-            <li>Após recebermos o comprovante, enviaremos a confirmação</li>
-          </ol>
+        <div style="background-color: #fef3c7; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #f59e0b;">
+          <h3 style="color: #92400e; margin: 0 0 16px 0; font-size: 18px;">📱 Dados para Transferência PIX</h3>
+          
+          <div style="background-color: white; padding: 16px; border-radius: 6px; margin-bottom: 16px;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">Chave PIX (Celular)</td>
+                <td style="padding: 8px 0; color: #0F2820; font-weight: bold; text-align: right; font-family: monospace;">(91) 98100-0800</td>
+              </tr>
+              <tr style="border-top: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">Beneficiário</td>
+                <td style="padding: 8px 0; color: #0F2820; font-weight: bold; text-align: right;">J Ramos Barros Hotelaria e Eventos Me</td>
+              </tr>
+              <tr style="border-top: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">CNPJ</td>
+                <td style="padding: 8px 0; color: #0F2820; text-align: right; font-family: monospace;">09.519.659/0001-90</td>
+              </tr>
+              <tr style="border-top: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">Banco</td>
+                <td style="padding: 8px 0; color: #0F2820; text-align: right;">Caixa Econômica Federal</td>
+              </tr>
+              <tr style="border-top: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">Agência</td>
+                <td style="padding: 8px 0; color: #0F2820; text-align: right; font-family: monospace;">3632</td>
+              </tr>
+              <tr style="border-top: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">Conta Corrente</td>
+                <td style="padding: 8px 0; color: #0F2820; text-align: right; font-family: monospace;">386-6</td>
+              </tr>
+              <tr style="border-top: 1px solid #e5e7eb;">
+                <td style="padding: 8px 0; color: #666; font-size: 12px; font-weight: bold; text-transform: uppercase;">Operação</td>
+                <td style="padding: 8px 0; color: #0F2820; text-align: right; font-family: monospace;">003</td>
+              </tr>
+              <tr style="border-top: 2px solid #f59e0b; background-color: #fef3c7;">
+                <td style="padding: 12px 8px; color: #92400e; font-size: 14px; font-weight: bold;">VALOR A TRANSFERIR</td>
+                <td style="padding: 12px 8px; color: #92400e; font-weight: bold; text-align: right; font-size: 18px;">R$ ${totalPrice.toFixed(2)}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="color: #78350f; font-size: 14px; line-height: 1.6;">
+            <p style="margin: 0 0 8px 0;"><strong>✅ Após realizar a transferência:</strong></p>
+            <ol style="margin: 0; padding-left: 20px;">
+              <li>Envie o comprovante para: <strong>reserva@hotelsolar.tur.br</strong></li>
+              <li>Aguarde nossa confirmação por e-mail</li>
+              <li>Sua reserva será confirmada em até 24 horas úteis</li>
+            </ol>
+          </div>
         </div>
       `;
     } else {
