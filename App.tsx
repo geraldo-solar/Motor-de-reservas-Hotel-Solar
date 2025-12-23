@@ -761,6 +761,14 @@ const App: React.FC = () => {
         return;
     }
 
+    // Bloquear vendas a partir de 01/07/2026
+    const cutoffDate = new Date(2026, 6, 1); // 1º de julho de 2026 (mês 6 = julho, zero-indexed)
+    cutoffDate.setHours(0, 0, 0, 0);
+    if (clickedDate >= cutoffDate) {
+        alert("Vendas fechadas a partir de 01/07/2026. Entre em contato para mais informações.");
+        return;
+    }
+
     const isoDate = clickedDate.toISOString().split('T')[0];
 
     // Reset if cycle complete
@@ -952,6 +960,11 @@ const App: React.FC = () => {
               const iso = date.toISOString().split('T')[0];
               const isPast = date < today;
               
+              // Verificar se data está bloqueada (>= 01/07/2026)
+              const cutoffDate = new Date(2026, 6, 1);
+              cutoffDate.setHours(0, 0, 0, 0);
+              const isBlocked = date >= cutoffDate;
+              
               let isSelected = false;
               let inRange = false;
               
@@ -980,7 +993,7 @@ const App: React.FC = () => {
               let textClass = "text-gray-700";
               let borderClass = "border-gray-200";
 
-              if (isPast) {
+              if (isPast || isBlocked) {
                  bgClass = "bg-gray-100 opacity-50 cursor-not-allowed";
                  textClass = "text-gray-400";
               } else if (isSelected) {
@@ -999,7 +1012,7 @@ const App: React.FC = () => {
               return (
                  <div 
                    key={day}
-                   onClick={() => !isPast && handleDateClick(day)}
+                   onClick={() => !isPast && !isBlocked && handleDateClick(day)}
                    className={`
                       h-12 md:h-20 border rounded-sm p-1 md:p-2 cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden
                       ${bgClass} ${textClass} ${borderClass}
