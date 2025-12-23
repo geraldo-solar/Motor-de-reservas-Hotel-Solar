@@ -310,17 +310,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
       return `${year}-${month}-${day}`;
     };
     
-    // Debug logs
-    console.log('[FRONTEND DEBUG] additionalGuests before filter:', additionalGuests);
-    const filteredGuests = additionalGuests.filter(g => g.name.trim());
-    console.log('[FRONTEND DEBUG] additionalGuests after filter:', filteredGuests);
-    
     const reservationPayload = {
         checkIn: initialCheckIn ? formatDateLocal(initialCheckIn) : '',
         checkOut: initialCheckOut ? formatDateLocal(initialCheckOut) : '',
         nights: nights,
         mainGuest: { name, email, phone, cpf },
-        additionalGuests: filteredGuests,
+        additionalGuests: additionalGuests.filter(g => g.name.trim()),
         observations,
         rooms: selectedRooms.map((r, idx) => ({
           id: r.id,
@@ -343,8 +338,6 @@ const BookingForm: React.FC<BookingFormProps> = ({
             installments: installments
         } : undefined,
     };
-    
-    console.log('[FRONTEND DEBUG] reservationPayload:', JSON.stringify(reservationPayload, null, 2));
     
     // Submit reservation to API
     setIsSubmitting(true);

@@ -11,18 +11,13 @@ export default async function handler(
   }
 
   try {
-    console.log('[SEND EMAIL] ========== API CALLED ==========');
-    console.log('[SEND EMAIL] Request body:', JSON.stringify(req.body, null, 2));
     const { reservation } = req.body;
 
     if (!reservation || !reservation.id) {
       console.error('[SEND EMAIL] ❌ Missing reservation data');
       return res.status(400).json({ error: 'Missing reservation data' });
     }
-    
-    console.log('[SEND EMAIL] ✅ Processing reservation:', reservation.id);
-    console.log('[SEND EMAIL] Guest email:', reservation?.mainGuest?.email);
-    console.log('[SEND EMAIL] BREVO_API_KEY configured:', !!BREVO_API_KEY);
+
 
     // Extract data safely
     const guestName = reservation?.mainGuest?.name || 'Cliente';
@@ -65,7 +60,6 @@ export default async function handler(
     
     try {
       additionalGuests = typeof reservation.additionalGuests === 'string' ? JSON.parse(reservation.additionalGuests) : (reservation.additionalGuests || []);
-      console.log('[SEND EMAIL] additionalGuests parsed:', JSON.stringify(additionalGuests, null, 2));
     } catch (e) {
       console.error('[SEND EMAIL] Error parsing additionalGuests:', e);
       additionalGuests = [];
@@ -87,7 +81,6 @@ export default async function handler(
         
         // Acompanhantes vinculados por roomIndex
         const roomGuestsFromIndex = additionalGuests.filter((g: any) => g.roomIndex === index);
-        console.log(`[SEND EMAIL] Room ${index} guests from roomIndex:`, roomGuestsFromIndex);
         const roomGuestsFromIndexHtml = roomGuestsFromIndex.length > 0
           ? `<div style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
               <p style="margin: 0 0 5px 0; font-weight: bold; font-size: 12px; color: #666;">Acompanhantes:</p>
@@ -269,7 +262,6 @@ export default async function handler(
 
     // Send client email
     if (guestEmail) {
-      console.log('[SEND EMAIL] Attempting to send client email to:', guestEmail);
       try {
         const response = await fetch('https://api.brevo.com/v3/smtp/email', {
           method: 'POST',
@@ -285,12 +277,9 @@ export default async function handler(
             htmlContent: clientEmailHtml
           })
         });
-
-        console.log('[SEND EMAIL] Brevo API response status (client):', response.status);
         
         if (response.ok) {
           results.clientEmail.sent = true;
-          console.log('[SEND EMAIL] ✅ Client email sent successfully to:', guestEmail);
         } else {
           const errorData = await response.json();
           results.clientEmail.error = JSON.stringify(errorData);
@@ -303,7 +292,6 @@ export default async function handler(
     }
 
     // Send admin email
-    console.log('[SEND EMAIL] Attempting to send admin email to: reserva@hotelsolar.tur.br');
     try {
       const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -319,12 +307,9 @@ export default async function handler(
           htmlContent: adminEmailHtml
         })
       });
-
-      console.log('[SEND EMAIL] Brevo API response status (admin):', response.status);
       
       if (response.ok) {
         results.adminEmail.sent = true;
-        console.log('[SEND EMAIL] ✅ Admin email sent successfully to: reserva@hotelsolar.tur.br');
       } else {
         const errorData = await response.json();
         results.adminEmail.error = JSON.stringify(errorData);
