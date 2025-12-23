@@ -667,9 +667,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [isAddingPackage, setIsAddingPackage] = useState(false);
   
   const [newPackage, setNewPackage] = useState<Partial<HolidayPackage>>({
-    name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', 
-    startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [],
-    roomPrices: []
+    name: '', 
+    description: '', 
+    active: true, 
+    imageUrl: 'https://picsum.photos/800/600', 
+    startIsoDate: '', 
+    endIsoDate: '', 
+    noCheckoutDates: [], 
+    noCheckInDates: [],
+    roomPrices: [],
+    includes: []
   });
   const [editingPackageId, setEditingPackageId] = useState<string | null>(null);
 
@@ -852,7 +859,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       };
       onUpdatePackages([...packages, pkg]);
       setIsAddingPackage(false);
-      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', roomPrices: [] });
+      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [], roomPrices: [], includes: [] });
   };
 
   const handleDeletePackage = (id: string) => {
@@ -902,13 +909,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       onUpdatePackages(updatedPackages);
       setIsAddingPackage(false);
       setEditingPackageId(null);
-      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', roomPrices: [] });
+      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [], roomPrices: [], includes: [] });
   };
 
   const handleCancelEditPackage = () => {
       setIsAddingPackage(false);
       setEditingPackageId(null);
-      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', roomPrices: [] });
+      setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [], roomPrices: [], includes: [] });
   };
 
   // Auto-fill room prices from map when dates are set
@@ -1831,7 +1838,13 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                <div className="flex justify-between items-start">
                                    <div>
                                        <h3 className="font-serif font-bold text-xl text-[#0F2820]">{pkg.name}</h3>
-                                       <p className="text-sm text-gray-500">{new Date(pkg.startIsoDate + 'T12:00:00').toLocaleDateString()} até {new Date(pkg.endIsoDate + 'T12:00:00').toLocaleDateString()}</p>
+                                       <p className="text-sm text-gray-500">
+                                         {pkg.startIsoDate && pkg.endIsoDate ? (
+                                           `${new Date(pkg.startIsoDate + 'T12:00:00').toLocaleDateString()} até ${new Date(pkg.endIsoDate + 'T12:00:00').toLocaleDateString()}`
+                                         ) : (
+                                           <span className="text-red-500">⚠️ Datas não definidas</span>
+                                         )}
+                                       </p>
                                    </div>
                                    <div className="flex items-center gap-2">
                                        <label className="flex items-center gap-2 cursor-pointer mr-4">
