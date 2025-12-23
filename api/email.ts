@@ -197,7 +197,7 @@ async function sendClientConfirmation(req: VercelRequest, res: VercelResponse) {
 
                 <tr>
                   <td style="background-color: #2F3A2F; padding: 30px; text-align: center;">
-                    <img src="https://www.hotelsolar.tur.br/hotel-solar-logo.png" alt="Hotel Solar" style="height: 60px; margin-bottom: 16px;" />
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/AIaaNfDYIQxujmoI.png" alt="Hotel Solar" style="height: 30px; margin-bottom: 16px;" />
                     <p style="color: #9ca3af; margin: 0; font-size: 14px; line-height: 1.6;">
                       <strong style="color: #E5D3B3;">Hotel Solar</strong><br>
                       Av. Atlântica • CEP 68721-000 • Salinópolis - PA<br>
@@ -365,7 +365,7 @@ async function sendPaymentConfirmation(req: VercelRequest, res: VercelResponse) 
 
                 <tr>
                   <td style="background-color: #2F3A2F; padding: 30px; text-align: center;">
-                    <img src="https://www.hotelsolar.tur.br/hotel-solar-logo.png" alt="Hotel Solar" style="height: 60px; margin-bottom: 16px;" />
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/AIaaNfDYIQxujmoI.png" alt="Hotel Solar" style="height: 30px; margin-bottom: 16px;" />
                     <p style="color: #9ca3af; margin: 0; font-size: 14px; line-height: 1.6;">
                       <strong style="color: #E5D3B3;">Hotel Solar</strong><br>
                       Av. Atlântica • CEP 68721-000 • Salinópolis - PA<br>
@@ -740,7 +740,7 @@ async function sendPaymentDenied(req: VercelRequest, res: VercelResponse) {
 
                 <tr>
                   <td style="background-color: #2F3A2F; padding: 30px; text-align: center;">
-                    <img src="https://www.hotelsolar.tur.br/hotel-solar-logo.png" alt="Hotel Solar" style="height: 60px; margin-bottom: 16px;" />
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/AIaaNfDYIQxujmoI.png" alt="Hotel Solar" style="height: 30px; margin-bottom: 16px;" />
                     <p style="color: #9ca3af; margin: 0; font-size: 14px; line-height: 1.6;">
                       <strong style="color: #E5D3B3;">Hotel Solar</strong><br>
                       Av. Atlântica • CEP 68721-000 • Salinópolis - PA<br>
