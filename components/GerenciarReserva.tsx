@@ -216,7 +216,6 @@ export default function GerenciarReserva() {
               {[
                 { id: 'detalhes', label: '📋 Detalhes' },
                 ...(reservation.status !== 'CANCELLED' ? [
-                  { id: 'editar', label: '✏️ Editar' },
                   { id: 'cancelar', label: '❌ Cancelar' }
                 ] : []),
                 { id: 'regulamento', label: '📜 Regulamento' }
@@ -325,98 +324,7 @@ export default function GerenciarReserva() {
               </div>
             )}
 
-            {activeTab === 'editar' && (
-              <div className="space-y-6">
-                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
-                  <p className="text-blue-800">
-                    <strong>ℹ️ Atenção:</strong> Alterações estão sujeitas à disponibilidade e podem resultar em ajuste de valores.
-                  </p>
-                </div>
 
-                <div>
-                  <h2 className="text-xl font-bold mb-4">📅 Alterar Datas</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
-                      <input
-                        type="date"
-                        value={editCheckIn}
-                        onChange={(e) => setEditCheckIn(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
-                      <input
-                        type="date"
-                        value={editCheckOut}
-                        onChange={(e) => setEditCheckOut(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h2 className="text-xl font-bold mb-4">👥 Editar Acompanhantes</h2>
-                  <div className="space-y-4">
-                    {editGuests.map((guest, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
-                            <input
-                              type="text"
-                              value={guest.name}
-                              onChange={(e) => {
-                                const newGuests = [...editGuests];
-                                newGuests[index].name = e.target.value;
-                                setEditGuests(newGuests);
-                              }}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">CPF (opcional)</label>
-                            <input
-                              type="text"
-                              value={guest.cpf || ''}
-                              onChange={(e) => {
-                                const newGuests = [...editGuests];
-                                newGuests[index].cpf = e.target.value;
-                                setEditGuests(newGuests);
-                              }}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Idade (opcional)</label>
-                            <input
-                              type="number"
-                              value={guest.age || ''}
-                              onChange={(e) => {
-                                const newGuests = [...editGuests];
-                                newGuests[index].age = parseInt(e.target.value) || undefined;
-                                setEditGuests(newGuests);
-                              }}
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37]"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleSaveChanges}
-                  disabled={saving}
-                  className="w-full bg-[#16A34A] text-white px-6 py-4 rounded-lg font-bold text-lg hover:bg-[#15803D] transition disabled:opacity-50"
-                >
-                  {saving ? 'Salvando...' : '💾 Salvar Alterações'}
-                </button>
-              </div>
-            )}
 
             {activeTab === 'cancelar' && (
               <div className="space-y-6">
