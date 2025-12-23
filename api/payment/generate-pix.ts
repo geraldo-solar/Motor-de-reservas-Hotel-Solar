@@ -24,20 +24,22 @@ export default async function handler(
     // In production, you would call your payment gateway API here
     // For now, we'll generate a mock PIX code
     
-    // PIX Key (this should be your actual PIX key)
-    const pixKey = process.env.PIX_KEY || '+5591981000800'; // Celular (91) 98100-0800
+    // PIX Key - ATUALIZADO para novo celular
+    const pixKey = '+5591981000800'; // Celular (91) 98100-0800 - Forçando novo valor
+    console.log('[PIX] Using PIX key:', pixKey);
     
-    // Dados bancários atualizados
+    // Dados bancários ATUALIZADOS - 22/12/2024
     const merchantInfo = {
       name: 'J RAMOS BARROS HOTELARIA E EVENTOS ME',
-      city: 'BELEM', // Ajuste conforme a cidade
+      city: 'BELEM',
       cnpj: '09.519.659/0001-90',
       bank: 'Caixa Econômica Federal',
       agency: '3632',
       account: '386',
-      accountDigit: '6', // Dígito verificador
+      accountDigit: '6',
       operation: '003'
     };
+    console.log('[PIX] Merchant info:', merchantInfo.name, merchantInfo.cnpj);
     
     // Generate a simple PIX code (in production, use proper PIX payload format)
     // This is a simplified example - real PIX codes follow the EMV QR Code standard
