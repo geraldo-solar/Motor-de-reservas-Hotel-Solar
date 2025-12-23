@@ -111,12 +111,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Delete package
       const { id } = req.query;
       const packageId = Array.isArray(id) ? id[0] : id;
+      
+      console.log('[PACKAGES API] DELETE request for package:', packageId);
 
-      await sql`
+      const result = await sql`
         DELETE FROM packages WHERE id = ${packageId}
       `;
+      
+      console.log('[PACKAGES API] Delete result:', result.rowCount, 'rows affected');
 
-      return res.status(200).json({ success: true });
+      return res.status(200).json({ success: true, rowCount: result.rowCount });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

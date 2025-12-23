@@ -509,9 +509,13 @@ const App: React.FC = () => {
        
       // Find deleted packages
       const deletedIds = Array.from(oldPackageIds).filter(id => !newPackageIds.has(id));
+      console.log('[PACKAGE SYNC] Deleted package IDs:', deletedIds);
       for (const id of deletedIds) {
         if (typeof id === 'string') {
-          await deletePackage(id).catch(err => console.error('Failed to delete package:', err));
+          console.log('[PACKAGE SYNC] Deleting package:', id);
+          await deletePackage(id)
+            .then(() => console.log('[PACKAGE SYNC] Successfully deleted package:', id))
+            .catch(err => console.error('[PACKAGE SYNC] Failed to delete package:', id, err));
         }
       }
        
