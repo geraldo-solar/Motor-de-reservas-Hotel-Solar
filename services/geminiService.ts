@@ -172,8 +172,10 @@ export const processAdminCommand = async (
          {"dateIso":"YYYY-MM-DD","price":500,"availableQuantity":5,"noCheckIn":false,"noCheckOut":false,"isClosed":false}
       3. Mantenha overrides existentes de outras datas
       4. Retorne JSON com chaves modificadas + "message"
-      5. Lista COMPLETA dos itens alterados
-      6. IMPORTANTE - Ao criar PACOTES, TODOS os campos são obrigatórios:
+      5. **IMPORTANTE**: Ao criar/adicionar novos itens, retorne a lista COMPLETA incluindo os existentes + novos
+      6. **IMPORTANTE**: Ao editar/deletar, retorne a lista COMPLETA com as modificações aplicadas
+      7. Nunca delete itens existentes a menos que explicitamente solicitado
+      8. IMPORTANTE - Ao criar PACOTES, TODOS os campos são obrigatórios:
          - id: string único (use kebab-case, ex: "reveillon-2025")
          - name: nome do pacote
          - description: descrição detalhada
