@@ -159,8 +159,9 @@ export default async function handler(
         <body style="font-family: Arial, sans-serif; background-color: #f3f4f6; padding: 20px; margin: 0;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="background: linear-gradient(135deg, #2F3A2F 0%, #1a221a 100%); padding: 40px 30px; text-align: center;">
+              <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/LCoBrkXVRxHSucxK.png" alt="Hotel Solar" style="max-width: 200px; height: auto; margin: 0 auto 20px auto; display: block;" />
               <h1 style="color: #E5D3B3; margin: 0 0 10px 0; font-size: 28px;">✅ Reserva Solicitada!</h1>
-              <p style="color: #D4AF37; margin: 0; font-size: 16px;">Hotel Solar</p>
+              <p style="color: #D4AF37; margin: 0; font-size: 16px;">Obrigado por nos escolher!</p>
             </div>
             <div style="padding: 30px;">
               <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
@@ -218,6 +219,9 @@ export default async function handler(
         <head><meta charset="utf-8"></head>
         <body style="font-family: Arial, sans-serif; padding: 20px; margin: 0;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #D4AF37;">
+              <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/LCoBrkXVRxHSucxK.png" alt="Hotel Solar" style="max-width: 180px; height: auto; margin: 0 auto 15px auto; display: block;" />
+            </div>
             <h1 style="color: #2F3A2F; margin: 0 0 20px 0;">🔔 Nova Reserva</h1>
             <p style="font-size: 18px; margin: 0 0 20px 0;"><strong>Número da Reserva:</strong> ${reservationNumber}</p>
             
