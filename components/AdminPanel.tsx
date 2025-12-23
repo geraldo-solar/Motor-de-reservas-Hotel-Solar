@@ -1869,9 +1869,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                    <div>
                                        <h3 className="font-serif font-bold text-xl text-[#0F2820]">{pkg.name}</h3>
                                        <p className="text-sm text-gray-500">
-                                         {pkg.startIsoDate && pkg.endIsoDate ? (
-                                           `${new Date(pkg.startIsoDate + 'T12:00:00').toLocaleDateString()} até ${new Date(pkg.endIsoDate + 'T12:00:00').toLocaleDateString()}`
-                                         ) : (
+                                         {pkg.startIsoDate && pkg.endIsoDate ? (() => {
+                                           try {
+                                             // Parse dates safely in local timezone (same method as client page)
+                                             const startParts = pkg.startIsoDate.split('T')[0].split('-');
+                                             const endParts = pkg.endIsoDate.split('T')[0].split('-');
+                                             const startDate = new Date(parseInt(startParts[0]), parseInt(startParts[1]) - 1, parseInt(startParts[2]));
+                                             const endDate = new Date(parseInt(endParts[0]), parseInt(endParts[1]) - 1, parseInt(endParts[2]));
+                                             
+                                             if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                                               return <span className="text-red-500">⚠️ Datas inválidas</span>;
+                                             }
+                                             
+                                             return `${startDate.toLocaleDateString('pt-BR')} até ${endDate.toLocaleDateString('pt-BR')}`;
+                                           } catch (error) {
+                                             return <span className="text-red-500">⚠️ Erro ao processar datas</span>;
+                                           }
+                                         })() : (
                                            <span className="text-red-500">⚠️ Datas não definidas</span>
                                          )}
                                        </p>
