@@ -315,13 +315,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
         checkOut: initialCheckOut ? formatDateLocal(initialCheckOut) : '',
         nights: nights,
         mainGuest: { name, email, phone, cpf },
-        additionalGuests: additionalGuests.filter(g => g.name && g.cpf),
+        additionalGuests: additionalGuests.filter(g => g.name.trim()),
         observations,
         rooms: selectedRooms.map((r, idx) => ({
           id: r.id,
           name: r.name,
           priceSnapshot: calculateRoomTotal(r),
-          guests: additionalGuests.filter(g => g.roomIndex === idx && g.name && g.cpf)
+          guests: additionalGuests.filter(g => g.roomIndex === idx && g.name.trim())
         })),
         extras: Object.entries(selectedExtras).map(([id, qty]) => {
             const extra = extras.find(e => e.id === id);
