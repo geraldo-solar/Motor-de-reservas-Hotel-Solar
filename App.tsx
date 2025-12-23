@@ -44,10 +44,7 @@ const RoomImageCarousel: React.FC<{ room: Room }> = ({ room }) => {
         className="w-full h-full object-cover transition duration-700 group-hover:scale-110" 
       />
       
-      {/* Badges */}
-      <div className="absolute top-4 right-4 bg-[#D4AF37] text-white px-3 py-1 text-xs font-bold uppercase tracking-widest shadow-md z-10">
-        Recomendado
-      </div>
+      {/* Badge de capacidade */}
       <div className="absolute bottom-4 left-4 bg-[#0F2820]/90 backdrop-blur-sm text-white px-3 py-1.5 text-xs flex items-center gap-1 rounded-sm shadow-sm border border-[#D4AF37]/30 z-10">
         <Users size={12} className="text-[#D4AF37]"/> Acomoda até {room.capacity} pessoas
       </div>
