@@ -1576,6 +1576,25 @@ const App: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {packages.filter(p => p.active).map(pkg => {
+                    // Debug log
+                    console.log('[PACKAGE RENDER] Rendering package:', pkg.id, pkg);
+                    
+                    // Validate required fields
+                    if (!pkg.startIsoDate || !pkg.endIsoDate) {
+                      console.error('[PACKAGE RENDER] Missing dates for package:', pkg.id);
+                      return null;
+                    }
+                    
+                    if (!pkg.roomPrices || pkg.roomPrices.length === 0) {
+                      console.error('[PACKAGE RENDER] Missing roomPrices for package:', pkg.id);
+                      return null;
+                    }
+                    
+                    if (!pkg.includes || pkg.includes.length === 0) {
+                      console.warn('[PACKAGE RENDER] Missing includes for package:', pkg.id, '- using default');
+                      pkg.includes = ['Hospedagem', 'Café da manhã'];
+                    }
+                    
                     // Get minimum price from roomPrices, or Infinity if no prices set
                     const minPrice = pkg.roomPrices.length > 0 ? Math.min(...pkg.roomPrices.map(rp => rp.price)) : Infinity;
                     
@@ -1590,11 +1609,16 @@ const App: React.FC = () => {
                       
                       // Validate dates
                       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                        console.error('Invalid package dates:', pkg);
+                        console.error('[PACKAGE RENDER] Invalid package dates:', pkg);
+                        return null;
+                      }
+                      
+                      if (nights <= 0) {
+                        console.error('[PACKAGE RENDER] Invalid nights calculation:', nights, 'for package:', pkg.id);
                         return null;
                       }
                     } catch (error) {
-                      console.error('Error parsing package dates:', pkg, error);
+                      console.error('[PACKAGE RENDER] Error parsing package dates:', pkg, error);
                       return null;
                     }
 
@@ -1602,7 +1626,15 @@ const App: React.FC = () => {
                       <div key={pkg.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                         {/* Package Image */}
                         <div className="relative h-56 overflow-hidden">
-                          <img src={pkg.imageUrl} alt={pkg.name} className="w-full h-full object-cover" />
+                          <img 
+                            src={pkg.imageUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'} 
+                            alt={pkg.name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('[PACKAGE RENDER] Image load error for package:', pkg.id);
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+                            }}
+                          />
                           <div className="absolute top-4 right-4 bg-[#D4AF37] text-[#0F2820] px-3 py-1 rounded-full text-xs font-bold">
                             {nights} noites
                           </div>
