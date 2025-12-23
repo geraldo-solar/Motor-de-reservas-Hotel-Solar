@@ -1461,7 +1461,19 @@ const App: React.FC = () => {
         canRedo={future.length > 0}
         onUndo={handleUndo}
         onRedo={handleRedo}
-      />
+      >
+        {/* Chat Assistant na seção Admin */}
+        <ChatAssistant 
+          rooms={rooms} 
+          packages={packages} 
+          extras={extras}
+          currentView={currentView}
+          selectedRooms={selectedRooms}
+          checkIn={checkIn}
+          checkOut={checkOut}
+          hotelInfo={config.aiKnowledgeBase}
+        />
+      </AdminPanel>
     );
   }
 

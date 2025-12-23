@@ -24,6 +24,7 @@ interface AdminPanelProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  children?: React.ReactNode;
 }
 
 // --- HELPER: Consistent Date Key Generator (Local YYYY-MM-DD) ---
@@ -639,7 +640,8 @@ const AdminCalendarSelector: React.FC<{
 const AdminPanel: React.FC<AdminPanelProps> = ({ 
   rooms, packages, discounts, extras, config, reservations,
   onUpdateRooms, onUpdatePackages, onUpdateDiscounts, onUpdateExtras, onUpdateConfig, onUpdateReservationStatus, onLogout,
-  onUndo, onRedo, canUndo, canRedo
+  onUndo, onRedo, canUndo, canRedo,
+  children
 }) => {
   type AdminTab = 'map' | 'reservations' | 'rooms' | 'packages' | 'extras' | 'discounts' | 'ai' | 'config';
   
@@ -2153,6 +2155,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         )}
 
       </main>
+      
+      {/* Render children (ChatAssistant) */}
+      {children}
     </div>
   );
 };
