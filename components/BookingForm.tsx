@@ -349,14 +349,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Email notifications are now sent by the backend API automatically
       // No need to call sendReservationEmail here (removed to avoid duplicate emails)
       
-      // If PIX payment, generate PIX code
-      if (paymentMethod === 'PIX') {
-        const pixResponse = await generatePixPayment(total, reservation.id, name);
-        setPixData({
-          payload: pixResponse.pix.payload,
-          qrCode: pixResponse.pix.qrCode
-        });
-      }
+      // PIX payment - dados bancários são exibidos diretamente no formulário
+      // Não é necessário gerar QR Code
       
       // Add to local state (for backward compatibility)
       onAddReservation(reservation);
@@ -707,16 +701,70 @@ const BookingForm: React.FC<BookingFormProps> = ({
                </div>
                
                {paymentMethod === 'PIX' && (
-                  <div className="bg-white border border-gray-200 p-6 rounded-lg flex flex-col items-center text-center animate-in fade-in">
-                      <p className="text-sm text-gray-500 mb-4">Escaneie o QR Code abaixo ou copie a chave para pagar.</p>
-                      <div className="bg-gray-100 p-4 rounded-lg mb-4">
-                          <QrCode size={120} className="text-[#0F2820]" />
+                  <div className="bg-white border border-gray-200 p-6 rounded-lg animate-in fade-in">
+                      <p className="text-sm text-gray-700 mb-4 font-semibold text-center">Faça a transferência PIX usando os dados abaixo:</p>
+                      
+                      <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                          <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                              <span className="text-xs font-bold text-gray-500 uppercase">Chave PIX (Celular)</span>
+                              <div className="flex items-center gap-2">
+                                  <span className="text-sm font-mono font-bold text-[#0F2820]">(91) 98100-0800</span>
+                                  <button 
+                                      onClick={() => {
+                                          navigator.clipboard.writeText('5591981000800');
+                                          alert('Chave PIX copiada!');
+                                      }}
+                                      className="p-1 bg-[#0F2820] text-white rounded hover:bg-[#1a3c30]" 
+                                      title="Copiar chave"
+                                  >
+                                      <Copy size={14}/>
+                                  </button>
+                              </div>
+                          </div>
+                          
+                          <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                              <span className="text-xs font-bold text-gray-500 uppercase">Beneficiário</span>
+                              <span className="text-sm font-bold text-[#0F2820] text-right">J Ramos Barros Hotelaria e Eventos Me</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                              <span className="text-xs font-bold text-gray-500 uppercase">CNPJ</span>
+                              <span className="text-sm font-mono text-[#0F2820]">09.519.659/0001-90</span>
+                          </div>
+                          
+                          <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                              <span className="text-xs font-bold text-gray-500 uppercase">Banco</span>
+                              <span className="text-sm text-[#0F2820]">Caixa Econômica Federal</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 pt-2">
+                              <div>
+                                  <span className="text-xs font-bold text-gray-500 uppercase block">Agência</span>
+                                  <span className="text-sm font-mono text-[#0F2820]">3632</span>
+                              </div>
+                              <div>
+                                  <span className="text-xs font-bold text-gray-500 uppercase block">Conta</span>
+                                  <span className="text-sm font-mono text-[#0F2820]">386-6</span>
+                              </div>
+                              <div>
+                                  <span className="text-xs font-bold text-gray-500 uppercase block">Operação</span>
+                                  <span className="text-sm font-mono text-[#0F2820]">003</span>
+                              </div>
+                              <div>
+                                  <span className="text-xs font-bold text-gray-500 uppercase block">Tipo</span>
+                                  <span className="text-sm text-[#0F2820]">Conta Corrente</span>
+                              </div>
+                          </div>
+                          
+                          <div className="bg-[#D4AF37]/10 p-3 rounded mt-3">
+                              <p className="text-xs text-gray-700"><strong>Valor a transferir:</strong> R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                          </div>
                       </div>
-                      <div className="flex items-center gap-2 w-full max-w-sm">
-                          <input readOnly value="00020126580014br.gov.bcb.pix0136123e4567-e89b-12d3-a456-426614174000" className="flex-1 bg-gray-50 border border-gray-200 p-2 text-xs rounded text-gray-500 truncate" />
-                          <button className="p-2 bg-[#0F2820] text-white rounded hover:bg-[#1a3c30]" title="Copiar"><Copy size={16}/></button>
-                      </div>
-                      <p className="text-xs text-[#D4AF37] font-bold mt-4 flex items-center gap-1"><ShieldCheck size={14}/> Pagamento Seguro</p>
+                      
+                      <p className="text-xs text-gray-500 mt-4 text-center">
+                          📲 Após realizar a transferência, envie o comprovante para <strong>reserva@hotelsolar.tur.br</strong>
+                      </p>
+                      <p className="text-xs text-[#D4AF37] font-bold mt-2 flex items-center justify-center gap-1"><ShieldCheck size={14}/> Pagamento Seguro</p>
                   </div>
                )}
 
