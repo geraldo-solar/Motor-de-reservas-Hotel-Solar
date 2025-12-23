@@ -138,17 +138,14 @@ const GeneralMapCalendar: React.FC<{
   const month = currentDate.getMonth();
   const daysInMonth = getDaysInMonth(year, month);
 
-  // Filter out past dates and blocked dates (>= 01/07/2026)
+  // Filter out past dates only (admin can edit future dates)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
-  const cutoffDate = new Date(2026, 6, 1); // 1º de julho de 2026
-  cutoffDate.setHours(0, 0, 0, 0);
   
   const allDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const daysArray = allDays.filter(day => {
     const dateObj = new Date(year, month, day);
-    return dateObj >= today && dateObj < cutoffDate; // Bloquear datas >= 01/07/2026
+    return dateObj >= today; // Permitir edição de todas as datas futuras
   });
 
   const handlePrev = () => setCurrentDate(new Date(year, month - 1, 1));
@@ -157,17 +154,6 @@ const GeneralMapCalendar: React.FC<{
   const handleBulkApply = () => {
      if (!bulkStart || !bulkEnd) {
          alert("Selecione a data de início e fim.");
-         return;
-     }
-     
-     // Validar se as datas estão antes de 01/07/2026
-     const cutoffDate = new Date(2026, 6, 1);
-     cutoffDate.setHours(0, 0, 0, 0);
-     const startDate = new Date(bulkStart);
-     const endDate = new Date(bulkEnd);
-     
-     if (startDate >= cutoffDate || endDate >= cutoffDate) {
-         alert("Não é possível editar datas a partir de 01/07/2026. Vendas fechadas para esse período.");
          return;
      }
      
@@ -897,17 +883,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleCreatePackage = () => {
       if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate) return;
       
-      // Validar se as datas estão antes de 01/07/2026
-      const cutoffDate = new Date(2026, 6, 1);
-      cutoffDate.setHours(0, 0, 0, 0);
-      const startDate = new Date(newPackage.startIsoDate);
-      const endDate = new Date(newPackage.endIsoDate);
-      
-      if (startDate >= cutoffDate || endDate >= cutoffDate) {
-          alert("Não é possível criar pacotes com datas a partir de 01/07/2026. Vendas fechadas para esse período.");
-          return;
-      }
-      
       const pkg: HolidayPackage = {
           id: Math.random().toString(36).substr(2, 9),
           name: newPackage.name,
@@ -960,17 +935,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleUpdatePackage2 = () => {
       if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) return;
-      
-      // Validar se as datas estão antes de 01/07/2026
-      const cutoffDate = new Date(2026, 6, 1);
-      cutoffDate.setHours(0, 0, 0, 0);
-      const startDate = new Date(newPackage.startIsoDate);
-      const endDate = new Date(newPackage.endIsoDate);
-      
-      if (startDate >= cutoffDate || endDate >= cutoffDate) {
-          alert("Não é possível editar pacotes com datas a partir de 01/07/2026. Vendas fechadas para esse período.");
-          return;
-      }
       
       const updatedPackages = packages.map(p => 
           p.id === editingPackageId 
