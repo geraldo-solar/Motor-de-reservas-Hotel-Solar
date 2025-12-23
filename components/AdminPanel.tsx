@@ -724,8 +724,32 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         changed = true;
       }
       if (response.packages) {
-        onUpdatePackages(response.packages);
-        changed = true;
+        // Validate packages before saving
+        const validPackages = response.packages.filter(pkg => {
+          if (!pkg.startIsoDate || !pkg.endIsoDate) {
+            console.warn('[AI VALIDATION] Package without dates:', pkg.name);
+            return false;
+          }
+          const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+          if (!dateRegex.test(pkg.startIsoDate) || !dateRegex.test(pkg.endIsoDate)) {
+            console.warn('[AI VALIDATION] Package with invalid date format:', pkg.name);
+            return false;
+          }
+          return true;
+        });
+        
+        if (validPackages.length < response.packages.length) {
+          const invalidCount = response.packages.length - validPackages.length;
+          setAiMessage({ 
+            text: `⚠️ ${invalidCount} pacote(s) foram ignorados por falta de datas válidas. A IA deve fornecer datas no formato YYYY-MM-DD.`,
+            type: 'error'
+          });
+        }
+        
+        if (validPackages.length > 0) {
+          onUpdatePackages(validPackages);
+          changed = true;
+        }
       }
       if (response.discounts) {
         onUpdateDiscounts(response.discounts);
