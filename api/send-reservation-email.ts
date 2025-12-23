@@ -159,7 +159,7 @@ export default async function handler(
         <body style="font-family: Arial, sans-serif; background-color: #f3f4f6; padding: 20px; margin: 0;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="background: linear-gradient(135deg, #2F3A2F 0%, #1a221a 100%); padding: 40px 30px; text-align: center;">
-              <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/LCoBrkXVRxHSucxK.png" alt="Hotel Solar" style="max-width: 200px; height: auto; margin: 0 auto 20px auto; display: block;" />
+              <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663213718939/AIaaNfDYIQxujmoI.png" alt="Hotel Solar" style="max-width: 100px; height: auto; margin: 0 auto 20px auto; display: block;" />
               <h1 style="color: #E5D3B3; margin: 0 0 10px 0; font-size: 28px;">✅ Reserva Solicitada!</h1>
               <p style="color: #D4AF37; margin: 0; font-size: 16px;">Obrigado por nos escolher!</p>
             </div>
