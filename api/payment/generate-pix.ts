@@ -25,14 +25,26 @@ export default async function handler(
     // For now, we'll generate a mock PIX code
     
     // PIX Key (this should be your actual PIX key)
-    const pixKey = process.env.PIX_KEY || 'reserva@hotelsolar.tur.br';
+    const pixKey = process.env.PIX_KEY || '+5591981000800'; // Celular (91) 98100-0800
+    
+    // Dados bancários atualizados
+    const merchantInfo = {
+      name: 'J RAMOS BARROS HOTELARIA E EVENTOS ME',
+      city: 'BELEM', // Ajuste conforme a cidade
+      cnpj: '09.519.659/0001-90',
+      bank: 'Caixa Econômica Federal',
+      agency: '3632',
+      account: '386',
+      accountDigit: '6', // Dígito verificador
+      operation: '003'
+    };
     
     // Generate a simple PIX code (in production, use proper PIX payload format)
     // This is a simplified example - real PIX codes follow the EMV QR Code standard
     const pixPayload = generatePixPayload({
       pixKey,
-      merchantName: 'HOTEL SOLAR',
-      merchantCity: 'SAO PAULO',
+      merchantName: merchantInfo.name,
+      merchantCity: merchantInfo.city,
       amount: parseFloat(amount),
       transactionId: reservationId.slice(0, 25), // Max 25 chars
     });
