@@ -747,7 +747,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         }
         
         if (validPackages.length > 0) {
-          onUpdatePackages(validPackages);
+          // Merge with existing packages to avoid deletion
+          // Find which packages are new or updated
+          const existingPackageIds = new Set(packages.map(p => p.id));
+          const aiPackageIds = new Set(validPackages.map(p => p.id));
+          
+          // Keep existing packages that weren't touched by AI
+          const untouchedPackages = packages.filter(p => !aiPackageIds.has(p.id));
+          
+          // Combine untouched + AI packages
+          const mergedPackages = [...untouchedPackages, ...validPackages];
+          
+          console.log('[AI MERGE] Existing packages:', packages.length);
+          console.log('[AI MERGE] AI returned packages:', validPackages.length);
+          console.log('[AI MERGE] Merged total:', mergedPackages.length);
+          
+          onUpdatePackages(mergedPackages);
           changed = true;
         }
       }
