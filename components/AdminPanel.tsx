@@ -895,17 +895,23 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleEditPackage = (id: string) => {
       const pkg = packages.find(p => p.id === id);
       if (pkg) {
+          // Validate dates before editing
+          if (!pkg.startIsoDate || !pkg.endIsoDate) {
+              alert('⚠️ Este pacote tem datas inválidas e não pode ser editado. Por favor, delete-o e crie um novo.');
+              return;
+          }
+          
           setNewPackage({
               name: pkg.name,
               description: pkg.description,
               imageUrl: pkg.imageUrl,
               includes: pkg.includes.join(', ') as any,
               active: pkg.active,
-              startIsoDate: pkg.startIsoDate,
-              endIsoDate: pkg.endIsoDate,
-              roomPrices: pkg.roomPrices,
-              noCheckoutDates: pkg.noCheckoutDates,
-              noCheckInDates: pkg.noCheckInDates
+              startIsoDate: pkg.startIsoDate || '',
+              endIsoDate: pkg.endIsoDate || '',
+              roomPrices: pkg.roomPrices || [],
+              noCheckoutDates: pkg.noCheckoutDates || [],
+              noCheckInDates: pkg.noCheckInDates || []
           });
           setEditingPackageId(id);
           setIsAddingPackage(true);
