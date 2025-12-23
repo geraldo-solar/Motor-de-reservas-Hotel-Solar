@@ -40,6 +40,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'POST') {
       // Create new package
       const { id, name, description, imageUrl, includes, active, startIsoDate, endIsoDate, roomPrices, noCheckoutDates, noCheckInDates } = req.body;
+      
+      // Validate required fields
+      if (!id || !name) {
+        return res.status(400).json({ error: 'Missing required fields: id, name' });
+      }
+      
+      if (!startIsoDate || !endIsoDate) {
+        return res.status(400).json({ error: 'Missing required date fields: startIsoDate, endIsoDate' });
+      }
+      
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(startIsoDate) || !dateRegex.test(endIsoDate)) {
+        return res.status(400).json({ error: 'Invalid date format. Expected YYYY-MM-DD' });
+      }
 
       await sql`
         INSERT INTO packages (id, name, description, image_url, includes, active, start_iso_date, end_iso_date, room_prices, no_checkout_dates, no_checkin_dates)
@@ -57,6 +72,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method === 'PUT') {
       // Update package
       const { id, name, description, imageUrl, includes, active, startIsoDate, endIsoDate, roomPrices, noCheckoutDates, noCheckInDates } = req.body;
+      
+      // Validate required fields
+      if (!id || !name) {
+        return res.status(400).json({ error: 'Missing required fields: id, name' });
+      }
+      
+      if (!startIsoDate || !endIsoDate) {
+        return res.status(400).json({ error: 'Missing required date fields: startIsoDate, endIsoDate' });
+      }
+      
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(startIsoDate) || !dateRegex.test(endIsoDate)) {
+        return res.status(400).json({ error: 'Invalid date format. Expected YYYY-MM-DD' });
+      }
 
       await sql`
         UPDATE packages 
