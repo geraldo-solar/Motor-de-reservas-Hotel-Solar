@@ -538,11 +538,25 @@ const App: React.FC = () => {
        // Find new or updated packages
        for (const pkg of newPackages) {
          if (!oldPackageIds.has(pkg.id)) {
-           await createPackage(pkg).catch(err => console.error('Failed to create package:', err));
+           console.log('[PACKAGE SYNC] Creating new package:', pkg.id);
+           await createPackage(pkg)
+             .then(() => console.log('[PACKAGE SYNC] Successfully created package:', pkg.id))
+             .catch(err => console.error('[PACKAGE SYNC] Failed to create package:', pkg.id, err));
          } else {
            const oldPkg = packages.find(p => p.id === pkg.id);
-           if (JSON.stringify(oldPkg) !== JSON.stringify(pkg)) {
-             await updatePackage(pkg).catch(err => console.error('Failed to update package:', err));
+           const oldJson = JSON.stringify(oldPkg);
+           const newJson = JSON.stringify(pkg);
+           
+           if (oldJson !== newJson) {
+             console.log('[PACKAGE SYNC] Package changed, updating:', pkg.id);
+             console.log('[PACKAGE SYNC] Old:', oldPkg);
+             console.log('[PACKAGE SYNC] New:', pkg);
+             
+             await updatePackage(pkg)
+               .then(() => console.log('[PACKAGE SYNC] Successfully updated package:', pkg.id))
+               .catch(err => console.error('[PACKAGE SYNC] Failed to update package:', pkg.id, err));
+           } else {
+             console.log('[PACKAGE SYNC] Package unchanged, skipping:', pkg.id);
            }
          }
        }
