@@ -159,8 +159,9 @@ const App: React.FC = () => {
     const dateParam = params.get('date');
     const checkInParam = params.get('checkin');
     const checkOutParam = params.get('checkout');
+    const packageParam = params.get('package');
     
-    console.log('[URL Params Debug]', { dateParam, checkInParam, checkOutParam });
+    console.log('[URL Params Debug]', { dateParam, checkInParam, checkOutParam, packageParam });
     
     if (dateParam) {
       // Single date parameter - set as check-in
@@ -194,7 +195,17 @@ const App: React.FC = () => {
         }
       }
     }
-  }, []);
+    
+    // Handle package parameter
+    if (packageParam && packages.length > 0) {
+      const pkg = packages.find(p => p.id === packageParam);
+      if (pkg) {
+        console.log('[Opening package from URL]', pkg);
+        setSelectedPackage(pkg);
+        setCurrentView(ViewState.PACKAGES);
+      }
+    }
+  }, [packages]);
 
   // Load data from database on mount
   useEffect(() => {
@@ -1427,6 +1438,31 @@ const App: React.FC = () => {
                       </button>
                     </div>
                   )}
+                  
+                  {/* Botão Compartilhar Pacote */}
+                  <div className="flex justify-center mt-4">
+                    <button
+                      onClick={() => {
+                        const shareUrl = `${window.location.origin}/?package=${pkg.id}`;
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                          alert(`Link do pacote copiado!\n\n${shareUrl}\n\nEnvie este link para compartilhar o pacote "${pkg.name}".`);
+                        }).catch(err => {
+                          console.error('Erro ao copiar:', err);
+                          prompt('Copie este link:', shareUrl);
+                        });
+                      }}
+                      className="bg-white hover:bg-gray-50 text-[#0F2820] px-6 py-3 rounded-sm font-bold border-2 border-[#D4AF37] transition-all flex items-center gap-2 shadow-md"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                      </svg>
+                      Compartilhar este Pacote
+                    </button>
+                  </div>
               </div>
            </div>
         </div>
