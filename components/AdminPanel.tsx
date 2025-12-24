@@ -1990,18 +1990,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                                    <span className="text-xs font-bold truncate pr-2">{room.name}</span>
                                                    <div className="flex items-center w-24">
                                                        <span className="text-xs text-gray-400 mr-1">R$</span>
-                                                       <input 
-                                                          type="number"
-                                                          value={rp ? rp.price : 0}
-                                                          onChange={(e) => {
-                                                              const val = Number(e.target.value);
-                                                              const newPrices = pkg.roomPrices.filter(p => p.roomId !== room.id);
-                                                              if (val > 0) newPrices.push({ roomId: room.id, price: val });
-                                                              handleUpdatePackage(pkg.id, { roomPrices: newPrices });
-                                                          }}
-                                                          className="w-full text-xs font-bold outline-none text-right"
-                                                          placeholder="0"
-                                                       />
+                                                       <span className="text-xs font-bold text-gray-700">
+                                                          {rp ? rp.price.toLocaleString('pt-BR') : '0'}
+                                                       </span>
                                                    </div>
                                                </div>
                                            );
