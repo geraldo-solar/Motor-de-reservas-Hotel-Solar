@@ -43,6 +43,46 @@ const formatDateLocal = (dateString: string) => {
   return `${day}/${month}/${year}`;
 };
 
+// --- HELPER: Compress image to reduce file size ---
+const compressImage = (file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Calculate new dimensions
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to base64 with compression
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+};
+
 export const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -1616,18 +1656,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                    type="file" 
                                    accept="image/*" 
                                    className="hidden"
-                                   onChange={(e) => {
-                                     const file = e.target.files?.[0];
-                                     if (file) {
-                                       const reader = new FileReader();
-                                       reader.onloadend = () => {
-                                         const newImages = [...currentImages];
-                                         newImages[index] = reader.result as string;
-                                         setNewRoom({...newRoom, imageUrls: newImages.filter(img => img), imageUrl: newImages[0] || ''} as any);
-                                       };
-                                       reader.readAsDataURL(file);
-                                     }
-                                   }}
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      try {
+                                        // Compress image before saving
+                                        const compressedImage = await compressImage(file, 1200, 0.8);
+                                        const newImages = [...currentImages];
+                                        newImages[index] = compressedImage;
+                                        setNewRoom({...newRoom, imageUrls: newImages.filter(img => img), imageUrl: newImages[0] || ''} as any);
+                                      } catch (error) {
+                                        console.error('Error compressing image:', error);
+                                        alert('Erro ao processar imagem. Tente novamente.');
+                                      }
+                                    }
+                                  }}
                                  />
                                </label>
                                {imageUrl && (
@@ -1805,16 +1848,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                      type="file" 
                                      accept="image/*" 
                                      className="hidden"
-                                     onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                           const reader = new FileReader();
-                                           reader.onloadend = () => {
-                                              setNewPackage({...newPackage, imageUrl: reader.result as string});
-                                           };
-                                           reader.readAsDataURL(file);
-                                        }
-                                     }}
+                                    onChange={async (e) => {
+                                       const file = e.target.files?.[0];
+                                       if (file) {
+                                          try {
+                                             const compressedImage = await compressImage(file, 1200, 0.8);
+                                             setNewPackage({...newPackage, imageUrl: compressedImage});
+                                          } catch (error) {
+                                             console.error('Error compressing image:', error);
+                                             alert('Erro ao processar imagem. Tente novamente.');
+                                          }
+                                       }
+                                    }}
                                   />
                                </label>
                                {newPackage.imageUrl && (
@@ -2022,16 +2067,18 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                       type="file" 
                                       accept="image/*" 
                                       className="hidden"
-                                      onChange={(e) => {
-                                         const file = e.target.files?.[0];
-                                         if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                               setNewExtra({...newExtra, imageUrl: reader.result as string});
-                                            };
-                                            reader.readAsDataURL(file);
-                                         }
-                                      }}
+                                     onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                           try {
+                                              const compressedImage = await compressImage(file, 800, 0.8);
+                                              setNewExtra({...newExtra, imageUrl: compressedImage});
+                                           } catch (error) {
+                                              console.error('Error compressing image:', error);
+                                              alert('Erro ao processar imagem. Tente novamente.');
+                                           }
+                                        }
+                                     }}
                                    />
                                 </label>
                                 {newExtra.imageUrl && (
