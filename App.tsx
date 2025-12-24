@@ -689,23 +689,21 @@ const App: React.FC = () => {
 
   const selectedNights = calculateNights();
 
-  // Handle hash navigation to packages
+  // Handle hash navigation to specific package
   useEffect(() => {
     const hash = window.location.hash;
     console.log('[HASH] Current hash:', hash);
     
-    // Check if hash contains #pacotes
-    if (hash.includes('#pacotes') && !isLoadingData) {
-      console.log('[HASH] Navigating to packages view');
+    // Check if hash contains package ID
+    if (hash.startsWith('#package-') && !isLoadingData) {
+      const packageId = hash.replace('#package-', '');
+      console.log('[HASH] Package ID found:', packageId);
+      
+      // Navigate to packages view
       setCurrentView(ViewState.PACKAGES);
       
-      // Check if there's a specific package ID
-      const packageMatch = hash.match(/#package-([^#]+)/);
-      if (packageMatch && packageMatch[1]) {
-        const packageId = packageMatch[1];
-        console.log('[HASH] Package ID found:', packageId);
-        setSelectedPackageId(packageId);
-      }
+      // Set package ID for scroll
+      setSelectedPackageId(packageId);
     }
   }, [isLoadingData]);
 
@@ -1461,7 +1459,7 @@ const App: React.FC = () => {
                   <div className="flex justify-center mt-4">
                     <button
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/#pacotes#package-${pkg.id}`;
+                        const shareUrl = `${window.location.origin}/#package-${pkg.id}`;
                         navigator.clipboard.writeText(shareUrl).then(() => {
                           alert(`Link do pacote copiado!\n\n${shareUrl}\n\nEnvie este link para compartilhar o pacote "${pkg.name}".`);
                         }).catch(err => {
