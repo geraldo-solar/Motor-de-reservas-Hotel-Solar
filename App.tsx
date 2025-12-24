@@ -476,6 +476,10 @@ const App: React.FC = () => {
          
          console.log(`[PACKAGE SYNC] Processing package "${pkg.name}" from ${pkg.startIsoDate} to ${pkg.endIsoDate}`);
          
+         // Calculate number of nights in the package
+         const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+         console.log(`[PACKAGE SYNC] Package has ${nights} nights`);
+         
          // For each room price in the package
          for (const roomPrice of pkg.roomPrices) {
            const roomIndex = updatedRooms.findIndex(r => r.id === roomPrice.roomId);
@@ -484,7 +488,10 @@ const App: React.FC = () => {
            const room = updatedRooms[roomIndex];
            let overrides = room.overrides || [];
            
-           console.log(`[PACKAGE SYNC] Syncing room "${room.name}" with price ${roomPrice.price}`);
+           // Calculate price per night (divide total package price by number of nights)
+           const pricePerNight = Math.round(roomPrice.price / nights);
+           
+           console.log(`[PACKAGE SYNC] Syncing room "${room.name}" - Total: ${roomPrice.price}, Nights: ${nights}, Per Night: ${pricePerNight}`);
            
            // Create overrides for each date in the package period
            const currentDate = new Date(startDate);
@@ -498,13 +505,13 @@ const App: React.FC = () => {
              const existingIndex = overrides.findIndex(o => o.dateIso === dateStr);
              
              if (existingIndex >= 0) {
-               // Update existing override
-               overrides[existingIndex].price = roomPrice.price;
+               // Update existing override with price per night
+               overrides[existingIndex].price = pricePerNight;
              } else {
-               // Create new override
+               // Create new override with price per night
                overrides.push({
                  dateIso: dateStr,
-                 price: roomPrice.price,
+                 price: pricePerNight,
                  availableQuantity: room.totalQuantity
                });
              }
