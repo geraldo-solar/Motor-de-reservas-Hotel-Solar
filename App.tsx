@@ -152,6 +152,7 @@ const App: React.FC = () => {
 
   // Loading state
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [packageFromUrlProcessed, setPackageFromUrlProcessed] = useState(false);
 
   // Check URL parameters for pre-selected date
   useEffect(() => {
@@ -683,10 +684,13 @@ const App: React.FC = () => {
 
   // Handle package parameter from URL (after activePackages is defined)
   useEffect(() => {
+    // Only process once
+    if (packageFromUrlProcessed) return;
+    
     const params = new URLSearchParams(window.location.search);
     const packageParam = params.get('package');
     
-    console.log('[URL PACKAGE] Checking:', { packageParam, activePackagesCount: activePackages.length, isLoadingData });
+    console.log('[URL PACKAGE] Checking:', { packageParam, activePackagesCount: activePackages.length, isLoadingData, processed: packageFromUrlProcessed });
     
     if (packageParam && activePackages.length > 0 && !isLoadingData) {
       console.log('[URL PACKAGE] Looking for package:', packageParam);
@@ -698,12 +702,15 @@ const App: React.FC = () => {
         setSelectedPackage(pkg);
         setSelectedPackageId(pkg.id);
         setCurrentView(ViewState.PACKAGES);
+        setPackageFromUrlProcessed(true);
       } else {
         console.error('[URL PACKAGE] Package NOT found with ID:', packageParam);
         console.error('[URL PACKAGE] Package may be inactive or does not exist');
+        // Mark as processed even if not found to avoid infinite loop
+        setPackageFromUrlProcessed(true);
       }
     }
-  }, [activePackages, isLoadingData]);
+  }, [activePackages, isLoadingData, packageFromUrlProcessed]);
 
   // Helper to get package on a specific date
   const getPackageOnDate = (date: Date) => {
