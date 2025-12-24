@@ -103,15 +103,22 @@ const App: React.FC = () => {
   // Scroll automático para o pacote selecionado
   useEffect(() => {
     if (currentView === ViewState.PACKAGES && selectedPackageId) {
-      // Aguardar renderização completa
+      console.log('[SCROLL] Attempting to scroll to package:', selectedPackageId);
+      // Aguardar renderização completa (aumentado para 800ms)
       setTimeout(() => {
-        const element = document.getElementById(`package-${selectedPackageId}`);
+        const elementId = `package-${selectedPackageId}`;
+        console.log('[SCROLL] Looking for element:', elementId);
+        const element = document.getElementById(elementId);
         if (element) {
+          console.log('[SCROLL] Element found! Scrolling...');
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
           // Limpar o ID após o scroll
-          setSelectedPackageId(null);
+          setTimeout(() => setSelectedPackageId(null), 1000);
+        } else {
+          console.error('[SCROLL] Element NOT found:', elementId);
+          console.error('[SCROLL] Available elements:', Array.from(document.querySelectorAll('[id^="package-"]')).map(el => el.id));
         }
-      }, 300);
+      }, 800);
     }
   }, [currentView, selectedPackageId]);
   
