@@ -1150,7 +1150,17 @@ const App: React.FC = () => {
                             min="0"
                             max={room.totalQuantity || 10}
                             value={roomQuantities[room.id] || 0}
+                            onFocus={(e) => {
+                              if (!checkIn || !checkOut) {
+                                e.target.blur();
+                                alert("Por favor, selecione as datas de Check-in e Check-out no calendário antes de adicionar um quarto.");
+                                setTimeout(() => {
+                                  calendarSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 100);
+                              }
+                            }}
                             onChange={(e) => {
+                              if (!checkIn || !checkOut) return;
                               const val = parseInt(e.target.value) || 0;
                               const max = room.totalQuantity || 10;
                               setRoomQuantities({...roomQuantities, [room.id]: Math.min(Math.max(0, val), max)});
@@ -1159,6 +1169,13 @@ const App: React.FC = () => {
                           />
                           <button
                             onClick={() => {
+                              if (!checkIn || !checkOut) {
+                                alert("Por favor, selecione as datas de Check-in e Check-out no calendário antes de adicionar um quarto.");
+                                setTimeout(() => {
+                                  calendarSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }, 100);
+                                return;
+                              }
                               const current = roomQuantities[room.id] || 0;
                               const max = room.totalQuantity || 10;
                               if (current < max) {
@@ -1467,6 +1484,13 @@ const App: React.FC = () => {
               </button>
               <button
                  onClick={() => {
+                     if (!checkIn || !checkOut) {
+                       alert("Por favor, selecione as datas de Check-in e Check-out no calendário antes de finalizar a reserva.");
+                       setTimeout(() => {
+                         calendarSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                       }, 100);
+                       return;
+                     }
                      setCurrentView(ViewState.BOOKING);
                      window.scrollTo({ top: 0, behavior: 'smooth' });
                  }}
