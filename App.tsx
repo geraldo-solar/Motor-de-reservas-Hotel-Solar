@@ -196,16 +196,17 @@ const App: React.FC = () => {
       }
     }
     
-    // Handle package parameter
-    if (packageParam && packages.length > 0) {
+    // Handle package parameter (only after data is loaded)
+    if (packageParam && packages.length > 0 && !isLoadingData) {
       const pkg = packages.find(p => p.id === packageParam);
       if (pkg) {
         console.log('[Opening package from URL]', pkg);
         setSelectedPackage(pkg);
+        setSelectedPackageId(pkg.id);
         setCurrentView(ViewState.PACKAGES);
       }
     }
-  }, [packages]);
+  }, [packages, isLoadingData]);
 
   // Load data from database on mount
   useEffect(() => {
