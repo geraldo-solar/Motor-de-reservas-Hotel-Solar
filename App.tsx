@@ -195,23 +195,7 @@ const App: React.FC = () => {
         }
       }
     }
-    
-    // Handle package parameter (only after data is loaded)
-    console.log('[URL PACKAGE] Checking:', { packageParam, packagesCount: packages.length, isLoadingData });
-    if (packageParam && packages.length > 0 && !isLoadingData) {
-      console.log('[URL PACKAGE] Looking for package:', packageParam);
-      console.log('[URL PACKAGE] Available packages:', packages.map(p => ({ id: p.id, name: p.name })));
-      const pkg = packages.find(p => p.id === packageParam);
-      if (pkg) {
-        console.log('[URL PACKAGE] Package found!', pkg);
-        setSelectedPackage(pkg);
-        setSelectedPackageId(pkg.id);
-        setCurrentView(ViewState.PACKAGES);
-      } else {
-        console.error('[URL PACKAGE] Package NOT found with ID:', packageParam);
-      }
-    }
-  }, [packages, isLoadingData]);
+  }, []);
 
   // Load data from database on mount
   useEffect(() => {
@@ -696,6 +680,30 @@ const App: React.FC = () => {
   };
 
   const selectedNights = calculateNights();
+
+  // Handle package parameter from URL (after activePackages is defined)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const packageParam = params.get('package');
+    
+    console.log('[URL PACKAGE] Checking:', { packageParam, activePackagesCount: activePackages.length, isLoadingData });
+    
+    if (packageParam && activePackages.length > 0 && !isLoadingData) {
+      console.log('[URL PACKAGE] Looking for package:', packageParam);
+      console.log('[URL PACKAGE] Available active packages:', activePackages.map(p => ({ id: p.id, name: p.name, active: p.active })));
+      
+      const pkg = activePackages.find(p => p.id === packageParam);
+      if (pkg) {
+        console.log('[URL PACKAGE] Package found!', pkg);
+        setSelectedPackage(pkg);
+        setSelectedPackageId(pkg.id);
+        setCurrentView(ViewState.PACKAGES);
+      } else {
+        console.error('[URL PACKAGE] Package NOT found with ID:', packageParam);
+        console.error('[URL PACKAGE] Package may be inactive or does not exist');
+      }
+    }
+  }, [activePackages, isLoadingData]);
 
   // Helper to get package on a specific date
   const getPackageOnDate = (date: Date) => {
