@@ -197,13 +197,18 @@ const App: React.FC = () => {
     }
     
     // Handle package parameter (only after data is loaded)
+    console.log('[URL PACKAGE] Checking:', { packageParam, packagesCount: packages.length, isLoadingData });
     if (packageParam && packages.length > 0 && !isLoadingData) {
+      console.log('[URL PACKAGE] Looking for package:', packageParam);
+      console.log('[URL PACKAGE] Available packages:', packages.map(p => ({ id: p.id, name: p.name })));
       const pkg = packages.find(p => p.id === packageParam);
       if (pkg) {
-        console.log('[Opening package from URL]', pkg);
+        console.log('[URL PACKAGE] Package found!', pkg);
         setSelectedPackage(pkg);
         setSelectedPackageId(pkg.id);
         setCurrentView(ViewState.PACKAGES);
+      } else {
+        console.error('[URL PACKAGE] Package NOT found with ID:', packageParam);
       }
     }
   }, [packages, isLoadingData]);
