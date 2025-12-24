@@ -148,6 +148,7 @@ const App: React.FC = () => {
 
   // Refs for scrolling
   const roomsSectionRef = useRef<HTMLDivElement>(null);
+  const calendarSectionRef = useRef<HTMLDivElement>(null);
 
   // Loading state
   const [isLoadingData, setIsLoadingData] = useState(true);
@@ -819,7 +820,10 @@ const App: React.FC = () => {
   const handleAddToBooking = (room: Room) => {
     if (!checkIn || !checkOut) {
         alert("Por favor, selecione as datas de Check-in e Check-out no calendário antes de adicionar um quarto.");
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to calendar section
+        setTimeout(() => {
+          calendarSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
         return;
     }
     
@@ -1577,7 +1581,7 @@ const App: React.FC = () => {
           </section>
 
           {/* Calendar Section */}
-          <section className="relative z-30 -mt-24 px-4 pb-12">
+          <section ref={calendarSectionRef} className="relative z-30 -mt-24 px-4 pb-12">
             {renderCalendar()}
             
             {/* Share Link Button */}
