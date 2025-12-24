@@ -846,6 +846,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleUpdateRoom = () => {
       if (!newRoom.name || !editingRoomId) return;
       const imageUrls = (newRoom as any).imageUrls || [newRoom.imageUrl || ''];
+      console.log('[UPDATE ROOM] Updating room:', editingRoomId);
+      console.log('[UPDATE ROOM] imageUrls:', imageUrls);
+      console.log('[UPDATE ROOM] imageUrls length:', imageUrls.length);
+      console.log('[UPDATE ROOM] First image length:', imageUrls[0]?.length);
       const updatedRooms = rooms.map(r => 
           r.id === editingRoomId 
               ? { 
