@@ -682,35 +682,25 @@ const App: React.FC = () => {
 
   const selectedNights = calculateNights();
 
-  // Handle package parameter from URL (after activePackages is defined)
+  // Handle hash navigation to packages
   useEffect(() => {
-    // Only process once
-    if (packageFromUrlProcessed) return;
+    const hash = window.location.hash;
+    console.log('[HASH] Current hash:', hash);
     
-    const params = new URLSearchParams(window.location.search);
-    const packageParam = params.get('package');
-    
-    console.log('[URL PACKAGE] Checking:', { packageParam, activePackagesCount: activePackages.length, isLoadingData, processed: packageFromUrlProcessed });
-    
-    if (packageParam && activePackages.length > 0 && !isLoadingData) {
-      console.log('[URL PACKAGE] Looking for package:', packageParam);
-      console.log('[URL PACKAGE] Available active packages:', activePackages.map(p => ({ id: p.id, name: p.name, active: p.active })));
+    // Check if hash contains #pacotes
+    if (hash.includes('#pacotes') && !isLoadingData) {
+      console.log('[HASH] Navigating to packages view');
+      setCurrentView(ViewState.PACKAGES);
       
-      const pkg = activePackages.find(p => p.id === packageParam);
-      if (pkg) {
-        console.log('[URL PACKAGE] Package found!', pkg);
-        setSelectedPackage(pkg);
-        setSelectedPackageId(pkg.id);
-        setCurrentView(ViewState.PACKAGES);
-        setPackageFromUrlProcessed(true);
-      } else {
-        console.error('[URL PACKAGE] Package NOT found with ID:', packageParam);
-        console.error('[URL PACKAGE] Package may be inactive or does not exist');
-        // Mark as processed even if not found to avoid infinite loop
-        setPackageFromUrlProcessed(true);
+      // Check if there's a specific package ID
+      const packageMatch = hash.match(/#package-([^#]+)/);
+      if (packageMatch && packageMatch[1]) {
+        const packageId = packageMatch[1];
+        console.log('[HASH] Package ID found:', packageId);
+        setSelectedPackageId(packageId);
       }
     }
-  }, [activePackages, isLoadingData, packageFromUrlProcessed]);
+  }, [isLoadingData]);
 
   // Helper to get package on a specific date
   const getPackageOnDate = (date: Date) => {
@@ -1464,7 +1454,7 @@ const App: React.FC = () => {
                   <div className="flex justify-center mt-4">
                     <button
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/?package=${pkg.id}`;
+                        const shareUrl = `${window.location.origin}/#pacotes#package-${pkg.id}`;
                         navigator.clipboard.writeText(shareUrl).then(() => {
                           alert(`Link do pacote copiado!\n\n${shareUrl}\n\nEnvie este link para compartilhar o pacote "${pkg.name}".`);
                         }).catch(err => {
