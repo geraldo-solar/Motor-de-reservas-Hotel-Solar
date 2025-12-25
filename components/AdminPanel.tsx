@@ -1014,6 +1014,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleUpdatePackage2 = () => {
+      alert('🔵 BOTÃO CLICADO! Função handleUpdatePackage2 foi chamada.');
       console.log('[UPDATE PACKAGE] Starting update...');
       console.log('[UPDATE PACKAGE] newPackage:', newPackage);
       console.log('[UPDATE PACKAGE] editingPackageId:', editingPackageId);
