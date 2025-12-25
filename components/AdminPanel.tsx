@@ -1015,11 +1015,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleUpdatePackage2 = () => {
       try {
-      alert('🔵 BOTÃO CLICADO! Função handleUpdatePackage2 foi chamada.');
       console.log('[UPDATE PACKAGE] Starting update...');
       console.log('[UPDATE PACKAGE] newPackage:', newPackage);
       console.log('[UPDATE PACKAGE] editingPackageId:', editingPackageId);
-      alert('🟠 Após console.logs iniciais');
       
       if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) {
           console.log('[UPDATE PACKAGE] Validation failed!');
@@ -1031,7 +1029,6 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           return;
       }
       
-      alert('🟠 Passou validação, criando updatedPackages...');
       console.log('[UPDATE PACKAGE] Creating updated packages...');
       const updatedPackages = packages.map(p => 
           p.id === editingPackageId 
@@ -1040,7 +1037,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   name: newPackage.name!, 
                   description: newPackage.description || '', 
                   imageUrl: newPackage.imageUrl || '',
-                  includes: (newPackage.includes as unknown as string || '').split(',').map((s:string) => s.trim()).filter((s:string) => s),
+                  includes: Array.isArray(newPackage.includes) 
+                      ? newPackage.includes 
+                      : (typeof newPackage.includes === 'string' ? newPackage.includes.split(',').map((s:string) => s.trim()).filter((s:string) => s) : []),
                   startIsoDate: newPackage.startIsoDate!,
                   endIsoDate: newPackage.endIsoDate!,
                   roomPrices: newPackage.roomPrices || [],
@@ -1051,9 +1050,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       );
       console.log('[UPDATE PACKAGE] Updated packages:', updatedPackages);
       console.log('[UPDATE PACKAGE] Calling onUpdatePackages...');
-      alert('🟡 ANTES de chamar onUpdatePackages');
       onUpdatePackages(updatedPackages);
-      alert('🟢 DEPOIS de chamar onUpdatePackages - Pacote atualizado!');
+      alert('✅ Pacote atualizado com sucesso!');
       console.log('[UPDATE PACKAGE] Resetting state...');
       setIsAddingPackage(false);
       setEditingPackageId(null);
