@@ -460,8 +460,10 @@ const App: React.FC = () => {
   };
 
   const updatePackagesWithHistory = async (newPackages: HolidayPackage[]) => {
+     alert('🔵 updatePackagesWithHistory INICIADA');
      saveCheckpoint();
      setPackages(newPackages);
+     alert('🟣 Estado setPackages atualizado');
      
      // Sync package prices with room overrides automatically
      try {
@@ -582,7 +584,9 @@ const App: React.FC = () => {
        }
      } catch (error) {
        console.error('Error syncing packages with Postgres:', error);
+       alert('❌ ERRO ao sincronizar com banco: ' + error);
      }
+     alert('✅ updatePackagesWithHistory CONCLUÍDA');
   };
 
   const updateDiscountsWithHistory = async (newDiscounts: DiscountCode[]) => {
