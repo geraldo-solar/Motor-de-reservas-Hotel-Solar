@@ -1013,7 +1013,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleUpdatePackage2 = () => {
-      if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) return;
+      if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) {
+          alert('Preencha todos os campos obrigatórios: Nome, Data de Início e Data de Fim.');
+          return;
+      }
       
       const updatedPackages = packages.map(p => 
           p.id === editingPackageId 
