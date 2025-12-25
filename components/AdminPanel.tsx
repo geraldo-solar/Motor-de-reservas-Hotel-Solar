@@ -1048,6 +1048,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       console.log('[UPDATE PACKAGE] Updated packages:', updatedPackages);
       console.log('[UPDATE PACKAGE] Calling onUpdatePackages...');
       onUpdatePackages(updatedPackages);
+      alert('✅ Pacote atualizado com sucesso! A página será recarregada.');
       console.log('[UPDATE PACKAGE] Resetting state...');
       setIsAddingPackage(false);
       setEditingPackageId(null);
