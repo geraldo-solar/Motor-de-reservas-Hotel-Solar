@@ -1014,10 +1014,12 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleUpdatePackage2 = () => {
+      try {
       alert('🔵 BOTÃO CLICADO! Função handleUpdatePackage2 foi chamada.');
       console.log('[UPDATE PACKAGE] Starting update...');
       console.log('[UPDATE PACKAGE] newPackage:', newPackage);
       console.log('[UPDATE PACKAGE] editingPackageId:', editingPackageId);
+      alert('🟠 Após console.logs iniciais');
       
       if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) {
           console.log('[UPDATE PACKAGE] Validation failed!');
@@ -1029,6 +1031,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           return;
       }
       
+      alert('🟠 Passou validação, criando updatedPackages...');
       console.log('[UPDATE PACKAGE] Creating updated packages...');
       const updatedPackages = packages.map(p => 
           p.id === editingPackageId 
@@ -1055,6 +1058,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
       setIsAddingPackage(false);
       setEditingPackageId(null);
       setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [], roomPrices: [], includes: [] });
+      } catch (error) {
+          alert('❌ ERRO: ' + error);
+          console.error('[UPDATE PACKAGE] Error:', error);
+      }
   };
 
   const handleCancelEditPackage = () => {
