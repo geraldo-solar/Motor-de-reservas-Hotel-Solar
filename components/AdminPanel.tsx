@@ -164,6 +164,7 @@ const GeneralMapCalendar: React.FC<{
   const [bulkStart, setBulkStart] = useState('');
   const [bulkEnd, setBulkEnd] = useState('');
   const [bulkRoomId, setBulkRoomId] = useState('all');
+  const [dateSelectionMode, setDateSelectionMode] = useState(false); // Modo de seleção de datas por clique
   
   // Price Logic
   const [bulkPrice, setBulkPrice] = useState<string>('');
@@ -194,6 +195,32 @@ const GeneralMapCalendar: React.FC<{
 
   const handlePrev = () => setCurrentDate(new Date(year, month - 1, 1));
   const handleNext = () => setCurrentDate(new Date(year, month + 1, 1));
+
+  // Função para selecionar datas clicando no calendário
+  const handleDateClick = (isoDate: string) => {
+      if (!dateSelectionMode) return; // Só funciona se o modo estiver ativo
+      
+      if (!bulkStart || (bulkStart && bulkEnd)) {
+          // Primeira seleção ou reiniciar seleção
+          setBulkStart(isoDate);
+          setBulkEnd('');
+      } else if (bulkStart && !bulkEnd) {
+          // Segunda seleção - definir fim
+          const start = new Date(bulkStart);
+          const end = new Date(isoDate);
+          
+          if (end < start) {
+              // Se a data final for antes da inicial, inverte
+              setBulkStart(isoDate);
+              setBulkEnd(bulkStart);
+          } else {
+              setBulkEnd(isoDate);
+          }
+          
+          // Desativa o modo de seleção após selecionar ambas as datas
+          setDateSelectionMode(false);
+      }
+  };
 
   const handleBulkApply = () => {
      if (!bulkStart || !bulkEnd) {
@@ -287,6 +314,24 @@ const GeneralMapCalendar: React.FC<{
               <div className="space-y-1">
                  <label className="text-[10px] font-bold uppercase text-gray-500">Fim</label>
                  <input type="date" value={bulkEnd} onChange={e => setBulkEnd(e.target.value)} className={inputStyle} />
+              </div>
+              
+              {/* Botão para ativar seleção de datas por clique */}
+              <div className="col-span-1 md:col-span-2 lg:col-span-4">
+                 <button
+                    type="button"
+                    onClick={() => setDateSelectionMode(!dateSelectionMode)}
+                    className={`w-full px-4 py-2 rounded font-medium text-xs transition ${
+                       dateSelectionMode 
+                          ? 'bg-[#D4AF37] text-[#0F2820] shadow-lg border-2 border-[#0F2820]' 
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border border-gray-300'
+                    }`}
+                 >
+                    {dateSelectionMode 
+                       ? '👆 CLIQUE NO CALENDÁRIO para selecionar ' + (!bulkStart ? 'DATA INICIAL' : !bulkEnd ? 'DATA FINAL' : 'NOVA DATA INICIAL')
+                       : '📅 Selecionar Datas Clicando no Calendário'
+                    }
+                 </button>
               </div>
               
               {/* Weekday Selector */}
@@ -538,20 +583,34 @@ const GeneralMapCalendar: React.FC<{
                           });
                       };
 
+                      // Verificar se esta data está no intervalo selecionado
+                      const isInSelectedRange = bulkStart && bulkEnd && isoDate >= bulkStart && isoDate <= bulkEnd;
+                      const isStartDate = isoDate === bulkStart;
+                      const isEndDate = isoDate === bulkEnd;
+                      
                       return (
                         <div 
                           key={`${room.id}-${day}`} 
-                          className={`${cellStyle} ${isClosed ? 'bg-red-900/30 border-red-800/50' : ''}`}
+                          className={`${cellStyle} ${isClosed ? 'bg-red-900/30 border-red-800/50' : ''} ${
+                             dateSelectionMode ? 'cursor-pointer hover:ring-2 hover:ring-[#D4AF37]' : ''
+                          } ${
+                             isInSelectedRange ? 'bg-[#D4AF37]/20 border-[#D4AF37]' : ''
+                          } ${
+                             isStartDate || isEndDate ? 'ring-2 ring-[#D4AF37] bg-[#D4AF37]/30' : ''
+                          }`}
+                          onClick={() => dateSelectionMode && handleDateClick(isoDate)}
+                          title={dateSelectionMode ? `Clique para selecionar ${!bulkStart || (bulkStart && bulkEnd) ? 'data inicial' : 'data final'}` : ''}
                         >
                           {/* Price Input */}
                           <div className={`flex items-center gap-0.5 md:gap-1 bg-[#2F3A2F] rounded px-0.5 md:px-1 border border-[#4A5D43] ${isClosed ? 'opacity-50' : ''}`}>
                               <span className="text-[8px] md:text-[9px] text-green-400 font-bold hidden md:inline">R$</span>
                               <input 
                                 type="number"
-                                disabled={override?.isClosed === true}
+                                disabled={override?.isClosed === true || dateSelectionMode}
                                 className="w-full bg-transparent text-[#E5D3B3] text-[10px] md:text-xs font-mono outline-none p-0 md:p-0.5 text-center md:text-left"
                                 value={displayPrice || ''}
                                 onChange={(e) => handleUpdate({ price: Number(e.target.value) })}
+                                onClick={(e) => dateSelectionMode && e.stopPropagation()}
                                 placeholder="0"
                               />
                           </div>
@@ -561,17 +620,25 @@ const GeneralMapCalendar: React.FC<{
                               <span className="text-[8px] md:text-[9px] text-blue-400 font-bold hidden md:inline">QTD</span>
                               <input 
                                 type="number"
-                                disabled={override?.isClosed === true}
+                                disabled={override?.isClosed === true || dateSelectionMode}
                                 className="w-full bg-transparent text-[#E5D3B3] text-[10px] md:text-xs font-mono outline-none p-0 md:p-0.5 text-center md:text-left"
                                 value={displayQty || ''}
                                 onChange={(e) => handleUpdate({ availableQuantity: Number(e.target.value) })}
+                                onClick={(e) => dateSelectionMode && e.stopPropagation()}
                               />
                           </div>
 
                           {/* Restrictions Toggles */}
                           <div className="flex gap-0.5 md:gap-1 mt-0.5 md:mt-1">
                               <button 
-                                onClick={() => handleUpdate({ isClosed: !override?.isClosed })}
+                                onClick={(e) => {
+                                   if (dateSelectionMode) {
+                                      e.stopPropagation();
+                                      return;
+                                   }
+                                   handleUpdate({ isClosed: !override?.isClosed });
+                                }}
+                                disabled={dateSelectionMode}
                                 className={`flex-1 h-4 md:h-5 rounded flex items-center justify-center text-[7px] md:text-[8px] font-bold uppercase transition ${override?.isClosed ? 'bg-red-600 text-white' : 'bg-[#2F3A2F] text-green-500 hover:bg-green-900'}`}
                                 title={override?.isClosed ? "Abrir Vendas" : "Fechar Vendas"}
                                 type="button"
@@ -582,7 +649,14 @@ const GeneralMapCalendar: React.FC<{
                               {!isClosed && (
                                   <>
                                       <button 
-                                      onClick={() => handleUpdate({ noCheckIn: !noCheckIn })}
+                                      onClick={(e) => {
+                                         if (dateSelectionMode) {
+                                            e.stopPropagation();
+                                            return;
+                                         }
+                                         handleUpdate({ noCheckIn: !noCheckIn });
+                                      }}
+                                      disabled={dateSelectionMode}
                                       className={`w-4 md:w-5 h-4 md:h-5 rounded flex items-center justify-center text-[7px] md:text-[8px] font-bold transition ${noCheckIn ? 'bg-orange-500 text-white' : 'bg-[#2F3A2F] text-gray-500 hover:bg-gray-700'}`}
                                       title="Restringir Entrada"
                                       type="button"
@@ -590,7 +664,14 @@ const GeneralMapCalendar: React.FC<{
                                       I
                                       </button>
                                       <button 
-                                      onClick={() => handleUpdate({ noCheckOut: !noCheckOut })}
+                                      onClick={(e) => {
+                                         if (dateSelectionMode) {
+                                            e.stopPropagation();
+                                            return;
+                                         }
+                                         handleUpdate({ noCheckOut: !noCheckOut });
+                                      }}
+                                      disabled={dateSelectionMode}
                                       className={`w-4 md:w-5 h-4 md:h-5 rounded flex items-center justify-center text-[7px] md:text-[8px] font-bold transition ${noCheckOut ? 'bg-red-500 text-white' : 'bg-[#2F3A2F] text-gray-500 hover:bg-gray-700'}`}
                                       title="Restringir Saída"
                                       type="button"
