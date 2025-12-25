@@ -973,8 +973,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           endIsoDate: newPackage.endIsoDate,
           roomPrices: newPackage.roomPrices || [],
           noCheckoutDates: newPackage.noCheckoutDates || [],
-          noCheckInDates: newPackage.noCheckInDates || [],
-          promotionBadge: newPackage.promotionBadge || undefined
+          noCheckInDates: newPackage.noCheckInDates || []
       };
       onUpdatePackages([...packages, pkg]);
       setIsAddingPackage(false);
@@ -1006,8 +1005,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               endIsoDate: pkg.endIsoDate,
               roomPrices: pkg.roomPrices || [],
               noCheckoutDates: pkg.noCheckoutDates || [],
-              noCheckInDates: pkg.noCheckInDates || [],
-              promotionBadge: pkg.promotionBadge || ''
+              noCheckInDates: pkg.noCheckInDates || []
           });
           setEditingPackageId(id);
           setIsAddingPackage(true);
@@ -1029,8 +1027,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   endIsoDate: newPackage.endIsoDate!,
                   roomPrices: newPackage.roomPrices || [],
                   noCheckoutDates: newPackage.noCheckoutDates || [],
-                  noCheckInDates: newPackage.noCheckInDates || [],
-                  promotionBadge: newPackage.promotionBadge || undefined
+                  noCheckInDates: newPackage.noCheckInDates || []
                 }
               : p
       );
@@ -1864,16 +1861,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             placeholder="Café da Manhã, Transfer, etc"
                          />
                       </div>
-                      <div className="md:col-span-2">
-                         <label className={labelStyle}>Badge de Promoção (Opcional)</label>
-                         <input 
-                            value={newPackage.promotionBadge || ''} 
-                            onChange={e => setNewPackage({...newPackage, promotionBadge: e.target.value})} 
-                            className={inputStyle} 
-                            placeholder="Ex: 15% OFF, Promoção Especial, Black Friday"
-                         />
-                         <p className="text-xs text-gray-500 mt-1">💡 Aparecerá no calendário e nos quartos durante o período do pacote</p>
-                      </div>
+
                       <div className="md:col-span-2">
                          <label className={labelStyle}>Imagem do Pacote</label>
                          <div className="space-y-2">

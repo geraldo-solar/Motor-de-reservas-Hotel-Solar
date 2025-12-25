@@ -36,7 +36,6 @@ export interface HolidayPackage {
   roomPrices: { roomId: string; price: number }[]; 
   noCheckoutDates: string[]; 
   noCheckInDates: string[];
-  promotionBadge?: string; // e.g., "15% OFF", "Promoção Especial"
 }
 
 export interface ExtraService {

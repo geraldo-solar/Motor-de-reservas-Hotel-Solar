@@ -1102,15 +1102,8 @@ const App: React.FC = () => {
                     </div>
                     
                    {pkg && !isPast && (
-                      <div className="flex flex-col gap-0.5">
-                         {pkg.promotionBadge && (
-                            <div className="text-[7px] md:text-[10px] font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-1 py-0.5 rounded-sm shadow-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                               🔥 {pkg.promotionBadge}
-                            </div>
-                         )}
-                         <div className={`text-[8px] md:text-xs leading-tight font-medium whitespace-nowrap md:whitespace-normal overflow-hidden text-ellipsis p-0.5 md:p-1 rounded-sm ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}`}>
-                            {pkg.name}
-                         </div>
+                      <div className="text-[8px] md:text-xs leading-tight font-medium whitespace-nowrap md:whitespace-normal overflow-hidden text-ellipsis p-0.5 md:p-1 rounded-sm ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}">
+                         {pkg.name}
                       </div>
                    )}
                    {!pkg && datePromotion && !isPast && (
