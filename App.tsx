@@ -733,6 +733,23 @@ const App: React.FC = () => {
       return room.overrides?.find(o => o.dateIso === iso);
   };
 
+  // Check if room has promotion in selected period
+  const getRoomPromotion = (room: Room): { badge: string; discount: number } | null => {
+     if (!checkIn || !checkOut) return null;
+     
+     let tempDate = new Date(checkIn);
+     const endDate = new Date(checkOut);
+     
+     while (tempDate < endDate) {
+         const override = getRoomOverride(room, tempDate);
+         if (override?.promotionBadge && override?.promotionDiscount) {
+            return { badge: override.promotionBadge, discount: override.promotionDiscount };
+         }
+         tempDate.setDate(tempDate.getDate() + 1);
+     }
+     return null;
+  };
+
   // Calculate Total Price considering daily overrides
   const calculateTotalRoomPrice = (room: Room, applyDiscount: boolean = true) => {
      if (!checkIn || !checkOut) return room.price;
@@ -749,6 +766,11 @@ const App: React.FC = () => {
          if (override?.price === undefined) {
             const day = tempDate.getDay();
             if (day === 5 || day === 6) dailyPrice *= 1.15; // +15% on weekends default
+         }
+         
+         // Apply promotion discount if exists
+         if (applyDiscount && override?.promotionDiscount) {
+            dailyPrice = dailyPrice - (dailyPrice * override.promotionDiscount / 100);
          }
          
          total += dailyPrice;
@@ -1025,6 +1047,18 @@ const App: React.FC = () => {
 
               const pkg = getPackageOnDate(date);
               
+              // Check if any room has promotion on this date
+              let datePromotion: { badge: string; discount: number } | null = null;
+              if (!pkg) { // Only show override promotion if no package
+                for (const room of rooms) {
+                  const override = room.overrides?.find(o => o.dateIso === iso);
+                  if (override?.promotionBadge && override?.promotionDiscount) {
+                    datePromotion = { badge: override.promotionBadge, discount: override.promotionDiscount };
+                    break;
+                  }
+                }
+              }
+              
               // Restrictions styling
               const noCheckIn = restrictedCheckInDates.has(iso);
               const noCheckOut = restrictedCheckOutDates.has(iso);
@@ -1079,6 +1113,11 @@ const App: React.FC = () => {
                          </div>
                       </div>
                    )}
+                   {!pkg && datePromotion && !isPast && (
+                      <div className="text-[7px] md:text-[10px] font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-1 py-0.5 rounded-sm shadow-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                         🔥 {datePromotion.badge}
+                      </div>
+                   )}
                  </div>
               );
            })}
@@ -1111,6 +1150,14 @@ const App: React.FC = () => {
             <RoomImageCarousel room={room} />
             
             <div className="p-6 flex-1 flex flex-col">
+               {(() => {
+                  const promotion = getRoomPromotion(room);
+                  return promotion && (
+                     <div className="mb-2 inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded-sm shadow-sm w-fit">
+                        🔥 {promotion.badge}
+                     </div>
+                  );
+               })()}
                <h3 className="text-xl font-serif text-[#0F2820] mb-2">{room.name}</h3>
                <p className="text-gray-500 text-sm mb-4 line-clamp-2 font-light">{room.description}</p>
                
@@ -1132,7 +1179,7 @@ const App: React.FC = () => {
                                   <span className="text-sm font-bold text-red-500 uppercase tracking-wider">Esgotado</span>
                               ) : (
                                   <div className="flex flex-col">
-                                    {appliedDiscount ? (
+                                    {appliedDiscount || getRoomPromotion(room) ? (
                                       <>
                                         <div className="flex items-baseline gap-1 mb-1">
                                           <span className="text-xs text-red-500 line-through">R$</span>

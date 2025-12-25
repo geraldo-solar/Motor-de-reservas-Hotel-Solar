@@ -174,6 +174,8 @@ const GeneralMapCalendar: React.FC<{
   const [bulkNoCheckIn, setBulkNoCheckIn] = useState<string>('no_change');
   const [bulkNoCheckOut, setBulkNoCheckOut] = useState<string>('no_change');
   const [bulkWeekdays, setBulkWeekdays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]); // 0=Dom, 1=Seg, ..., 6=Sáb
+  const [bulkPromotionDiscount, setBulkPromotionDiscount] = useState<string>('');
+  const [bulkPromotionBadge, setBulkPromotionBadge] = useState<string>('');
 
   const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
   const year = currentDate.getFullYear();
@@ -206,6 +208,8 @@ const GeneralMapCalendar: React.FC<{
      if (bulkIsClosed !== 'no_change') updates.isClosed = bulkIsClosed === 'true';
      if (bulkNoCheckIn !== 'no_change') updates.noCheckIn = bulkNoCheckIn === 'true';
      if (bulkNoCheckOut !== 'no_change') updates.noCheckOut = bulkNoCheckOut === 'true';
+     if (bulkPromotionDiscount !== '') updates.promotionDiscount = Number(bulkPromotionDiscount);
+     if (bulkPromotionBadge !== '') updates.promotionBadge = bulkPromotionBadge;
 
      const hasPriceUpdate = bulkPrice !== '';
      const hasOtherUpdate = Object.keys(updates).length > 0;
@@ -251,6 +255,8 @@ const GeneralMapCalendar: React.FC<{
       setBulkIsClosed('no_change');
       setBulkNoCheckIn('no_change');
       setBulkNoCheckOut('no_change');
+      setBulkPromotionDiscount('');
+      setBulkPromotionBadge('');
   };
 
   // Style constants
@@ -383,6 +389,33 @@ const GeneralMapCalendar: React.FC<{
                     <option value="false">Aberta (Venda)</option>
                     <option value="true">Fechada (Indisponível)</option>
                  </select>
+              </div>
+
+              {/* Promotion Fields */}
+              <div className="space-y-1">
+                 <label className="text-[10px] font-bold uppercase text-gray-500 flex items-center gap-1">
+                    <Percent size={12} className="text-orange-500"/> Desconto %
+                 </label>
+                 <input 
+                    type="number" 
+                    placeholder="Ex: 15" 
+                    value={bulkPromotionDiscount} 
+                    onChange={e => setBulkPromotionDiscount(e.target.value)} 
+                    className={inputStyle}
+                    min="0"
+                    max="100"
+                 />
+              </div>
+
+              <div className="space-y-1">
+                 <label className="text-[10px] font-bold uppercase text-gray-500">Badge Promoção</label>
+                 <input 
+                    type="text" 
+                    placeholder="Ex: 15% OFF" 
+                    value={bulkPromotionBadge} 
+                    onChange={e => setBulkPromotionBadge(e.target.value)} 
+                    className={inputStyle}
+                 />
               </div>
 
               <div className="space-y-1 flex gap-2">

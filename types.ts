@@ -6,6 +6,8 @@ export interface RoomDateOverride {
   noCheckIn?: boolean;
   noCheckOut?: boolean;
   isClosed?: boolean; // New: Closed for sale
+  promotionDiscount?: number; // Percentage discount (e.g., 15 for 15%)
+  promotionBadge?: string; // Badge text (e.g., "15% OFF")
 }
 
 export interface Room {
