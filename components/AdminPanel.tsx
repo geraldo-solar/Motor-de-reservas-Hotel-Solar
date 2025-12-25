@@ -740,6 +740,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
 
   const [isAddingPackage, setIsAddingPackage] = useState(false);
+  const [isUploadingPackageImage, setIsUploadingPackageImage] = useState(false);
   
   const [newPackage, setNewPackage] = useState<Partial<HolidayPackage>>({
     name: '', 
@@ -1887,18 +1888,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                                      type="file" 
                                      accept="image/*" 
                                      className="hidden"
-                                    onChange={async (e) => {
-                                       const file = e.target.files?.[0];
-                                       if (file) {
-                                          try {
-                                             const compressedImage = await compressImage(file, 1200, 0.8);
-                                             setNewPackage({...newPackage, imageUrl: compressedImage});
-                                          } catch (error) {
-                                             console.error('Error compressing image:', error);
-                                             alert('Erro ao processar imagem. Tente novamente.');
-                                          }
-                                       }
-                                    }}
+                                   onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file) {
+                                         try {
+                                            setIsUploadingPackageImage(true);
+                                            const compressedImage = await compressImage(file, 1200, 0.8);
+                                            setNewPackage({...newPackage, imageUrl: compressedImage});
+                                         } catch (error) {
+                                            console.error('Error compressing image:', error);
+                                            alert('Erro ao processar imagem. Tente novamente.');
+                                         } finally {
+                                            setIsUploadingPackageImage(false);
+                                         }
+                                      }
+                                   }}
                                   />
                                </label>
                                {newPackage.imageUrl && (
@@ -1946,10 +1950,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                       )}
                     </div>
                     <div className="flex gap-2 mt-4 justify-end">
-                       {editingPackageId ? (
+                        {editingPackageId ? (
                           <>
                              <button onClick={handleCancelEditPackage} className="px-4 py-2 bg-gray-400 text-white rounded shadow hover:bg-gray-500">Cancelar</button>
-                             <button onClick={handleUpdatePackage2} className="bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Atualizar</button>
+                             <button 
+                                onClick={handleUpdatePackage2} 
+                                disabled={isUploadingPackageImage}
+                                className={`px-6 py-2 rounded shadow ${isUploadingPackageImage ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                             >
+                                {isUploadingPackageImage ? 'Processando imagem...' : 'Atualizar'}
+                             </button>
                           </>
                        ) : (
                           <>
