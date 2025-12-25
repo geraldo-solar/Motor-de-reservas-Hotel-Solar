@@ -1014,11 +1014,21 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleUpdatePackage2 = () => {
+      console.log('[UPDATE PACKAGE] Starting update...');
+      console.log('[UPDATE PACKAGE] newPackage:', newPackage);
+      console.log('[UPDATE PACKAGE] editingPackageId:', editingPackageId);
+      
       if (!newPackage.name || !newPackage.startIsoDate || !newPackage.endIsoDate || !editingPackageId) {
+          console.log('[UPDATE PACKAGE] Validation failed!');
+          console.log('[UPDATE PACKAGE] name:', newPackage.name);
+          console.log('[UPDATE PACKAGE] startIsoDate:', newPackage.startIsoDate);
+          console.log('[UPDATE PACKAGE] endIsoDate:', newPackage.endIsoDate);
+          console.log('[UPDATE PACKAGE] editingPackageId:', editingPackageId);
           alert('Preencha todos os campos obrigatórios: Nome, Data de Início e Data de Fim.');
           return;
       }
       
+      console.log('[UPDATE PACKAGE] Creating updated packages...');
       const updatedPackages = packages.map(p => 
           p.id === editingPackageId 
               ? { 
@@ -1035,7 +1045,10 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                 }
               : p
       );
+      console.log('[UPDATE PACKAGE] Updated packages:', updatedPackages);
+      console.log('[UPDATE PACKAGE] Calling onUpdatePackages...');
       onUpdatePackages(updatedPackages);
+      console.log('[UPDATE PACKAGE] Resetting state...');
       setIsAddingPackage(false);
       setEditingPackageId(null);
       setNewPackage({ name: '', description: '', active: true, imageUrl: 'https://picsum.photos/800/600', startIsoDate: '', endIsoDate: '', noCheckoutDates: [], noCheckInDates: [], roomPrices: [], includes: [] });
