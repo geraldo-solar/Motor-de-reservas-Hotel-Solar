@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { Lock, Settings, Package, BedDouble, Tag, Save, LogOut, Plus, Trash2, AlertTriangle, X, Image as ImageIcon, Sparkles, Wand2, Loader2, CheckSquare, Square, ChevronLeft, ChevronRight, LogIn, Pencil, Calendar as CalendarIcon, BrainCircuit, ShoppingBag, Grid, DollarSign, Users, Ban, RotateCcw, RotateCw, Upload, Layers, ArrowRight, ArrowLeft, RefreshCcw, Percent, FileText, CheckCircle, XCircle, Info, CreditCard, Menu, Edit } from 'lucide-react';
-import { Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, RoomDateOverride, Reservation, ReservationStatus } from '../types';
+import { Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, RoomDateOverride, Reservation, ReservationStatus, Promotion } from '../types';
 import { ADMIN_CREDENTIALS } from '../constants';
 import { processAdminCommand } from '../services/geminiService';
 
@@ -12,12 +12,14 @@ interface AdminPanelProps {
   extras: ExtraService[];
   config: HotelConfig;
   reservations: Reservation[];
+  promotions: Promotion[];
   onUpdateRooms: (rooms: Room[]) => void;
   onUpdatePackages: (packages: HolidayPackage[]) => void;
   onUpdateDiscounts: (discounts: DiscountCode[]) => void;
   onUpdateExtras: (extras: ExtraService[]) => void;
   onUpdateConfig: (config: HotelConfig) => void;
   onUpdateReservationStatus: (id: string, status: ReservationStatus) => void;
+  onUpdatePromotions: (promotions: Promotion[]) => void;
   onLogout: () => void;
   // History Props
   canUndo: boolean;
@@ -938,7 +940,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
           endIsoDate: newPackage.endIsoDate,
           roomPrices: newPackage.roomPrices || [],
           noCheckoutDates: newPackage.noCheckoutDates || [],
-          noCheckInDates: newPackage.noCheckInDates || []
+          noCheckInDates: newPackage.noCheckInDates || [],
+          promotionBadge: newPackage.promotionBadge || undefined
       };
       onUpdatePackages([...packages, pkg]);
       setIsAddingPackage(false);
@@ -964,13 +967,14 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
               name: pkg.name,
               description: pkg.description,
               imageUrl: pkg.imageUrl,
-              includes: pkg.includes.join(', ') as any,
+              includes: pkg.includes,
               active: pkg.active,
-              startIsoDate: pkg.startIsoDate || '',
-              endIsoDate: pkg.endIsoDate || '',
+              startIsoDate: pkg.startIsoDate,
+              endIsoDate: pkg.endIsoDate,
               roomPrices: pkg.roomPrices || [],
               noCheckoutDates: pkg.noCheckoutDates || [],
-              noCheckInDates: pkg.noCheckInDates || []
+              noCheckInDates: pkg.noCheckInDates || [],
+              promotionBadge: pkg.promotionBadge || ''
           });
           setEditingPackageId(id);
           setIsAddingPackage(true);
@@ -992,7 +996,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                   endIsoDate: newPackage.endIsoDate!,
                   roomPrices: newPackage.roomPrices || [],
                   noCheckoutDates: newPackage.noCheckoutDates || [],
-                  noCheckInDates: newPackage.noCheckInDates || []
+                  noCheckInDates: newPackage.noCheckInDates || [],
+                  promotionBadge: newPackage.promotionBadge || undefined
                 }
               : p
       );
@@ -1825,6 +1830,16 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                             className={inputStyle} 
                             placeholder="Café da Manhã, Transfer, etc"
                          />
+                      </div>
+                      <div className="md:col-span-2">
+                         <label className={labelStyle}>Badge de Promoção (Opcional)</label>
+                         <input 
+                            value={newPackage.promotionBadge || ''} 
+                            onChange={e => setNewPackage({...newPackage, promotionBadge: e.target.value})} 
+                            className={inputStyle} 
+                            placeholder="Ex: 15% OFF, Promoção Especial, Black Friday"
+                         />
+                         <p className="text-xs text-gray-500 mt-1">💡 Aparecerá no calendário e nos quartos durante o período do pacote</p>
                       </div>
                       <div className="md:col-span-2">
                          <label className={labelStyle}>Imagem do Pacote</label>

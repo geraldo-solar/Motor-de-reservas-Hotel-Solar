@@ -33,7 +33,8 @@ export interface HolidayPackage {
   endIsoDate: string;   // YYYY-MM-DD
   roomPrices: { roomId: string; price: number }[]; 
   noCheckoutDates: string[]; 
-  noCheckInDates: string[]; 
+  noCheckInDates: string[];
+  promotionBadge?: string; // e.g., "15% OFF", "Promoção Especial"
 }
 
 export interface ExtraService {
@@ -122,4 +123,15 @@ export interface Reservation {
   };
   
   status: ReservationStatus;
+}
+
+export interface Promotion {
+  id: string;
+  name: string;
+  description: string;
+  discountPercentage: number; // e.g., 15 for 15%
+  startDate: string; // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
+  roomIds: string[]; // Empty array = applies to all rooms
+  active: boolean;
 }

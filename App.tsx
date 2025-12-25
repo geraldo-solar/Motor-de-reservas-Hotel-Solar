@@ -8,7 +8,7 @@ import ThankYouPage from './components/ThankYouPageSimple';
 import AdminPanel, { AdminLogin } from './components/AdminPanel';
 import RegulamentoHospedagem from './components/RegulamentoHospedagem';
 import CancelReservationPage from './components/CancelReservationPage';
-import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus } from './types';
+import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus, Promotion } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
 import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2, Tag } from 'lucide-react';
 import { fetchRooms, fetchPackages, fetchExtras, fetchDiscounts, fetchConfig, fetchReservations, createRoom, updateRoom, deleteRoom, createPackage, updatePackage, deletePackage, createExtra, updateExtra, deleteExtra, createDiscount, updateDiscount, deleteDiscount, updateConfig as updateConfigAPI } from './services/apiService';
@@ -131,6 +131,9 @@ const App: React.FC = () => {
 
   // Reservations State (NEW)
   const [reservations, setReservations] = useState<Reservation[]>(INITIAL_RESERVATIONS);
+  
+  // Promotions State
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   // History State for Undo/Redo
   const [past, setPast] = useState<HistoryState[]>([]);
@@ -1064,11 +1067,18 @@ const App: React.FC = () => {
                        </div>
                     </div>
                     
-                    {pkg && !isPast && (
-                       <div className={`text-[8px] md:text-xs leading-tight font-medium whitespace-nowrap md:whitespace-normal overflow-hidden text-ellipsis p-0.5 md:p-1 rounded-sm ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}`}>
-                          {pkg.name}
-                       </div>
-                    )}
+                   {pkg && !isPast && (
+                      <div className="flex flex-col gap-0.5">
+                         {pkg.promotionBadge && (
+                            <div className="text-[7px] md:text-[10px] font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-1 py-0.5 rounded-sm shadow-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                               🔥 {pkg.promotionBadge}
+                            </div>
+                         )}
+                         <div className={`text-[8px] md:text-xs leading-tight font-medium whitespace-nowrap md:whitespace-normal overflow-hidden text-ellipsis p-0.5 md:p-1 rounded-sm ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}`}>
+                            {pkg.name}
+                         </div>
+                      </div>
+                   )}
                  </div>
               );
            })}
@@ -1574,11 +1584,13 @@ const App: React.FC = () => {
         extras={extras}
         config={config}
         reservations={reservations} // Pass Reservations
+        promotions={promotions}
         // Pass wrapped functions that include history logic
         onUpdateRooms={updateRoomsWithHistory}
         onUpdatePackages={updatePackagesWithHistory}
         onUpdateDiscounts={updateDiscountsWithHistory}
         onUpdateExtras={updateExtrasWithHistory}
+        onUpdatePromotions={setPromotions}
         onUpdateConfig={async (newConfig: HotelConfig) => {
           setConfig(newConfig);
           try {
