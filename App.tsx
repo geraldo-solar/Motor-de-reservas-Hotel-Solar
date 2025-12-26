@@ -1031,13 +1031,13 @@ const App: React.FC = () => {
            <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-full transition"><ChevronRight className="text-[#0F2820]"/></button>
         </div>
 
-        <div className="grid grid-cols-7 gap-2 mb-2">
+        <div className="grid grid-cols-7 gap-2 md:gap-3 mb-3">
            {['DOM','SEG','TER','QUA','QUI','SEX','SÁB'].map(d => (
-              <div key={d} className="text-center text-xs font-bold text-gray-400 tracking-widest">{d}</div>
+              <div key={d} className="text-center text-xs md:text-sm font-bold text-gray-500 tracking-wider">{d}</div>
            ))}
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-2 md:gap-3">
            {Array(firstDay).fill(null).map((_, i) => <div key={`empty-${i}`} />)}
            {Array(daysInMonth).fill(null).map((_, i) => {
               const day = i + 1;
@@ -1086,24 +1086,25 @@ const App: React.FC = () => {
               const noCheckOut = restrictedCheckOutDates.has(iso);
 
               // Styling
-              let bgClass = "bg-white hover:border-[#D4AF37]";
+              let bgClass = "bg-white hover:bg-[#F9F8F6] hover:border-[#D4AF37] hover:shadow-md";
               let textClass = "text-gray-700";
-              let borderClass = "border-gray-200";
+              let borderClass = "border-gray-300";
 
               if (isPast || isBlocked) {
                  bgClass = "bg-gray-100 opacity-50 cursor-not-allowed";
                  textClass = "text-gray-400";
+                 borderClass = "border-gray-200";
               } else if (isSelected) {
-                 bgClass = "bg-[#2F3A2F]"; // Moss Green
+                 bgClass = "bg-[#2F3A2F] shadow-lg"; // Moss Green
                  textClass = "text-[#E5D3B3] font-bold"; // Sand
                  borderClass = "border-[#2F3A2F]";
               } else if (inRange) {
-                 bgClass = "bg-[#2F3A2F]"; // Moss Green Solid
+                 bgClass = "bg-[#2F3A2F] shadow-lg"; // Moss Green Solid
                  textClass = "text-[#E5D3B3] font-bold"; // Sand
                  borderClass = "border-[#2F3A2F]";
               } else if (pkg) {
-                 bgClass = "bg-[#F3E5AB]/30"; // Light Gold
-                 borderClass = "border-[#D4AF37]/50";
+                 bgClass = "bg-[#F3E5AB]/40 hover:bg-[#F3E5AB]/60"; // Light Gold
+                 borderClass = "border-[#D4AF37]/60";
               }
 
               return (
@@ -1111,12 +1112,12 @@ const App: React.FC = () => {
                    key={day}
                    onClick={() => !isPast && !isBlocked && handleDateClick(day)}
                    className={`
-                      h-12 md:h-20 border rounded-sm p-1 md:p-2 cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden
+                      min-h-[56px] md:h-20 border-2 rounded-lg p-2 md:p-2 cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden active:scale-95
                       ${bgClass} ${textClass} ${borderClass}
                    `}
                 >
                     <div className="flex justify-between items-start">
-                       <span className={`text-sm md:text-lg leading-none ${isSelected || inRange ? 'text-[#E5D3B3]' : ''}`}>{day}</span>
+                       <span className={`text-base md:text-lg font-bold leading-none ${isSelected || inRange ? 'text-[#E5D3B3]' : ''}`}>{day}</span>
                        <div className="flex gap-0.5">
                           {noCheckIn && !isPast && <span title="Sem check-in" className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-orange-400"></span>}
                           {noCheckOut && !isPast && <span title="Sem check-out" className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-red-400"></span>}
@@ -1124,12 +1125,12 @@ const App: React.FC = () => {
                     </div>
                     
                    {pkg && !isPast && (
-                      <div className="text-[8px] md:text-xs leading-tight font-medium break-words p-0.5 md:p-1 rounded-sm ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}">
+                      <div className="text-[10px] md:text-xs leading-tight font-semibold break-words p-1 md:p-1 rounded-md ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}">
                          {pkg.name}
                       </div>
                    )}
                    {!pkg && datePromotion && !isPast && (
-                      <div className="text-[7px] md:text-[10px] font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-1 py-0.5 rounded-sm shadow-sm break-words leading-tight">
+                      <div className="text-[9px] md:text-[10px] font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-1.5 py-0.5 rounded-md shadow-sm break-words leading-tight">
                          🔥 {datePromotion.badge}
                       </div>
                    )}
