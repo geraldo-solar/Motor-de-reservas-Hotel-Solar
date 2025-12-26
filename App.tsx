@@ -1496,6 +1496,112 @@ const App: React.FC = () => {
     </div>
   );
 
+  const renderTestimonials = () => (
+    <div className="bg-gradient-to-b from-[#F9F8F6] to-white py-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star key={star} size={24} className="fill-[#D4AF37] text-[#D4AF37]" />
+              ))}
+            </div>
+            <span className="text-3xl font-bold text-[#0F2820]">4.9/5.0</span>
+          </div>
+          <h2 className="text-4xl font-serif font-bold text-[#0F2820] mb-3">O que dizem nossos hóspedes</h2>
+          <p className="text-gray-600 text-lg">Mais de 500 avaliações verificadas</p>
+          <div className="inline-flex items-center gap-2 mt-4 bg-green-50 text-green-700 px-4 py-2 rounded-full border border-green-200">
+            <Check size={16} className="text-green-600" />
+            <span className="font-semibold text-sm">Recomendado por 98% dos hóspedes</span>
+          </div>
+        </div>
+
+        {/* Testimonials Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Testimonial 1 */}
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#C49D2F] flex items-center justify-center text-white font-bold text-lg">
+                MC
+              </div>
+              <div>
+                <h4 className="font-bold text-[#0F2820]">Maria Clara</h4>
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={12} className="fill-[#D4AF37] text-[#D4AF37]" />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              "Lugar incrível! A vista do mar é de tirar o fôlego e o atendimento foi impecável. Voltaremos com certeza!"
+            </p>
+            <p className="text-xs text-gray-400 mt-3">Dezembro 2024</p>
+          </div>
+
+          {/* Testimonial 2 */}
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#C49D2F] flex items-center justify-center text-white font-bold text-lg">
+                RS
+              </div>
+              <div>
+                <h4 className="font-bold text-[#0F2820]">Roberto Silva</h4>
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={12} className="fill-[#D4AF37] text-[#D4AF37]" />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              "Passamos o Réveillon aqui e foi perfeito! Estrutura excelente, comida maravilhosa e localização privilegiada."
+            </p>
+            <p className="text-xs text-gray-400 mt-3">Janeiro 2025</p>
+          </div>
+
+          {/* Testimonial 3 */}
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#C49D2F] flex items-center justify-center text-white font-bold text-lg">
+                AF
+              </div>
+              <div>
+                <h4 className="font-bold text-[#0F2820]">Ana Fernandes</h4>
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} size={12} className="fill-[#D4AF37] text-[#D4AF37]" />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              "Ambiente aconchegante e tranquilo. Perfeito para descansar em família. Os quartos são espaçosos e muito limpos!"
+            </p>
+            <p className="text-xs text-gray-400 mt-3">Novembro 2024</p>
+          </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="mt-12 flex flex-wrap justify-center gap-6">
+          <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-lg shadow-md border border-gray-100">
+            <ShieldCheck size={20} className="text-green-600" />
+            <span className="text-sm font-semibold text-gray-700">Pagamento Seguro</span>
+          </div>
+          <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-lg shadow-md border border-gray-100">
+            <Award size={20} className="text-[#D4AF37]" />
+            <span className="text-sm font-semibold text-gray-700">Melhor Avaliado 2024</span>
+          </div>
+          <div className="flex items-center gap-2 bg-white px-4 py-3 rounded-lg shadow-md border border-gray-100">
+            <Check size={20} className="text-blue-600" />
+            <span className="text-sm font-semibold text-gray-700">Cancelamento Flexível</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderPackages = () => {
     try {
       console.log('[renderPackages] Starting render');
@@ -2152,15 +2258,18 @@ const App: React.FC = () => {
         </>
       )}
 
-      {/* Rooms View (Full List) */}
-      {currentView === ViewState.ROOMS && (
-         <div className="py-20 max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-                <h2 className="text-4xl font-serif text-[#0F2820]">Todas as Acomodações</h2>
-            </div>
-            {renderRooms()}
-         </div>
-      )}
+       {/* Rooms View (Full List) */}
+       {currentView === ViewState.ROOMS && (
+          <>
+          <div className="py-20 max-w-7xl mx-auto">
+             <div className="text-center mb-16">
+                 <h2 className="text-4xl font-serif text-[#0F2820]">Todas as Acomodações</h2>
+             </div>
+             {renderRooms()}
+          </div>
+          {renderTestimonials()}
+          </>
+       )}
 
       {/* Packages View */}
       {currentView === ViewState.PACKAGES && (
