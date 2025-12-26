@@ -133,6 +133,34 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const cpfRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLInputElement>(null);
+  
+  // Auto-save indicator
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  
+  // Load saved data from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('bookingFormData');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setName(data.name || '');
+        setEmail(data.email || '');
+        setPhone(data.phone || '');
+        setCpf(data.cpf || '');
+        setObservations(data.observations || '');
+        console.log('[BookingForm] Loaded saved data from localStorage');
+      } catch (e) {
+        console.error('[BookingForm] Error loading saved data:', e);
+      }
+    }
+  }, []);
+  
+  // Auto-save to localStorage whenever form data changes
+  useEffect(() => {
+    const formData = { name, email, phone, cpf, observations };
+    localStorage.setItem('bookingFormData', JSON.stringify(formData));
+    setLastSaved(new Date());
+  }, [name, email, phone, cpf, observations]);
 
   // Scroll to top on step change
   useEffect(() => {
@@ -355,6 +383,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
       // Add to local state (for backward compatibility)
       onAddReservation(reservation);
       
+      // Clear saved form data from localStorage after successful submission
+      localStorage.removeItem('bookingFormData');
+      console.log('[BookingForm] Cleared saved data from localStorage');
+      
       // Call completion callback to show thank you page
       console.log('DEBUG: About to call onReservationComplete', { reservationId: reservation.id, email, paymentMethod });
       if (onReservationComplete) {
@@ -509,6 +541,14 @@ const BookingForm: React.FC<BookingFormProps> = ({
         </div>
 
         <div className="p-6 md:p-8 space-y-8">
+            {/* Auto-save Indicator */}
+            {lastSaved && (
+              <div className="flex items-center gap-2 text-xs text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
+                <CheckCircle size={14} />
+                <span>Dados salvos automaticamente às {lastSaved.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+              </div>
+            )}
+            
             {/* Main Guest Form */}
             <div className="space-y-4">
                 <h3 className="font-bold text-[#0F2820] uppercase tracking-wide flex items-center gap-2"><User size={20}/> Dados do Hóspede Principal</h3>
@@ -522,7 +562,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
                               type="text" 
                               value={name}
                               onChange={e => setName(e.target.value)}
-                              className={`w-full pl-10 pr-4 py-3 bg-[#F9F8F6] border rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none ${errors.name ? 'border-red-500' : 'border-[#4A5D43]'}`}
+                              className={`w-full pl-10 pr-4 py-3 md:py-3 text-base bg-[#F9F8F6] border rounded-lg focus:ring-2 focus:ring-[#D4AF37] outline-none ${errors.name ? 'border-red-500' : 'border-[#4A5D43]'}`}
                               placeholder="Seu nome completo"
                            />
                         </div>
@@ -610,15 +650,15 @@ const BookingForm: React.FC<BookingFormProps> = ({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">CPF</label>
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase mb-1 block">CPF <span className="text-gray-400 font-normal">(Opcional)</span></label>
                                     <input 
                                         value={guest.cpf}
                                         onChange={(e) => {
                                             const v = e.target.value.replace(/\D/g, '').slice(0, 11);
                                             handleUpdateGuest(index, 'cpf', v.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'));
                                         }}
-                                        className="w-full px-3 py-2 bg-white border border-[#4A5D43] rounded focus:ring-1 focus:ring-[#D4AF37] outline-none text-sm"
-                                        placeholder="000.000.000-00"
+                                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-[#D4AF37] outline-none text-sm"
+                                        placeholder="000.000.000-00 (opcional)"
                                     />
                                 </div>
                                 <div>
