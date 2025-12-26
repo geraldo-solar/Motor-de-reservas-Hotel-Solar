@@ -1306,6 +1306,8 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
                     noCheckIn: updates.noCheckIn !== undefined ? updates.noCheckIn : (currentOverride.noCheckIn ?? false),
                     noCheckOut: updates.noCheckOut !== undefined ? updates.noCheckOut : (currentOverride.noCheckOut ?? false),
                     isClosed: updates.isClosed !== undefined ? updates.isClosed : (currentOverride.isClosed ?? false),
+                    promotionDiscount: updates.promotionDiscount !== undefined ? updates.promotionDiscount : currentOverride.promotionDiscount,
+                    promotionBadge: updates.promotionBadge !== undefined ? updates.promotionBadge : currentOverride.promotionBadge,
                 };
 
                 if (existingIndex >= 0) newOverrides[existingIndex] = merged;
