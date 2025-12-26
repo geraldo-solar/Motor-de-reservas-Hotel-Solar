@@ -785,6 +785,28 @@ const App: React.FC = () => {
      return Math.round(total);
   };
 
+  // Get minimum available quantity during the selected period
+  const getMinAvailableQuantity = (room: Room): number => {
+      if (!checkIn || !checkOut) {
+          return room.totalQuantity;
+      }
+
+      let minQty = room.totalQuantity;
+      let tempDate = new Date(checkIn);
+      const endDate = new Date(checkOut);
+
+      while (tempDate < endDate) {
+          const override = getRoomOverride(room, tempDate);
+          const qty = override?.availableQuantity !== undefined ? override.availableQuantity : room.totalQuantity;
+          
+          if (qty < minQty) minQty = qty;
+          
+          tempDate.setDate(tempDate.getDate() + 1);
+      }
+      
+      return minQty;
+  };
+
   // NEW: Check Availability considering totalQuantity and overrides
   const checkAvailability = (room: Room) => {
       // Basic check if dates not selected: if stock is 0, it's unavailable
@@ -1143,14 +1165,52 @@ const App: React.FC = () => {
             <RoomImageCarousel room={room} />
             
             <div className="p-6 flex-1 flex flex-col">
-               {(() => {
-                  const promotion = getRoomPromotion(room);
-                  return promotion && (
-                     <div className="mb-2 inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded-sm shadow-sm w-fit">
-                        🔥 {promotion.badge}
+               {/* Badges Container */}
+               <div className="flex flex-wrap gap-2 mb-2">
+                  {/* Promotion Badge */}
+                  {(() => {
+                     const promotion = getRoomPromotion(room);
+                     return promotion && (
+                        <div className="inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-1 rounded-sm shadow-sm">
+                           🔥 {promotion.badge}
+                        </div>
+                     );
+                  })()}
+                  
+                  {/* Scarcity Badges */}
+                  {checkIn && checkOut && isAvailable && (() => {
+                     const minQty = getMinAvailableQuantity(room);
+                     
+                     if (minQty === 1) {
+                        return (
+                           <div className="inline-flex items-center gap-1 text-xs font-bold bg-red-600 text-white px-2 py-1 rounded-sm shadow-sm animate-pulse">
+                              🚨 Última unidade!
+                           </div>
+                        );
+                     } else if (minQty === 2) {
+                        return (
+                           <div className="inline-flex items-center gap-1 text-xs font-bold bg-orange-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                              ⚠️ Últimas 2 unidades
+                           </div>
+                        );
+                     } else if (minQty === 3) {
+                        return (
+                           <div className="inline-flex items-center gap-1 text-xs font-bold bg-yellow-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                              ⚠️ Últimas 3 unidades
+                           </div>
+                        );
+                     }
+                     return null;
+                  })()}
+                  
+                  {/* Popular Badge - Show for rooms with id containing "loft" or "suite" (can be customized) */}
+                  {(room.id.toLowerCase().includes('loft') || room.name.toLowerCase().includes('exclusivo')) && (
+                     <div className="inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                        ⭐ Mais reservado
                      </div>
-                  );
-               })()}
+                  )}
+               </div>
+               
                <h3 className="text-xl font-serif text-[#0F2820] mb-2">{room.name}</h3>
                <p className="text-gray-500 text-sm mb-4 line-clamp-2 font-light">{room.description}</p>
                
