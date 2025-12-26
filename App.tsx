@@ -1125,7 +1125,7 @@ const App: React.FC = () => {
                     </div>
                     
                    {pkg && !isPast && (
-                      <div className="text-[10px] md:text-xs leading-tight font-semibold break-words p-1 md:p-1 rounded-md ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}">
+                      <div className="text-[8px] md:text-xs leading-[1.1] font-semibold break-words px-0.5 py-0.5 md:p-1 rounded-md ${inRange || isSelected ? 'text-[#E5D3B3] bg-white/10' : 'text-[#D4AF37] bg-[#F3E5AB]/50'}">
                          {pkg.name}
                       </div>
                    )}
