@@ -1180,26 +1180,60 @@ const App: React.FC = () => {
                   {/* Scarcity Badges */}
                   {checkIn && checkOut && isAvailable && (() => {
                      const minQty = getMinAvailableQuantity(room);
+                     const isSacadaVistaMar = room.name.toLowerCase().includes('sacada') && room.name.toLowerCase().includes('vista');
                      
-                     if (minQty === 1) {
-                        return (
-                           <div className="inline-flex items-center gap-1 text-xs font-bold bg-red-600 text-white px-2 py-1 rounded-sm shadow-sm animate-pulse">
-                              🚨 Última unidade!
-                           </div>
-                        );
-                     } else if (minQty === 2) {
-                        return (
-                           <div className="inline-flex items-center gap-1 text-xs font-bold bg-orange-600 text-white px-2 py-1 rounded-sm shadow-sm">
-                              ⚠️ Últimas 2 unidades
-                           </div>
-                        );
-                     } else if (minQty === 3) {
-                        return (
-                           <div className="inline-flex items-center gap-1 text-xs font-bold bg-yellow-600 text-white px-2 py-1 rounded-sm shadow-sm">
-                              ⚠️ Últimas 3 unidades
-                           </div>
-                        );
+                     // Sacada Vista Mar: Always show scarcity up to 4 units
+                     if (isSacadaVistaMar && minQty <= 4) {
+                        if (minQty === 1) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-red-600 text-white px-2 py-1 rounded-sm shadow-sm animate-pulse">
+                                 🚨 Última unidade!
+                              </div>
+                           );
+                        } else if (minQty === 2) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-orange-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                                 ⚠️ Últimas 2 unidades
+                              </div>
+                           );
+                        } else if (minQty === 3) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-yellow-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                                 ⚠️ Últimas 3 unidades
+                              </div>
+                           );
+                        } else if (minQty === 4) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-yellow-500 text-white px-2 py-1 rounded-sm shadow-sm">
+                                 ⚠️ Últimas 4 unidades
+                              </div>
+                           );
+                        }
                      }
+                     
+                     // Other rooms: Show scarcity only up to 3 units
+                     if (!isSacadaVistaMar) {
+                        if (minQty === 1) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-red-600 text-white px-2 py-1 rounded-sm shadow-sm animate-pulse">
+                                 🚨 Última unidade!
+                              </div>
+                           );
+                        } else if (minQty === 2) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-orange-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                                 ⚠️ Últimas 2 unidades
+                              </div>
+                           );
+                        } else if (minQty === 3) {
+                           return (
+                              <div className="inline-flex items-center gap-1 text-xs font-bold bg-yellow-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                                 ⚠️ Últimas 3 unidades
+                              </div>
+                           );
+                        }
+                     }
+                     
                      return null;
                   })()}
                   
