@@ -1244,6 +1244,16 @@ const App: React.FC = () => {
                         ⭐ Mais reservado
                      </div>
                   )}
+                  
+                  {/* Best Value Badge - Show for cheapest room */}
+                  {(() => {
+                     const cheapestRoom = activeRooms.reduce((min, r) => r.price > 0 && r.price < min.price ? r : min, activeRooms[0]);
+                     return room.id === cheapestRoom?.id && room.price > 0 && (
+                        <div className="inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-green-600 to-emerald-600 text-white px-2 py-1 rounded-sm shadow-sm">
+                           💰 Melhor Custo-Benefício
+                        </div>
+                     );
+                  })()}
                </div>
                
                <h3 className="text-xl font-serif text-[#0F2820] mb-2">{room.name}</h3>
@@ -1273,9 +1283,12 @@ const App: React.FC = () => {
                                           <span className="text-xs text-red-500 line-through">R$</span>
                                           <span className="text-lg font-serif text-red-500 line-through">{totalWithoutDiscount.toLocaleString('pt-BR')}</span>
                                         </div>
-                                        <div className="flex items-baseline gap-1">
+                                        <div className="flex items-baseline gap-1 mb-1">
                                           <span className="text-xs text-[#D4AF37]">R$</span>
                                           <span className="text-2xl font-serif text-[#0F2820]">{totalWithDiscount.toLocaleString('pt-BR')}</span>
+                                        </div>
+                                        <div className="inline-flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-sm mt-1">
+                                          🎉 Economize R$ {(totalWithoutDiscount - totalWithDiscount).toLocaleString('pt-BR')}
                                         </div>
                                       </>
                                     ) : (
