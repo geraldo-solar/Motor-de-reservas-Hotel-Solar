@@ -1162,7 +1162,7 @@ const App: React.FC = () => {
         const isUnavailable = !isAvailable;
 
         return (
-          <div key={room.id} className="group bg-white rounded-sm overflow-hidden shadow-lg border border-transparent hover:border-[#D4AF37] transition-all duration-300 flex flex-col">
+          <div key={room.id} className="group bg-white rounded-sm overflow-hidden shadow-lg border border-transparent hover:border-[#D4AF37] hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 flex flex-col">
             <RoomImageCarousel room={room} />
             
             <div className="p-6 flex-1 flex flex-col">
@@ -1360,7 +1360,7 @@ const App: React.FC = () => {
                             className="w-16 h-10 text-center border border-gray-300 rounded-sm font-bold text-lg"
                           />
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
                               if (!checkIn || !checkOut) {
                                 alert("Por favor, selecione as datas de Check-in e Check-out no calendário antes de adicionar um quarto.");
                                 setTimeout(() => {
@@ -1372,9 +1372,13 @@ const App: React.FC = () => {
                               const max = room.totalQuantity || 10;
                               if (current < max) {
                                 setRoomQuantities({...roomQuantities, [room.id]: current + 1});
+                                // Add success animation
+                                const btn = e.currentTarget;
+                                btn.classList.add('scale-125');
+                                setTimeout(() => btn.classList.remove('scale-125'), 200);
                               }
                             }}
-                            className="w-10 h-10 bg-[#0F2820] hover:bg-[#1a3c30] text-white rounded-sm font-bold text-lg transition"
+                            className="w-10 h-10 bg-[#0F2820] hover:bg-[#1a3c30] text-white rounded-sm font-bold text-lg transition-all duration-200 active:scale-95"
                             type="button"
                           >
                             +
@@ -1411,7 +1415,7 @@ const App: React.FC = () => {
               setRoomQuantities({}); // Reset quantities
               setCurrentView(ViewState.BOOKING); // Ir direto para o formulário
             }}
-            className="bg-[#D4AF37] hover:bg-[#C49D2F] text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition shadow-lg flex items-center gap-3"
+            className="bg-[#D4AF37] hover:bg-[#C49D2F] hover:scale-105 text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center gap-3 active:scale-95"
           >
             Continuar para Reserva
             <ArrowRight className="h-5 w-5" />
@@ -1612,7 +1616,7 @@ const App: React.FC = () => {
                             alert('Erro ao processar seleção: ' + error);
                           }
                         }}
-                        className="bg-[#D4AF37] hover:bg-[#C49D2F] text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition shadow-lg flex items-center gap-3"
+                        className="bg-[#D4AF37] hover:bg-[#C49D2F] hover:scale-105 text-[#0F2820] px-12 py-4 rounded-sm font-bold uppercase text-sm tracking-[0.2em] transition-all duration-300 shadow-lg hover:shadow-2xl flex items-center gap-3 active:scale-95"
                       >
                         Continuar para Reserva
                         <ArrowRight className="h-5 w-5" />
