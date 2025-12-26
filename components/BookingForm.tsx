@@ -415,6 +415,54 @@ const BookingForm: React.FC<BookingFormProps> = ({
   if (step === 1) {
     return (
       <div className="bg-white rounded-lg shadow-2xl overflow-hidden border border-[#D4AF37] animate-in fade-in slide-in-from-bottom-4">
+        {/* Progress Bar */}
+        <div className="bg-[#0F2820] px-4 py-3 border-b border-[#D4AF37]/30">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between relative">
+              {/* Step 1 */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#D4AF37] text-[#0F2820] font-bold flex items-center justify-center text-sm md:text-base shadow-lg">
+                  1
+                </div>
+                <span className="text-[8px] md:text-xs text-[#D4AF37] font-semibold text-center">Revisão</span>
+              </div>
+              
+              {/* Connector Line 1-2 */}
+              <div className="absolute top-4 md:top-5 left-[12.5%] right-[62.5%] h-0.5 bg-gray-600 -z-0"></div>
+              
+              {/* Step 2 */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-700 text-gray-400 font-bold flex items-center justify-center text-sm md:text-base">
+                  2
+                </div>
+                <span className="text-[8px] md:text-xs text-gray-400 font-semibold text-center">Dados</span>
+              </div>
+              
+              {/* Connector Line 2-3 */}
+              <div className="absolute top-4 md:top-5 left-[37.5%] right-[37.5%] h-0.5 bg-gray-600 -z-0"></div>
+              
+              {/* Step 3 */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-700 text-gray-400 font-bold flex items-center justify-center text-sm md:text-base">
+                  3
+                </div>
+                <span className="text-[8px] md:text-xs text-gray-400 font-semibold text-center">Pagamento</span>
+              </div>
+              
+              {/* Connector Line 3-4 */}
+              <div className="absolute top-4 md:top-5 left-[62.5%] right-[12.5%] h-0.5 bg-gray-600 -z-0"></div>
+              
+              {/* Step 4 */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-700 text-gray-400 font-bold flex items-center justify-center text-sm md:text-base">
+                  ✓
+                </div>
+                <span className="text-[8px] md:text-xs text-gray-400 font-semibold text-center">Confirmação</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="bg-[#0F2820] text-white p-6 border-b border-[#D4AF37] flex items-center gap-4">
            {onBackClick && (
            <button 
@@ -532,6 +580,54 @@ const BookingForm: React.FC<BookingFormProps> = ({
   // STEP 2: GUEST DATA & PAYMENT
   return (
     <div className="bg-white rounded-lg shadow-2xl overflow-hidden border border-[#D4AF37] animate-in fade-in slide-in-from-right-8">
+        {/* Progress Bar */}
+        <div className="bg-[#0F2820] px-4 py-3 border-b border-[#D4AF37]/30">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between relative">
+              {/* Step 1 - Completed */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-600 text-white font-bold flex items-center justify-center text-sm md:text-base shadow-lg">
+                  ✓
+                </div>
+                <span className="text-[8px] md:text-xs text-green-400 font-semibold text-center">Revisão</span>
+              </div>
+              
+              {/* Connector Line 1-2 - Completed */}
+              <div className="absolute top-4 md:top-5 left-[12.5%] right-[62.5%] h-0.5 bg-green-600 -z-0"></div>
+              
+              {/* Step 2 - Active */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#D4AF37] text-[#0F2820] font-bold flex items-center justify-center text-sm md:text-base shadow-lg animate-pulse">
+                  2
+                </div>
+                <span className="text-[8px] md:text-xs text-[#D4AF37] font-semibold text-center">Dados</span>
+              </div>
+              
+              {/* Connector Line 2-3 */}
+              <div className="absolute top-4 md:top-5 left-[37.5%] right-[37.5%] h-0.5 bg-gray-600 -z-0"></div>
+              
+              {/* Step 3 */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-700 text-gray-400 font-bold flex items-center justify-center text-sm md:text-base">
+                  3
+                </div>
+                <span className="text-[8px] md:text-xs text-gray-400 font-semibold text-center">Pagamento</span>
+              </div>
+              
+              {/* Connector Line 3-4 */}
+              <div className="absolute top-4 md:top-5 left-[62.5%] right-[12.5%] h-0.5 bg-gray-600 -z-0"></div>
+              
+              {/* Step 4 */}
+              <div className="flex flex-col items-center gap-1 z-10 flex-1">
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gray-700 text-gray-400 font-bold flex items-center justify-center text-sm md:text-base">
+                  ✓
+                </div>
+                <span className="text-[8px] md:text-xs text-gray-400 font-semibold text-center">Confirmação</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="bg-[#0F2820] text-white p-6 border-b border-[#D4AF37] flex items-center gap-4">
            <button onClick={() => setStep(1)} className="hover:bg-white/20 p-2 rounded-full transition"><ChevronLeft/></button>
            <div>
