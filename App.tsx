@@ -10,7 +10,7 @@ import RegulamentoHospedagem from './components/RegulamentoHospedagem';
 import CancelReservationPage from './components/CancelReservationPage';
 import { ViewState, Room, HolidayPackage, DiscountCode, HotelConfig, ExtraService, Reservation, ReservationStatus, Promotion } from './types';
 import { INITIAL_ROOMS, INITIAL_PACKAGES, INITIAL_DISCOUNTS, INITIAL_CONFIG, INITIAL_EXTRAS, INITIAL_RESERVATIONS } from './constants';
-import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2, Tag } from 'lucide-react';
+import { Star, MapPin, Wifi, Droplets, Utensils, Award, ShieldCheck, Calendar as CalendarIcon, ArrowRight, ChevronLeft, ChevronRight, BedDouble, Users, Check, Crown, ShoppingCart, Plus, Minus, Trash2, Tag, Camera, X } from 'lucide-react';
 import { fetchRooms, fetchPackages, fetchExtras, fetchDiscounts, fetchConfig, fetchReservations, createRoom, updateRoom, deleteRoom, createPackage, updatePackage, deletePackage, createExtra, updateExtra, deleteExtra, createDiscount, updateDiscount, deleteDiscount, updateConfig as updateConfigAPI } from './services/apiService';
 
 // Interface for History Snapshot
@@ -25,6 +25,7 @@ interface HistoryState {
 const RoomImageCarousel: React.FC<{ room: Room }> = ({ room }) => {
   const images = room.imageUrls && room.imageUrls.length > 0 ? room.imageUrls : [room.imageUrl];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -37,12 +38,21 @@ const RoomImageCarousel: React.FC<{ room: Room }> = ({ room }) => {
   };
   
   return (
-    <div className="relative h-64 overflow-hidden">
+    <>
+    <div className="relative h-64 overflow-hidden cursor-pointer" onClick={() => setIsLightboxOpen(true)}>
       <img 
         src={images[currentImageIndex]} 
         alt={room.name} 
         className="w-full h-full object-cover transition duration-700 group-hover:scale-110" 
       />
+      
+      {/* Photo Counter */}
+      {images.length > 1 && (
+        <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 text-xs rounded-full shadow-lg z-10 flex items-center gap-1">
+          <Camera size={12} />
+          {currentImageIndex + 1}/{images.length}
+        </div>
+      )}
       
       {/* Badge de capacidade */}
       <div className="absolute bottom-4 left-4 bg-[#0F2820]/90 backdrop-blur-sm text-white px-3 py-1.5 text-xs flex items-center gap-1 rounded-sm shadow-sm border border-[#D4AF37]/30 z-10">
@@ -88,6 +98,67 @@ const RoomImageCarousel: React.FC<{ room: Room }> = ({ room }) => {
         </>
       )}
     </div>
+    
+    {/* Lightbox */}
+    {isLightboxOpen && (
+      <div 
+        className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+        onClick={() => setIsLightboxOpen(false)}
+      >
+        <button
+          onClick={() => setIsLightboxOpen(false)}
+          className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white p-3 rounded-full transition z-50"
+          aria-label="Fechar"
+        >
+          <X size={24} />
+        </button>
+        
+        <div className="relative w-full max-w-6xl" onClick={(e) => e.stopPropagation()}>
+          <img 
+            src={images[currentImageIndex]} 
+            alt={room.name} 
+            className="w-full h-auto max-h-[90vh] object-contain rounded-lg" 
+          />
+          
+          {/* Counter in Lightbox */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-lg">
+            {currentImageIndex + 1} / {images.length}
+          </div>
+          
+          {/* Navigation in Lightbox */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition"
+                aria-label="Imagem anterior"
+              >
+                <ChevronLeft size={32} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentImageIndex((prev) => (prev + 1) % images.length);
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white p-4 rounded-full transition"
+                aria-label="Próxima imagem"
+              >
+                <ChevronRight size={32} />
+              </button>
+            </>
+          )}
+          
+          {/* Room Name */}
+          <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm text-white px-4 py-2 rounded-lg">
+            <h3 className="font-bold text-lg">{room.name}</h3>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 
